@@ -1,9 +1,10 @@
 ELM  ?= elm
+UV   ?= uv
 PORT ?= 8080
 
 ELM_SRC := $(wildcard frontend/src/*.elm)
 
-.PHONY: build run test test-minesweeper clean
+.PHONY: build run test test-minesweeper validar clean
 
 build: frontend/public/elm.js
 
@@ -19,6 +20,9 @@ test:
 
 test-minesweeper:
 	swipl -g run_tests -t halt backend/tests/test_minesweeper_board.pl
+
+validar:
+	$(UV) run scripts/validar_entrega.py
 
 clean:
 	rm -rf frontend/public/elm.js frontend/elm-stuff
