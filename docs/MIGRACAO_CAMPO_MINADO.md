@@ -52,19 +52,20 @@ definir um termo de estado de partida nem abrir uma API de teste.
 com testes em `backend/tests/test_minesweeper_game.pl` e contrato detalhado em
 [MINESWEEPER_GAME.md](MINESWEEPER_GAME.md).
 
-### Frente 03 — API e sessões de Davi
+### Frente 03 — API e sessões
 
-O servidor atual usa `/api/new` e `/api/hint` e inclui semente e solução no fluxo
-de Sudoku. Esses handlers não devem ser adaptados por simples renomeação: o novo
-servidor guarda o estado real da partida e produz uma projeção pública.
+**Implementado na frente 03:** `backend/server.pl` expõe somente a nova API de
+Campo Minado e preserva o serviço de arquivos estáticos. O armazenamento em
+`backend/minesweeper/sessions.pl` guarda o estado real da partida em memória e
+produz apenas a projeção pública do motor.
 
-O contrato planejado usa `POST /api/games`, `GET /api/games/:id` e
-`POST /api/games/:id/actions`. O módulo `minesweeper_game` já aceita ações
-no formato dict JSON e fornece `public_snapshot/3` com o campo `id`, além dos
-erros mapeados para HTTP 400 (`invalid_action`, `invalid_cell`) e HTTP 409
-(`game_over`, `cell_flagged`, `cell_revealed`). Sessões, sincronização de ações e
-expiração ficam nesta frente; `board.pl` e `game.pl` não mantêm estado global
-mutável de partidas. `docs/API.md` será produzido pela frente 03.
+O contrato usa `POST /api/games`, `GET /api/games/:id` e
+`POST /api/games/:id/actions`, documentados em [API.md](API.md). Sessões usam
+UUID v4 opaco, expiram após duas horas, têm limite padrão de 1.000 partidas e
+serializam ações por partida. As suítes `test_minesweeper_sessions.pl` e
+`test_minesweeper_http.pl` cobrem expiração, isolamento, concorrência, erros e
+ausência de vazamento. `board.pl` e `game.pl` continuam sem estado global mutável
+de partidas.
 
 ### Frentes 04 e 05 — cliente e apresentação
 
