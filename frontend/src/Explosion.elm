@@ -1,11 +1,15 @@
-module Explosion exposing (styles, view)
+module Explosion exposing (view)
 
 {-| Animação da bomba pixel-art explodindo em 3D (inspirada no Zachstronaut
-Firebomb), implementada em 100% Elm + CSS puro sem dependências externas de JS.
+Firebomb), implementada em Elm + CSS externo (`frontend/public/style.css`).
+
+Os estilos e o suporte a `@media (prefers-reduced-motion: reduce)` ficam no
+stylesheet externo para evitar divergência de quebras de linha (CRLF/LF) no
+bundle `elm.js` entre ambientes Windows e Linux e respeitar acessibilidade.
 -}
 
-import Html exposing (Html, div, text)
-import Html.Attributes exposing (attribute, class, style)
+import Html exposing (Html, div)
+import Html.Attributes exposing (attribute, class)
 
 
 type alias Pixel =
@@ -16,82 +20,6 @@ type alias Pixel =
     , dy : Int
     , dz : Int
     }
-
-
-styles : Html msg
-styles =
-    Html.node "style"
-        []
-        [ text """
-@keyframes ms-shake {
-  0%, 100% { transform: translate(0, 0); }
-  15% { transform: translate(-8px, -5px) rotate(-1deg); }
-  30% { transform: translate(8px, 4px) rotate(1deg); }
-  45% { transform: translate(-6px, 5px) rotate(-0.5deg); }
-  60% { transform: translate(6px, -4px) rotate(0.5deg); }
-  75% { transform: translate(-3px, 2px); }
-}
-@keyframes ms-flash {
-  0% { opacity: 0.85; }
-  35% { opacity: 0.15; }
-  55% { opacity: 0.6; }
-  100% { opacity: 0; }
-}
-@keyframes ms-pixel-fly {
-  0% {
-    transform: translate3d(0, 0, 0) rotateX(0deg) rotateY(0deg);
-    opacity: 1;
-  }
-  12% {
-    transform: translate3d(0, 0, 0) scale(1.15);
-    opacity: 1;
-  }
-  100% {
-    transform: translate3d(var(--dx), var(--dy), var(--dz)) rotateX(540deg) rotateY(720deg);
-    opacity: 0;
-  }
-}
-@keyframes ms-cell-boom {
-  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 120, 0, 0.9); }
-  40% { transform: scale(1.35); box-shadow: 0 0 24px 8px rgba(255, 60, 0, 0.9); }
-  100% { transform: scale(1); box-shadow: 0 0 10px 2px rgba(220, 38, 38, 0.7); }
-}
-.minesweeper-app--exploded {
-  animation: ms-shake 0.45s ease-out;
-}
-.ms-explosion-overlay {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 9999;
-  overflow: hidden;
-}
-.ms-explosion-flash {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle, rgba(255,234,216,0.95) 0%, rgba(255,102,0,0.5) 45%, transparent 80%);
-  animation: ms-flash 0.5s ease-out forwards;
-}
-.ms-bomb-stage {
-  position: fixed;
-  left: 50%;
-  top: 50%;
-  width: 192px;
-  height: 192px;
-  margin-left: -96px;
-  margin-top: -96px;
-  perspective: 400px;
-}
-.ms-bomb-pixel {
-  position: absolute;
-  width: 12px;
-  height: 12px;
-  animation: ms-pixel-fly 1.35s cubic-bezier(0.18, 0.75, 0.35, 1) forwards;
-}
-.board-cell--exploded {
-  animation: ms-cell-boom 0.5s ease-out forwards;
-}
-""" ]
 
 
 view : Html msg
@@ -106,12 +34,21 @@ viewPixel : Pixel -> Html msg
 viewPixel p =
     div
         [ class "ms-bomb-pixel"
-        , style "left" (String.fromInt p.x ++ "px")
-        , style "top" (String.fromInt p.y ++ "px")
-        , style "background-color" p.color
-        , style "--dx" (String.fromInt p.dx ++ "px")
-        , style "--dy" (String.fromInt p.dy ++ "px")
-        , style "--dz" (String.fromInt p.dz ++ "px")
+        , attribute "style"
+            ("left:"
+                ++ String.fromInt p.x
+                ++ "px;top:"
+                ++ String.fromInt p.y
+                ++ "px;background-color:"
+                ++ p.color
+                ++ ";--dx:"
+                ++ String.fromInt p.dx
+                ++ "px;--dy:"
+                ++ String.fromInt p.dy
+                ++ "px;--dz:"
+                ++ String.fromInt p.dz
+                ++ "px;"
+            )
         ]
         []
 
