@@ -1,30 +1,78 @@
-ELM  ?= elm
-PORT ?= 8080
+SWIPL ?= swipl
+NPM   ?= npm
+PORT  ?= 8080
 
-ELM_SRC := $(wildcard frontend/src/*.elm)
+FRONTEND := frontend
+ELM_BIN  := $(FRONTEND)/node_modules/.bin
 
-.PHONY: build run test test-minesweeper clean
+ELM      ?= $(if $(wildcard $(ELM_BIN)/elm),$(abspath $(ELM_BIN)/elm),elm)
+ELM_TEST ?= $(if $(wildcard $(ELM_BIN)/elm-test),$(abspath $(ELM_BIN)/elm-test),elm-test)
 
-build: frontend/public/elm.js
+ELM_SRC    := $(wildcard $(FRONTEND)/src/*.elm)
+ELM_TESTS  := $(shell find $(FRONTEND)/tests -name '*.elm' 2>/dev/null)
+PL_TESTS   := $(sort $(wildcard backend/tests/test_*.pl))
+MS_TESTS   := $(sort $(wildcard backend/tests/test_minesweeper_*.pl))
+BUNDLE     := $(FRONTEND)/public/elm.js
+BUNDLE_TMP := elm-stuff/elm.check.js
 
-frontend/public/elm.js: $(ELM_SRC) frontend/elm.json
-	cd frontend && $(ELM) make src/Main.elm --optimize --output=public/elm.js
+.PHONY: help deps build run test test-prolog test-minesweeper test-acceptance \
+        test-elm check-bundle ci clean
+
+help:
+	@echo "make deps              instala elm e elm-test fixados (npm ci em frontend/)"
+	@echo "make build             compila $(BUNDLE)"
+	@echo "make run [PORT=8080]   compila e inicia o servidor"
+	@echo "make test              testes Prolog e Elm"
+	@echo "make test-prolog       todas as suítes backend/tests/test_*.pl"
+	@echo "make test-minesweeper  suítes de Campo Minado (sem o legado Sudoku)"
+	@echo "make test-acceptance   fluxos integrados via HTTP"
+	@echo "make test-elm          elm-test em frontend/tests"
+	@echo "make check-bundle      confere se $(BUNDLE) corresponde ao fonte"
+	@echo "make ci                test + check-bundle (o mesmo que o GitHub Actions)"
+
+deps:
+	cd $(FRONTEND) && $(NPM) ci
+
+build: $(BUNDLE)
+
+$(BUNDLE): $(ELM_SRC) $(FRONTEND)/elm.json
+	cd $(FRONTEND) && $(ELM) make src/Main.elm --optimize --output=public/elm.js
 
 run: build
-	swipl backend/server.pl $(PORT)
+	$(SWIPL) backend/server.pl $(PORT)
 
-test:
-	swipl -g run_tests -t halt backend/tests/test_sudoku.pl
-	swipl -g run_tests -t halt backend/tests/test_minesweeper_board.pl
-	swipl -g run_tests -t halt backend/tests/test_minesweeper_game.pl
-	swipl -g run_tests -t halt backend/tests/test_minesweeper_sessions.pl
-	swipl -g run_tests -t halt backend/tests/test_minesweeper_http.pl
+test: test-prolog test-elm
+
+test-prolog:
+	@set -e; for t in $(PL_TESTS); do \
+	  echo "== $$t"; $(SWIPL) -g run_tests -t halt $$t; \
+	done
 
 test-minesweeper:
-	swipl -g run_tests -t halt backend/tests/test_minesweeper_board.pl
-	swipl -g run_tests -t halt backend/tests/test_minesweeper_game.pl
-	swipl -g run_tests -t halt backend/tests/test_minesweeper_sessions.pl
-	swipl -g run_tests -t halt backend/tests/test_minesweeper_http.pl
+	@set -e; for t in $(MS_TESTS); do \
+	  echo "== $$t"; $(SWIPL) -g run_tests -t halt $$t; \
+	done
+
+test-acceptance:
+	$(SWIPL) -g run_tests -t halt backend/tests/test_minesweeper_acceptance.pl
+
+test-elm:
+ifeq ($(strip $(ELM_TESTS)),)
+	@echo "== elm-test: nenhum teste em $(FRONTEND)/tests (frentes 04/05); nada a executar"
+else
+	cd $(FRONTEND) && $(ELM_TEST) --compiler $(ELM)
+endif
+
+check-bundle:
+	@cd $(FRONTEND) && $(ELM) make src/Main.elm --optimize --output=$(BUNDLE_TMP) >/dev/null
+	@if cmp -s $(FRONTEND)/$(BUNDLE_TMP) $(BUNDLE); then \
+	  echo "== $(BUNDLE) corresponde ao fonte Elm"; \
+	else \
+	  echo "ERRO: $(BUNDLE) não corresponde ao fonte. Rode 'make build' e versione o resultado."; \
+	  exit 1; \
+	fi
+
+ci: test check-bundle
 
 clean:
-	rm -rf frontend/public/elm.js frontend/elm-stuff
+	rm -rf $(BUNDLE) $(FRONTEND)/elm-stuff
