@@ -48,42 +48,53 @@ Todo PR deve ser revisado e aprovado pelo responsável pela frente seguinte ante
 3. Completar regras, bandeiras, dificuldades, cronômetro e recuperação de erros.
 4. Validar acessibilidade, integração, testes e documentação; retirar o legado do produto ativo.
 
-## Como executar a base atual
+## Como executar
 
 O servidor já expõe a API de Campo Minado e continua servindo o bundle estático existente, que será substituído pelas frentes de cliente e interface.
 
-Requisitos: [SWI-Prolog](https://www.swi-prolog.org/) 9+ e [Elm](https://elm-lang.org/) 0.19.1. Para instalar o compilador Elm via npm:
+Requisitos:
+
+- [SWI-Prolog](https://www.swi-prolog.org/) **10 ou superior** (o CI usa 10.0.2). A série 9 não carrega `library(json)`, usada nos testes HTTP.
+- [Node.js](https://nodejs.org/) 18+ apenas para instalar as ferramentas Elm. As versões de [Elm](https://elm-lang.org/) 0.19.1 e `elm-test` ficam fixadas em `frontend/package.json`; não é preciso instalação global.
+- `make` é opcional.
+
+As partidas ficam só na memória do servidor: **reiniciar o servidor perde todas as partidas em andamento**, e uma partida sem atividade por duas horas expira.
+
+### Com make
 
 ```sh
-npm install -g elm
-```
-
-Com `make` disponível:
-
-```sh
+make deps
 make run
 make run PORT=3000
 make test
+make ci
 ```
 
-Sem `make`, compile o frontend e inicie o servidor:
+Outros alvos: `make test-minesweeper` (suítes de Campo Minado, sem o legado), `make test-acceptance` (fluxos integrados via HTTP), `make check-bundle` e `make help`.
+
+### Sem make
 
 ```sh
 cd frontend
-elm make src/Main.elm --optimize --output=public/elm.js
+npm ci
+npx elm make src/Main.elm --optimize --output=public/elm.js
 cd ..
 swipl backend/server.pl 8080
 ```
 
-Abra `http://localhost:8080`. O bundle `frontend/public/elm.js` já está versionado; para executar a base sem recompilar, basta iniciar o servidor Prolog.
+O bundle `frontend/public/elm.js` está versionado e corresponde ao fonte; para só executar, basta `swipl backend/server.pl 8080` e abrir `http://localhost:8080`.
 
-Para testar todo o backend:
+Testes sem make:
 
 ```sh
-make test
+for t in backend/tests/test_*.pl; do swipl -g run_tests -t halt "$t" || exit 1; done
 ```
 
-`make test-minesweeper` executa as suítes de tabuleiro, motor, sessões e API HTTP. `make test` inclui também a suíte legada de Sudoku durante a coexistência dos domínios.
+`test_sudoku.pl` é a suíte legada e sai junto com o Sudoku na integração final.
+
+### Integração contínua
+
+O workflow [`.github/workflows/ci.yml`](.github/workflows/ci.yml) roda em todo PR e em `main`: testes Prolog no contêiner `swipl:10.0.2` e, no job Elm, instalação fixada, conferência de que `elm.js` corresponde ao fonte e `elm-test`. Comandos, versões, matriz de cenários e procedimento de aceite no navegador estão em [docs/ACEITE.md](docs/ACEITE.md).
 
 ## Documentação
 
@@ -95,4 +106,6 @@ O [contrato do motor](docs/MINESWEEPER_GAME.md) documenta os predicados, ações
 
 O [contrato da API](docs/API.md) documenta endpoints, snapshots, erros, sessões e as fixtures JSON compartilhadas com o cliente Elm.
 
-O documento principal do novo projeto é o [plano de Campo Minado](docs/PLANO_CAMPO_MINADO.md). Os arquivos [FEATURES.md](docs/FEATURES.md) e [EXPLICACAO.md](docs/EXPLICACAO.md) ainda descrevem o Sudoku e serão atualizados na integração final.
+O [aceite integrado](docs/ACEITE.md) registra versões, comandos, a matriz de cenários com a suíte que cobre cada um e o procedimento de aceite no navegador.
+
+O documento principal do novo projeto é o [plano de Campo Minado](docs/PLANO_CAMPO_MINADO.md). [FEATURES.md](docs/FEATURES.md) lista as funcionalidades por camada e [EXPLICACAO.md](docs/EXPLICACAO.md) liga os tópicos da disciplina ao código; as seções de Elm serão completadas quando o cliente for integrado.

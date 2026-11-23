@@ -84,6 +84,12 @@ testes integrados passarem. Conferir imports Prolog/Elm, endpoints, título,
 textos, favicon, exemplos, documentação e correspondência do bundle servido com
 o código fonte. Preservar o histórico e as evidências de revisão de cada PR.
 
+**Em andamento na frente 06:** Makefile com descoberta automática das suítes,
+ferramentas Elm fixadas em `frontend/package.json`, CI em
+`.github/workflows/ci.yml`, conferência do bundle (`make check-bundle`) e
+testes integrados via HTTP em `backend/tests/test_minesweeper_acceptance.pl`.
+Versões, matriz de cenários e procedimento de navegador em [ACEITE.md](ACEITE.md).
+
 ## Comandos e limites desta entrega
 
 ```sh
