@@ -61,6 +61,7 @@ type PendingRequest
     | CreatingGame
     | MutatingAction Action
     | SyncingAfterUncertainAction
+    | SyncFailed
 
 
 type alias Model =
@@ -160,17 +161,27 @@ update msg model =
             sendPlayerAction (Api.ToggleFlag coord) model
 
         SyncGame ->
-            case model.screen of
-                Active snapshot ->
-                    ( { model
-                        | pending = SyncingAfterUncertainAction
-                        , feedback = Just "Consultando estado confirmado da partida no servidor..."
-                      }
-                    , Api.fetchGame snapshot.id (SyncResponse model.requestToken snapshot.id)
-                    )
+            if model.pending /= Idle && model.pending /= SyncFailed then
+                -- Evita disparar GET concorrente enquanto outra requisição já está em andamento.
+                ( model, Cmd.none )
 
-                _ ->
-                    ( model, Cmd.none )
+            else
+                case model.screen of
+                    Active snapshot ->
+                        let
+                            nextToken =
+                                model.requestToken + 1
+                        in
+                        ( { model
+                            | pending = SyncingAfterUncertainAction
+                            , requestToken = nextToken
+                            , feedback = Just "Consultando estado confirmado da partida no servidor..."
+                          }
+                        , Api.fetchGame snapshot.id (SyncResponse nextToken snapshot.id)
+                        )
+
+                    _ ->
+                        ( model, Cmd.none )
 
         Tick ->
             if model.timerRunning then
@@ -231,14 +242,14 @@ update msg model =
                             ( model, Cmd.none )
 
                         else
-                            handleActionResult token current result model
+                            handleActionResult current result model
 
                     _ ->
                         ( model, Cmd.none )
 
         SyncResponse token gameId result ->
-            if token /= model.requestToken then
-                -- Ignora sincronização atrasada de partida antiga.
+            if token /= model.requestToken || model.pending /= SyncingAfterUncertainAction then
+                -- Ignora sincronização atrasada ou obsoleta.
                 ( model, Cmd.none )
 
             else
@@ -282,7 +293,7 @@ sendPlayerAction action model =
     else
         case model.screen of
             Active snapshot ->
-                if Game.isFinished snapshot.status then
+                if not (canExecuteAction snapshot action) then
                     ( model, Cmd.none )
 
                 else
@@ -297,8 +308,29 @@ sendPlayerAction action model =
                 ( model, Cmd.none )
 
 
-handleActionResult : Int -> Snapshot -> Result ApiError Snapshot -> Model -> ( Model, Cmd Msg )
-handleActionResult token current result model =
+canExecuteAction : Snapshot -> Action -> Bool
+canExecuteAction snapshot action =
+    case action of
+        Api.Reveal coord ->
+            findCell coord snapshot
+                |> Maybe.map (Game.canReveal snapshot.status)
+                |> Maybe.withDefault False
+
+        Api.ToggleFlag coord ->
+            findCell coord snapshot
+                |> Maybe.map (Game.canToggleFlag snapshot.status)
+                |> Maybe.withDefault False
+
+
+findCell : Coord -> Snapshot -> Maybe Cell
+findCell coord snapshot =
+    snapshot.cells
+        |> List.filter (\cell -> cell.row == coord.row && cell.col == coord.col)
+        |> List.head
+
+
+handleActionResult : Snapshot -> Result ApiError Snapshot -> Model -> ( Model, Cmd Msg )
+handleActionResult current result model =
     case result of
         Ok snapshot ->
             if snapshot.revision < current.revision then
@@ -320,14 +352,19 @@ handleActionResult token current result model =
 
             else if Api.isUncertainOutcome err then
                 -- Timeout/rede: não repete a ação automaticamente (especialmente toggle_flag).
-                -- Consulta GET para recuperar o estado real antes de liberar comandos.
+                -- Consulta GET com novo token para recuperar o estado real antes de liberar comandos.
+                let
+                    nextToken =
+                        model.requestToken + 1
+                in
                 ( { model
                     | pending = SyncingAfterUncertainAction
+                    , requestToken = nextToken
                     , feedback =
                         Just
                             "A resposta da jogada não chegou a tempo. Sincronizando estado com o servidor..."
                   }
-                , Api.fetchGame current.id (SyncResponse token current.id)
+                , Api.fetchGame current.id (SyncResponse nextToken current.id)
                 )
 
             else
@@ -361,9 +398,9 @@ handleSyncResult current result model =
                 )
 
             else
-                -- Mantém comandos bloqueados até confirmar o estado via GET ou reiniciar.
+                -- Mantém comandos bloqueados em SyncFailed até confirmar o estado via GET ou reiniciar.
                 ( { model
-                    | pending = SyncingAfterUncertainAction
+                    | pending = SyncFailed
                     , feedback =
                         Just
                             ("Falha ao sincronizar a partida: "
@@ -510,11 +547,25 @@ viewFeedback state =
         Just message ->
             div [ class "feedback-banner", attribute "role" "status" ]
                 [ p [] [ text message ]
-                , if state.pending == SyncingAfterUncertainAction then
-                    button [ type_ "button", style "color" "#111", onClick SyncGame ] [ text "Sincronizar novamente" ]
+                , case state.pending of
+                    SyncingAfterUncertainAction ->
+                        button
+                            [ type_ "button"
+                            , style "color" "#111"
+                            , disabled True
+                            ]
+                            [ text "Sincronizando..." ]
 
-                  else
-                    text ""
+                    SyncFailed ->
+                        button
+                            [ type_ "button"
+                            , style "color" "#111"
+                            , onClick SyncGame
+                            ]
+                            [ text "Sincronizar novamente" ]
+
+                    _ ->
+                        text ""
                 ]
 
         Nothing ->

@@ -358,6 +358,11 @@ validateSnapshot snapshot =
         actualCount =
             List.length snapshot.cells
 
+        hasOutOfBoundsCell =
+            List.any
+                (\cell -> cell.row >= snapshot.rows || cell.col >= snapshot.cols)
+                snapshot.cells
+
         hasLeakedMine =
             not (Game.isFinished snapshot.status)
                 && List.any
@@ -371,6 +376,18 @@ validateSnapshot snapshot =
                 ++ ", recebido "
                 ++ String.fromInt actualCount
             )
+
+    else if snapshot.mineCount >= expectedCount then
+        Decode.fail
+            ("Quantidade de minas inválida: mineCount ("
+                ++ String.fromInt snapshot.mineCount
+                ++ ") deve ser menor que rows * cols ("
+                ++ String.fromInt expectedCount
+                ++ ")"
+            )
+
+    else if hasOutOfBoundsCell then
+        Decode.fail "Snapshot contém célula com coordenada fora dos limites do tabuleiro"
 
     else if hasLeakedMine then
         Decode.fail "Snapshot ativo não pode expor células mine/exploded"

@@ -180,6 +180,68 @@ decoderValidTests =
 
                     Err err ->
                         Expect.fail (Decode.errorToString err)
+        , test "decodifica estrutura completa 9×9 da fixture playing-easy.response.json" <|
+            \_ ->
+                let
+                    cellJson row col =
+                        if row == 0 && col == 0 then
+                            Encode.object
+                                [ ( "row", Encode.int row )
+                                , ( "col", Encode.int col )
+                                , ( "state", Encode.string "flagged" )
+                                ]
+
+                        else if row == 4 && col == 4 then
+                            Encode.object
+                                [ ( "row", Encode.int row )
+                                , ( "col", Encode.int col )
+                                , ( "state", Encode.string "revealed" )
+                                , ( "adjacentMines", Encode.int 1 )
+                                ]
+
+                        else
+                            Encode.object
+                                [ ( "row", Encode.int row )
+                                , ( "col", Encode.int col )
+                                , ( "state", Encode.string "hidden" )
+                                ]
+
+                    cells9x9 =
+                        List.range 0 8
+                            |> List.concatMap
+                                (\row ->
+                                    List.range 0 8
+                                        |> List.map (\col -> cellJson row col)
+                                )
+
+                    json =
+                        Encode.object
+                            [ ( "id", Encode.string "00000000-0000-4000-8000-000000000001" )
+                            , ( "difficulty", Encode.string "easy" )
+                            , ( "rows", Encode.int 9 )
+                            , ( "cols", Encode.int 9 )
+                            , ( "mineCount", Encode.int 10 )
+                            , ( "status", Encode.string "playing" )
+                            , ( "revision", Encode.int 2 )
+                            , ( "cells", Encode.list identity cells9x9 )
+                            ]
+                            |> Encode.encode 0
+                in
+                case Decode.decodeString Api.snapshotDecoder json of
+                    Ok snap ->
+                        Expect.all
+                            [ \_ -> Expect.equal 9 snap.rows
+                            , \_ -> Expect.equal 9 snap.cols
+                            , \_ -> Expect.equal 10 snap.mineCount
+                            , \_ -> Expect.equal Playing snap.status
+                            , \_ -> Expect.equal 81 (List.length snap.cells)
+                            , \_ -> Expect.equal 9 (Game.remainingMines snap)
+                            , \_ -> Expect.equal 9 (List.length (Game.cellsByRow snap))
+                            ]
+                            ()
+
+                    Err err ->
+                        Expect.fail (Decode.errorToString err)
         , test "decodifica payload de erro da API" <|
             \_ ->
                 let
@@ -247,6 +309,54 @@ decoderInvalidTests =
                 in
                 Decode.decodeString Api.snapshotDecoder json
                     |> Expect.err
+        , test "rejeita snapshot com mineCount >= rows * cols" <|
+            \_ ->
+                let
+                    json =
+                        """
+                        {
+                          "id": "00000000-0000-4000-8000-000000000001",
+                          "difficulty": "easy",
+                          "rows": 2,
+                          "cols": 2,
+                          "mineCount": 4,
+                          "status": "ready",
+                          "revision": 0,
+                          "cells": [
+                            { "row": 0, "col": 0, "state": "hidden" },
+                            { "row": 0, "col": 1, "state": "hidden" },
+                            { "row": 1, "col": 0, "state": "hidden" },
+                            { "row": 1, "col": 1, "state": "hidden" }
+                          ]
+                        }
+                        """
+                in
+                Decode.decodeString Api.snapshotDecoder json
+                    |> Expect.err
+        , test "rejeita snapshot com célula fora dos limites (row >= rows ou col >= cols)" <|
+            \_ ->
+                let
+                    json =
+                        """
+                        {
+                          "id": "00000000-0000-4000-8000-000000000001",
+                          "difficulty": "easy",
+                          "rows": 2,
+                          "cols": 2,
+                          "mineCount": 1,
+                          "status": "ready",
+                          "revision": 0,
+                          "cells": [
+                            { "row": 0, "col": 0, "state": "hidden" },
+                            { "row": 0, "col": 1, "state": "hidden" },
+                            { "row": 1, "col": 0, "state": "hidden" },
+                            { "row": 2, "col": 1, "state": "hidden" }
+                          ]
+                        }
+                        """
+                in
+                Decode.decodeString Api.snapshotDecoder json
+                    |> Expect.err
         , test "rejeita vazamento de mine/exploded em partida ativa (playing)" <|
             \_ ->
                 let
@@ -255,13 +365,16 @@ decoderInvalidTests =
                         {
                           "id": "00000000-0000-4000-8000-000000000001",
                           "difficulty": "easy",
-                          "rows": 1,
-                          "cols": 1,
+                          "rows": 2,
+                          "cols": 2,
                           "mineCount": 1,
                           "status": "playing",
                           "revision": 1,
                           "cells": [
-                            { "row": 0, "col": 0, "state": "mine" }
+                            { "row": 0, "col": 0, "state": "mine" },
+                            { "row": 0, "col": 1, "state": "hidden" },
+                            { "row": 1, "col": 0, "state": "hidden" },
+                            { "row": 1, "col": 1, "state": "hidden" }
                           ]
                         }
                         """
@@ -415,7 +528,7 @@ concurrencyAndTimeoutRecoveryTests =
                     , \_ -> Expect.equal Nothing mSynced.feedback
                     ]
                     ()
-        , test "se a sincronização via GET também falhar por rede, mantém comandos bloqueados" <|
+        , test "se a sincronização via GET também falhar por rede, entra em SyncFailed e mantém comandos bloqueados" <|
             \_ ->
                 let
                     m0 =
@@ -427,12 +540,97 @@ concurrencyAndTimeoutRecoveryTests =
                     ( m2, _ ) =
                         Main.update (ActionResponse m1.requestToken readySnapshot.id (Err NetworkError)) m1
 
+                    -- Enquanto o GET automático está em andamento, SyncGame extra é ignorado
+                    ( mIgnoredSync, cmdIgnoredSync ) =
+                        Main.update SyncGame m2
+
                     ( m3, _ ) =
                         Main.update (SyncResponse m2.requestToken readySnapshot.id (Err NetworkError)) m2
+
+                    -- Em SyncFailed, jogadas seguem bloqueadas
+                    ( mBlocked, cmdBlocked ) =
+                        Main.update (RevealCell { row = 1, col = 1 }) m3
                 in
                 Expect.all
-                    [ \_ -> Expect.equal SyncingAfterUncertainAction m3.pending
+                    [ \_ -> Expect.equal m2 mIgnoredSync
+                    , \_ -> Expect.equal Cmd.none cmdIgnoredSync
+                    , \_ -> Expect.equal SyncFailed m3.pending
+                    , \_ -> Expect.equal True (Main.isBusy m3)
                     , \_ -> Expect.notEqual Nothing m3.feedback
+                    , \_ -> Expect.equal m3 mBlocked
+                    , \_ -> Expect.equal Cmd.none cmdBlocked
+                    ]
+                    ()
+        , test "resposta atrasada de GET antigo não rebloqueia o tabuleiro após nova sincronização bem-sucedida" <|
+            \_ ->
+                let
+                    m0 =
+                        initActiveModel readySnapshot
+
+                    ( m1, _ ) =
+                        Main.update (ToggleFlag { row = 0, col = 0 }) m0
+
+                    -- 1º GET automático recebe novo token
+                    ( mSync1, _ ) =
+                        Main.update (ActionResponse m1.requestToken readySnapshot.id (Err Timeout)) m1
+
+                    staleSyncToken =
+                        mSync1.requestToken
+
+                    -- 1º GET falha e vai para SyncFailed
+                    ( mFailed, _ ) =
+                        Main.update (SyncResponse staleSyncToken readySnapshot.id (Err NetworkError)) mSync1
+
+                    -- Usuário aciona SyncGame novamente (novo token)
+                    ( mSync2, _ ) =
+                        Main.update SyncGame mFailed
+
+                    -- 2º GET conclui com sucesso e libera o tabuleiro
+                    ( mRecovered, _ ) =
+                        Main.update (SyncResponse mSync2.requestToken readySnapshot.id (Ok playingSnapshot)) mSync2
+
+                    -- Erro atrasado do 1º GET chega depois e deve ser descartado
+                    ( mAfterStaleErr, cmdAfterStaleErr ) =
+                        Main.update (SyncResponse staleSyncToken readySnapshot.id (Err NetworkError)) mRecovered
+                in
+                Expect.all
+                    [ \_ -> Expect.equal (m1.requestToken + 1) staleSyncToken
+                    , \_ -> Expect.equal (staleSyncToken + 1) mSync2.requestToken
+                    , \_ -> Expect.equal SyncingAfterUncertainAction mSync2.pending
+                    , \_ -> Expect.equal Idle mRecovered.pending
+                    , \_ -> Expect.equal mRecovered mAfterStaleErr
+                    , \_ -> Expect.equal Cmd.none cmdAfterStaleErr
+                    ]
+                    ()
+        , test "valida Game.canReveal e Game.canToggleFlag antes de enviar POST /actions" <|
+            \_ ->
+                let
+                    m0 =
+                        initActiveModel playingSnapshot
+
+                    -- Célula (0,0) está Flagged: não deve enviar RevealCell
+                    ( mRevealFlagged, cmdRevealFlagged ) =
+                        Main.update (RevealCell { row = 0, col = 0 }) m0
+
+                    -- Célula (0,1) está Revealed 1: não deve enviar RevealCell nem ToggleFlag
+                    ( mRevealRevealed, cmdRevealRevealed ) =
+                        Main.update (RevealCell { row = 0, col = 1 }) m0
+
+                    ( mFlagRevealed, cmdFlagRevealed ) =
+                        Main.update (ToggleFlag { row = 0, col = 1 }) m0
+
+                    -- Célula (0,0) está Flagged: pode receber ToggleFlag para desmarcar
+                    ( mUnflag, _ ) =
+                        Main.update (ToggleFlag { row = 0, col = 0 }) m0
+                in
+                Expect.all
+                    [ \_ -> Expect.equal m0 mRevealFlagged
+                    , \_ -> Expect.equal Cmd.none cmdRevealFlagged
+                    , \_ -> Expect.equal m0 mRevealRevealed
+                    , \_ -> Expect.equal Cmd.none cmdRevealRevealed
+                    , \_ -> Expect.equal m0 mFlagRevealed
+                    , \_ -> Expect.equal Cmd.none cmdFlagRevealed
+                    , \_ -> Expect.equal (MutatingAction (Api.ToggleFlag { row = 0, col = 0 })) mUnflag.pending
                     ]
                     ()
         ]

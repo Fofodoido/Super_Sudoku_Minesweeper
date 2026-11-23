@@ -1857,7 +1857,7 @@ var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, args)
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.b9,
+		impl.ca,
 		impl.cJ,
 		impl.cE,
 		function() { return function() {} }
@@ -3943,7 +3943,7 @@ var _Browser_element = _Debugger_element || F4(function(impl, flagDecoder, debug
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.b9,
+		impl.ca,
 		impl.cJ,
 		impl.cE,
 		function(sendToApp, initialModel) {
@@ -3979,7 +3979,7 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.b9,
+		impl.ca,
 		impl.cJ,
 		impl.cE,
 		function(sendToApp, initialModel) {
@@ -3992,7 +3992,7 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 			{
 				_VirtualDom_divertHrefToApp = divertHrefToApp;
 				var doc = view(model);
-				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.at);
+				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.as);
 				var patches = _VirtualDom_diff(currNode, nextNode);
 				bodyNode = _VirtualDom_applyPatches(bodyNode, currNode, patches, sendToApp);
 				currNode = nextNode;
@@ -4053,8 +4053,8 @@ function _Browser_makeAnimator(model, draw)
 
 function _Browser_application(impl)
 {
-	var onUrlChange = impl.co;
-	var onUrlRequest = impl.cp;
+	var onUrlChange = impl.cp;
+	var onUrlRequest = impl.cq;
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
@@ -4074,9 +4074,9 @@ function _Browser_application(impl)
 					var next = $elm$url$Url$fromString(href).a;
 					sendToApp(onUrlRequest(
 						(next
-							&& curr.bo === next.bo
+							&& curr.bp === next.bp
 							&& curr.a8 === next.a8
-							&& curr.bl.a === next.bl.a
+							&& curr.bm.a === next.bm.a
 						)
 							? $elm$browser$Browser$Internal(next)
 							: $elm$browser$Browser$External(href)
@@ -4084,9 +4084,9 @@ function _Browser_application(impl)
 				}
 			});
 		},
-		b9: function(flags)
+		ca: function(flags)
 		{
-			return A3(impl.b9, flags, _Browser_getUrl(), key);
+			return A3(impl.ca, flags, _Browser_getUrl(), key);
 		},
 		cK: impl.cK,
 		cJ: impl.cJ,
@@ -4156,17 +4156,17 @@ var _Browser_decodeEvent = F2(function(decoder, event)
 function _Browser_visibilityInfo()
 {
 	return (typeof _VirtualDom_doc.hidden !== 'undefined')
-		? { b5: 'hidden', bT: 'visibilitychange' }
+		? { b6: 'hidden', bV: 'visibilitychange' }
 		:
 	(typeof _VirtualDom_doc.mozHidden !== 'undefined')
-		? { b5: 'mozHidden', bT: 'mozvisibilitychange' }
+		? { b6: 'mozHidden', bV: 'mozvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.msHidden !== 'undefined')
-		? { b5: 'msHidden', bT: 'msvisibilitychange' }
+		? { b6: 'msHidden', bV: 'msvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.webkitHidden !== 'undefined')
-		? { b5: 'webkitHidden', bT: 'webkitvisibilitychange' }
-		: { b5: 'hidden', bT: 'visibilitychange' };
+		? { b6: 'webkitHidden', bV: 'webkitvisibilitychange' }
+		: { b6: 'hidden', bV: 'visibilitychange' };
 }
 
 
@@ -4247,11 +4247,11 @@ var _Browser_call = F2(function(functionName, id)
 function _Browser_getViewport()
 {
 	return {
-		bv: _Browser_getScene(),
-		bG: {
-			bJ: _Browser_window.pageXOffset,
-			bK: _Browser_window.pageYOffset,
-			bI: _Browser_doc.documentElement.clientWidth,
+		bx: _Browser_getScene(),
+		bI: {
+			bL: _Browser_window.pageXOffset,
+			bM: _Browser_window.pageYOffset,
+			bK: _Browser_doc.documentElement.clientWidth,
 			a7: _Browser_doc.documentElement.clientHeight
 		}
 	};
@@ -4262,7 +4262,7 @@ function _Browser_getScene()
 	var body = _Browser_doc.body;
 	var elem = _Browser_doc.documentElement;
 	return {
-		bI: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
+		bK: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
 		a7: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
 	};
 }
@@ -4286,14 +4286,14 @@ function _Browser_getViewportOf(id)
 	return _Browser_withNode(id, function(node)
 	{
 		return {
-			bv: {
-				bI: node.scrollWidth,
+			bx: {
+				bK: node.scrollWidth,
 				a7: node.scrollHeight
 			},
-			bG: {
-				bJ: node.scrollLeft,
-				bK: node.scrollTop,
-				bI: node.clientWidth,
+			bI: {
+				bL: node.scrollLeft,
+				bM: node.scrollTop,
+				bK: node.clientWidth,
 				a7: node.clientHeight
 			}
 		};
@@ -4324,17 +4324,17 @@ function _Browser_getElement(id)
 		var x = _Browser_window.pageXOffset;
 		var y = _Browser_window.pageYOffset;
 		return {
-			bv: _Browser_getScene(),
-			bG: {
-				bJ: x,
-				bK: y,
-				bI: _Browser_doc.documentElement.clientWidth,
+			bx: _Browser_getScene(),
+			bI: {
+				bL: x,
+				bM: y,
+				bK: _Browser_doc.documentElement.clientWidth,
 				a7: _Browser_doc.documentElement.clientHeight
 			},
-			b$: {
-				bJ: x + rect.left,
-				bK: y + rect.top,
-				bI: rect.width,
+			b0: {
+				bL: x + rect.left,
+				bM: y + rect.top,
+				bK: rect.width,
 				a7: rect.height
 			}
 		};
@@ -4397,8 +4397,8 @@ var _Http_toTask = F3(function(router, toTask, request)
 
 		_Http_configureRequest(xhr, request);
 
-		request.at.a && xhr.setRequestHeader('Content-Type', request.at.a);
-		xhr.send(request.at.b);
+		request.as.a && xhr.setRequestHeader('Content-Type', request.as.a);
+		xhr.send(request.as.b);
 
 		return function() { xhr.c = true; xhr.abort(); };
 	});
@@ -4415,7 +4415,7 @@ function _Http_configureRequest(xhr, request)
 	}
 	xhr.timeout = request.aM.a || 0;
 	xhr.responseType = request.av.d;
-	xhr.withCredentials = request.bN;
+	xhr.withCredentials = request.bP;
 }
 
 
@@ -4535,14 +4535,14 @@ function _Http_track(router, xhr, tracker)
 		if (xhr.c) { return; }
 		_Scheduler_rawSpawn(A2($elm$core$Platform$sendToSelf, router, _Utils_Tuple2(tracker, $elm$http$Http$Sending({
 			cA: event.loaded,
-			by: event.total
+			bA: event.total
 		}))));
 	});
 	xhr.addEventListener('progress', function(event) {
 		if (xhr.c) { return; }
 		_Scheduler_rawSpawn(A2($elm$core$Platform$sendToSelf, router, _Utils_Tuple2(tracker, $elm$http$Http$Receiving({
-			cs: event.loaded,
-			by: event.lengthComputable ? $elm$core$Maybe$Just(event.total) : $elm$core$Maybe$Nothing
+			ct: event.loaded,
+			bA: event.lengthComputable ? $elm$core$Maybe$Just(event.total) : $elm$core$Maybe$Nothing
 		}))));
 	});
 }
@@ -5095,7 +5095,7 @@ var $elm$url$Url$Http = 0;
 var $elm$url$Url$Https = 1;
 var $elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {
-		return {a3: fragment, a8: host, bj: path, bl: port_, bo: protocol, bp: query};
+		return {a3: fragment, a8: host, bk: path, bm: port_, bp: protocol, bq: query};
 	});
 var $elm$core$String$contains = _String_contains;
 var $elm$core$String$length = _String_length;
@@ -5430,7 +5430,7 @@ var $author$project$Api$Timeout = {$: 1};
 var $elm$json$Json$Decode$decodeString = _Json_runOnString;
 var $author$project$Api$ApiErrorPayload = F2(
 	function (code, message) {
-		return {aj: code, aA: message};
+		return {ak: code, aA: message};
 	});
 var $elm$json$Json$Decode$field = _Json_decodeField;
 var $elm$json$Json$Decode$string = _Json_decodeString;
@@ -6053,7 +6053,7 @@ var $elm$http$Http$Request = function (a) {
 };
 var $elm$http$Http$State = F2(
 	function (reqs, subs) {
-		return {br: reqs, bD: subs};
+		return {bs: reqs, bF: subs};
 	});
 var $elm$http$Http$init = $elm$core$Task$succeed(
 	A2($elm$http$Http$State, $elm$core$Dict$empty, _List_Nil));
@@ -6127,7 +6127,7 @@ var $elm$http$Http$onEffects = F4(
 				return $elm$core$Task$succeed(
 					A2($elm$http$Http$State, reqs, subs));
 			},
-			A3($elm$http$Http$updateReqs, router, cmds, state.br));
+			A3($elm$http$Http$updateReqs, router, cmds, state.bs));
 	});
 var $elm$core$List$maybeCons = F3(
 	function (f, mx, xs) {
@@ -6170,7 +6170,7 @@ var $elm$http$Http$onSelfMsg = F3(
 				A2(
 					$elm$core$List$filterMap,
 					A3($elm$http$Http$maybeSend, router, tracker, progress),
-					state.bD)));
+					state.bF)));
 	});
 var $elm$http$Http$Cancel = function (a) {
 	return {$: 0, a: a};
@@ -6184,8 +6184,8 @@ var $elm$http$Http$cmdMap = F2(
 			var r = cmd.a;
 			return $elm$http$Http$Request(
 				{
-					bN: r.bN,
-					at: r.at,
+					bP: r.bP,
+					as: r.as,
 					av: A2(_Http_mapExpect, func, r.av),
 					ax: r.ax,
 					aC: r.aC,
@@ -6214,17 +6214,17 @@ var $elm$http$Http$subscription = _Platform_leaf('Http');
 var $elm$http$Http$request = function (r) {
 	return $elm$http$Http$command(
 		$elm$http$Http$Request(
-			{bN: false, at: r.at, av: r.av, ax: r.ax, aC: r.aC, aM: r.aM, aN: r.aN, aO: r.aO}));
+			{bP: false, as: r.as, av: r.av, ax: r.ax, aC: r.aC, aM: r.aM, aN: r.aN, aO: r.aO}));
 };
 var $author$project$Api$requestTimeoutMs = 10000;
 var $author$project$Game$Snapshot = F8(
 	function (id, difficulty, rows, cols, mineCount, status, revision, cells) {
-		return {aT: cells, bV: cols, bY: difficulty, b6: id, V: mineCount, cw: revision, cz: rows, cB: status};
+		return {at: cells, aV: cols, bZ: difficulty, b7: id, bd: mineCount, cx: revision, bv: rows, cB: status};
 	});
 var $elm$json$Json$Decode$andThen = _Json_andThen;
 var $author$project$Game$Cell = F3(
 	function (row, col, state) {
-		return {ak: col, an: row, bA: state};
+		return {aa: col, af: row, bC: state};
 	});
 var $author$project$Game$Exploded = {$: 4};
 var $author$project$Game$Flagged = {$: 1};
@@ -6386,16 +6386,23 @@ var $author$project$Game$isFinished = function (status) {
 var $elm$core$Basics$neq = _Utils_notEqual;
 var $elm$core$Basics$not = _Basics_not;
 var $author$project$Api$validateSnapshot = function (snapshot) {
+	var hasOutOfBoundsCell = A2(
+		$elm$core$List$any,
+		function (cell) {
+			return (_Utils_cmp(cell.af, snapshot.bv) > -1) || (_Utils_cmp(cell.aa, snapshot.aV) > -1);
+		},
+		snapshot.at);
 	var hasLeakedMine = (!$author$project$Game$isFinished(snapshot.cB)) && A2(
 		$elm$core$List$any,
 		function (cell) {
-			return _Utils_eq(cell.bA, $author$project$Game$Mine) || _Utils_eq(cell.bA, $author$project$Game$Exploded);
+			return _Utils_eq(cell.bC, $author$project$Game$Mine) || _Utils_eq(cell.bC, $author$project$Game$Exploded);
 		},
-		snapshot.aT);
-	var expectedCount = snapshot.cz * snapshot.bV;
-	var actualCount = $elm$core$List$length(snapshot.aT);
+		snapshot.at);
+	var expectedCount = snapshot.bv * snapshot.aV;
+	var actualCount = $elm$core$List$length(snapshot.at);
 	return (!_Utils_eq(actualCount, expectedCount)) ? $elm$json$Json$Decode$fail(
-		'Quantidade de células inconsistente: esperado ' + ($elm$core$String$fromInt(expectedCount) + (', recebido ' + $elm$core$String$fromInt(actualCount)))) : (hasLeakedMine ? $elm$json$Json$Decode$fail('Snapshot ativo não pode expor células mine/exploded') : $elm$json$Json$Decode$succeed(snapshot));
+		'Quantidade de células inconsistente: esperado ' + ($elm$core$String$fromInt(expectedCount) + (', recebido ' + $elm$core$String$fromInt(actualCount)))) : ((_Utils_cmp(snapshot.bd, expectedCount) > -1) ? $elm$json$Json$Decode$fail(
+		'Quantidade de minas inválida: mineCount (' + ($elm$core$String$fromInt(snapshot.bd) + (') deve ser menor que rows * cols (' + ($elm$core$String$fromInt(expectedCount) + ')')))) : (hasOutOfBoundsCell ? $elm$json$Json$Decode$fail('Snapshot contém célula com coordenada fora dos limites do tabuleiro') : (hasLeakedMine ? $elm$json$Json$Decode$fail('Snapshot ativo não pode expor células mine/exploded') : $elm$json$Json$Decode$succeed(snapshot))));
 };
 var $author$project$Api$snapshotDecoder = A2(
 	$elm$json$Json$Decode$andThen,
@@ -6418,7 +6425,7 @@ var $author$project$Api$createGame = F2(
 	function (difficulty, toMsg) {
 		return $elm$http$Http$request(
 			{
-				at: $elm$http$Http$jsonBody(
+				as: $elm$http$Http$jsonBody(
 					$author$project$Api$encodeCreateGame(difficulty)),
 				av: A2($author$project$Api$expectJsonWithError, toMsg, $author$project$Api$snapshotDecoder),
 				ax: _List_Nil,
@@ -6430,11 +6437,11 @@ var $author$project$Api$createGame = F2(
 	});
 var $author$project$Main$startNewGame = F2(
 	function (difficulty, model) {
-		var nextToken = model.G + 1;
+		var nextToken = model.w + 1;
 		return _Utils_Tuple2(
 			_Utils_update(
 				model,
-				{bY: difficulty, A: 0, i: $elm$core$Maybe$Nothing, e: $author$project$Main$CreatingGame, G: nextToken, h: $author$project$Main$Loading, w: false}),
+				{bZ: difficulty, B: 0, i: $elm$core$Maybe$Nothing, c: $author$project$Main$CreatingGame, w: nextToken, h: $author$project$Main$Loading, x: false}),
 			A2(
 				$author$project$Api$createGame,
 				difficulty,
@@ -6444,7 +6451,7 @@ var $author$project$Main$init = function (_v0) {
 	return A2(
 		$author$project$Main$startNewGame,
 		0,
-		{bY: 0, A: 0, i: $elm$core$Maybe$Nothing, e: $author$project$Main$CreatingGame, G: 0, h: $author$project$Main$Loading, w: false});
+		{bZ: 0, B: 0, i: $elm$core$Maybe$Nothing, c: $author$project$Main$CreatingGame, w: 0, h: $author$project$Main$Loading, x: false});
 };
 var $author$project$Main$Tick = {$: 5};
 var $elm$time$Time$Every = F2(
@@ -6453,7 +6460,7 @@ var $elm$time$Time$Every = F2(
 	});
 var $elm$time$Time$State = F2(
 	function (taggers, processes) {
-		return {bn: processes, bE: taggers};
+		return {bo: processes, bG: taggers};
 	});
 var $elm$time$Time$init = $elm$core$Task$succeed(
 	A2($elm$time$Time$State, $elm$core$Dict$empty, $elm$core$Dict$empty));
@@ -6600,7 +6607,7 @@ var $elm$time$Time$spawnHelp = F3(
 	});
 var $elm$time$Time$onEffects = F3(
 	function (router, subs, _v0) {
-		var processes = _v0.bn;
+		var processes = _v0.bo;
 		var rightStep = F3(
 			function (_v6, id, _v7) {
 				var spawns = _v7.a;
@@ -6669,7 +6676,7 @@ var $elm$time$Time$millisToPosix = $elm$core$Basics$identity;
 var $elm$time$Time$now = _Time_now($elm$time$Time$millisToPosix);
 var $elm$time$Time$onSelfMsg = F3(
 	function (router, interval, state) {
-		var _v0 = A2($elm$core$Dict$get, interval, state.bE);
+		var _v0 = A2($elm$core$Dict$get, interval, state.bG);
 		if (_v0.$ === 1) {
 			return $elm$core$Task$succeed(state);
 		} else {
@@ -6718,7 +6725,7 @@ var $elm$time$Time$every = F2(
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Main$subscriptions = function (model) {
-	return model.w ? A2(
+	return model.x ? A2(
 		$elm$time$Time$every,
 		1000,
 		function (_v0) {
@@ -6735,6 +6742,7 @@ var $author$project$Main$Idle = {$: 0};
 var $author$project$Api$Reveal = function (a) {
 	return {$: 0, a: a};
 };
+var $author$project$Main$SyncFailed = {$: 4};
 var $author$project$Main$SyncResponse = F3(
 	function (a, b, c) {
 		return {$: 8, a: a, b: b, c: c};
@@ -6744,7 +6752,7 @@ var $author$project$Api$ToggleFlag = function (a) {
 	return {$: 1, a: a};
 };
 var $author$project$Api$errorCodeToMessage = function (payload) {
-	var _v0 = payload.aj;
+	var _v0 = payload.ak;
 	switch (_v0) {
 		case 'game_not_found':
 			return 'Sessão expirada ou partida não encontrada. Inicie um novo jogo.';
@@ -6765,7 +6773,7 @@ var $author$project$Api$errorCodeToMessage = function (payload) {
 		case 'internal_error':
 			return 'Erro interno no servidor ao processar a jogada.';
 		default:
-			return $elm$core$String$isEmpty(payload.aA) ? ('Erro ao comunicar com o servidor (' + (payload.aj + ').')) : payload.aA;
+			return $elm$core$String$isEmpty(payload.aA) ? ('Erro ao comunicar com o servidor (' + (payload.ak + ').')) : payload.aA;
 	}
 };
 var $author$project$Api$errorToMessage = function (err) {
@@ -6795,7 +6803,7 @@ var $author$project$Api$fetchGame = F2(
 	function (gameId, toMsg) {
 		return $elm$http$Http$request(
 			{
-				at: $elm$http$Http$emptyBody,
+				as: $elm$http$Http$emptyBody,
 				av: A2($author$project$Api$expectJsonWithError, toMsg, $author$project$Api$snapshotDecoder),
 				ax: _List_Nil,
 				aC: 'GET',
@@ -6825,18 +6833,18 @@ var $author$project$Main$applyConfirmedSnapshot = F2(
 		return _Utils_update(
 			model,
 			{
-				bY: snapshot.bY,
+				bZ: snapshot.bZ,
 				i: $elm$core$Maybe$Nothing,
-				e: $author$project$Main$Idle,
+				c: $author$project$Main$Idle,
 				h: $author$project$Main$Active(snapshot),
-				w: nextTimerRunning
+				x: nextTimerRunning
 			});
 	});
 var $author$project$Api$isSessionLost = function (err) {
 	if ((err.$ === 3) && (err.a === 404)) {
 		if (!err.b.$) {
 			var payload = err.b.a;
-			return payload.aj === 'game_not_found';
+			return payload.ak === 'game_not_found';
 		} else {
 			var _v1 = err.b;
 			return true;
@@ -6857,58 +6865,68 @@ var $author$project$Api$isUncertainOutcome = function (err) {
 };
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
-var $author$project$Main$handleActionResult = F4(
-	function (token, current, result, model) {
+var $author$project$Main$handleActionResult = F3(
+	function (current, result, model) {
 		if (!result.$) {
 			var snapshot = result.a;
-			return (_Utils_cmp(snapshot.cw, current.cw) < 0) ? _Utils_Tuple2(
+			return (_Utils_cmp(snapshot.cx, current.cx) < 0) ? _Utils_Tuple2(
 				_Utils_update(
 					model,
-					{e: $author$project$Main$Idle}),
+					{c: $author$project$Main$Idle}),
 				$elm$core$Platform$Cmd$none) : _Utils_Tuple2(
 				A2($author$project$Main$applyConfirmedSnapshot, snapshot, model),
 				$elm$core$Platform$Cmd$none);
 		} else {
 			var err = result.a;
-			return $author$project$Api$isSessionLost(err) ? _Utils_Tuple2(
-				_Utils_update(
-					model,
-					{
-						i: $elm$core$Maybe$Nothing,
-						e: $author$project$Main$Idle,
-						h: $author$project$Main$SessionLost(
-							$author$project$Api$errorToMessage(err)),
-						w: false
-					}),
-				$elm$core$Platform$Cmd$none) : ($author$project$Api$isUncertainOutcome(err) ? _Utils_Tuple2(
-				_Utils_update(
-					model,
-					{
-						i: $elm$core$Maybe$Just('A resposta da jogada não chegou a tempo. Sincronizando estado com o servidor...'),
-						e: $author$project$Main$SyncingAfterUncertainAction
-					}),
-				A2(
-					$author$project$Api$fetchGame,
-					current.b6,
-					A2($author$project$Main$SyncResponse, token, current.b6))) : _Utils_Tuple2(
-				_Utils_update(
-					model,
-					{
-						i: $elm$core$Maybe$Just(
-							$author$project$Api$errorToMessage(err)),
-						e: $author$project$Main$Idle
-					}),
-				$elm$core$Platform$Cmd$none));
+			if ($author$project$Api$isSessionLost(err)) {
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							i: $elm$core$Maybe$Nothing,
+							c: $author$project$Main$Idle,
+							h: $author$project$Main$SessionLost(
+								$author$project$Api$errorToMessage(err)),
+							x: false
+						}),
+					$elm$core$Platform$Cmd$none);
+			} else {
+				if ($author$project$Api$isUncertainOutcome(err)) {
+					var nextToken = model.w + 1;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								i: $elm$core$Maybe$Just('A resposta da jogada não chegou a tempo. Sincronizando estado com o servidor...'),
+								c: $author$project$Main$SyncingAfterUncertainAction,
+								w: nextToken
+							}),
+						A2(
+							$author$project$Api$fetchGame,
+							current.b7,
+							A2($author$project$Main$SyncResponse, nextToken, current.b7)));
+				} else {
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								i: $elm$core$Maybe$Just(
+									$author$project$Api$errorToMessage(err)),
+								c: $author$project$Main$Idle
+							}),
+						$elm$core$Platform$Cmd$none);
+				}
+			}
 		}
 	});
 var $author$project$Main$handleSyncResult = F3(
 	function (current, result, model) {
 		if (!result.$) {
 			var snapshot = result.a;
-			return (_Utils_cmp(snapshot.cw, current.cw) < 0) ? _Utils_Tuple2(
+			return (_Utils_cmp(snapshot.cx, current.cx) < 0) ? _Utils_Tuple2(
 				_Utils_update(
 					model,
-					{i: $elm$core$Maybe$Nothing, e: $author$project$Main$Idle}),
+					{i: $elm$core$Maybe$Nothing, c: $author$project$Main$Idle}),
 				$elm$core$Platform$Cmd$none) : _Utils_Tuple2(
 				A2($author$project$Main$applyConfirmedSnapshot, snapshot, model),
 				$elm$core$Platform$Cmd$none);
@@ -6919,10 +6937,10 @@ var $author$project$Main$handleSyncResult = F3(
 					model,
 					{
 						i: $elm$core$Maybe$Nothing,
-						e: $author$project$Main$Idle,
+						c: $author$project$Main$Idle,
 						h: $author$project$Main$SessionLost(
 							$author$project$Api$errorToMessage(err)),
-						w: false
+						x: false
 					}),
 				$elm$core$Platform$Cmd$none) : _Utils_Tuple2(
 				_Utils_update(
@@ -6930,7 +6948,7 @@ var $author$project$Main$handleSyncResult = F3(
 					{
 						i: $elm$core$Maybe$Just(
 							'Falha ao sincronizar a partida: ' + ($author$project$Api$errorToMessage(err) + ' Tente sincronizar novamente ou inicie um novo jogo.')),
-						e: $author$project$Main$SyncingAfterUncertainAction
+						c: $author$project$Main$SyncFailed
 					}),
 				$elm$core$Platform$Cmd$none);
 		}
@@ -6942,6 +6960,85 @@ var $author$project$Main$ActionResponse = F3(
 var $author$project$Main$MutatingAction = function (a) {
 	return {$: 2, a: a};
 };
+var $author$project$Game$canReveal = F2(
+	function (status, cell) {
+		return (!$author$project$Game$isFinished(status)) && _Utils_eq(cell.bC, $author$project$Game$Hidden);
+	});
+var $author$project$Game$canToggleFlag = F2(
+	function (status, cell) {
+		return (!$author$project$Game$isFinished(status)) && (_Utils_eq(cell.bC, $author$project$Game$Hidden) || _Utils_eq(cell.bC, $author$project$Game$Flagged));
+	});
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
+var $elm$core$List$head = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(x);
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $author$project$Main$findCell = F2(
+	function (coord, snapshot) {
+		return $elm$core$List$head(
+			A2(
+				$elm$core$List$filter,
+				function (cell) {
+					return _Utils_eq(cell.af, coord.af) && _Utils_eq(cell.aa, coord.aa);
+				},
+				snapshot.at));
+	});
+var $elm$core$Maybe$map = F2(
+	function (f, maybe) {
+		if (!maybe.$) {
+			var value = maybe.a;
+			return $elm$core$Maybe$Just(
+				f(value));
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	});
+var $elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (!maybe.$) {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
+	});
+var $author$project$Main$canExecuteAction = F2(
+	function (snapshot, action) {
+		if (!action.$) {
+			var coord = action.a;
+			return A2(
+				$elm$core$Maybe$withDefault,
+				false,
+				A2(
+					$elm$core$Maybe$map,
+					$author$project$Game$canReveal(snapshot.cB),
+					A2($author$project$Main$findCell, coord, snapshot)));
+		} else {
+			var coord = action.a;
+			return A2(
+				$elm$core$Maybe$withDefault,
+				false,
+				A2(
+					$elm$core$Maybe$map,
+					$author$project$Game$canToggleFlag(snapshot.cB),
+					A2($author$project$Main$findCell, coord, snapshot)));
+		}
+	});
 var $elm$json$Json$Encode$int = _Json_wrap;
 var $author$project$Api$encodeAction = function (action) {
 	if (!action.$) {
@@ -6954,10 +7051,10 @@ var $author$project$Api$encodeAction = function (action) {
 					$elm$json$Json$Encode$string('reveal')),
 					_Utils_Tuple2(
 					'row',
-					$elm$json$Json$Encode$int(coord.an)),
+					$elm$json$Json$Encode$int(coord.af)),
 					_Utils_Tuple2(
 					'col',
-					$elm$json$Json$Encode$int(coord.ak))
+					$elm$json$Json$Encode$int(coord.aa))
 				]));
 	} else {
 		var coord = action.a;
@@ -6969,10 +7066,10 @@ var $author$project$Api$encodeAction = function (action) {
 					$elm$json$Json$Encode$string('toggle_flag')),
 					_Utils_Tuple2(
 					'row',
-					$elm$json$Json$Encode$int(coord.an)),
+					$elm$json$Json$Encode$int(coord.af)),
 					_Utils_Tuple2(
 					'col',
-					$elm$json$Json$Encode$int(coord.ak))
+					$elm$json$Json$Encode$int(coord.aa))
 				]));
 	}
 };
@@ -6980,7 +7077,7 @@ var $author$project$Api$sendAction = F3(
 	function (gameId, action, toMsg) {
 		return $elm$http$Http$request(
 			{
-				at: $elm$http$Http$jsonBody(
+				as: $elm$http$Http$jsonBody(
 					$author$project$Api$encodeAction(action)),
 				av: A2($author$project$Api$expectJsonWithError, toMsg, $author$project$Api$snapshotDecoder),
 				ax: _List_Nil,
@@ -6992,24 +7089,24 @@ var $author$project$Api$sendAction = F3(
 	});
 var $author$project$Main$sendPlayerAction = F2(
 	function (action, model) {
-		if (!_Utils_eq(model.e, $author$project$Main$Idle)) {
+		if (!_Utils_eq(model.c, $author$project$Main$Idle)) {
 			return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 		} else {
 			var _v0 = model.h;
 			if (_v0.$ === 1) {
 				var snapshot = _v0.a;
-				return $author$project$Game$isFinished(snapshot.cB) ? _Utils_Tuple2(model, $elm$core$Platform$Cmd$none) : _Utils_Tuple2(
+				return (!A2($author$project$Main$canExecuteAction, snapshot, action)) ? _Utils_Tuple2(model, $elm$core$Platform$Cmd$none) : _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{
 							i: $elm$core$Maybe$Nothing,
-							e: $author$project$Main$MutatingAction(action)
+							c: $author$project$Main$MutatingAction(action)
 						}),
 					A3(
 						$author$project$Api$sendAction,
-						snapshot.b6,
+						snapshot.b7,
 						action,
-						A2($author$project$Main$ActionResponse, model.G, snapshot.b6)));
+						A2($author$project$Main$ActionResponse, model.w, snapshot.b7)));
 			} else {
 				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 			}
@@ -7022,7 +7119,7 @@ var $author$project$Main$update = F2(
 				var difficulty = msg.a;
 				return A2($author$project$Main$startNewGame, difficulty, model);
 			case 1:
-				return A2($author$project$Main$startNewGame, model.bY, model);
+				return A2($author$project$Main$startNewGame, model.bZ, model);
 			case 2:
 				var coord = msg.a;
 				return A2(
@@ -7036,42 +7133,48 @@ var $author$project$Main$update = F2(
 					$author$project$Api$ToggleFlag(coord),
 					model);
 			case 4:
-				var _v1 = model.h;
-				if (_v1.$ === 1) {
-					var snapshot = _v1.a;
-					return _Utils_Tuple2(
-						_Utils_update(
-							model,
-							{
-								i: $elm$core$Maybe$Just('Consultando estado confirmado da partida no servidor...'),
-								e: $author$project$Main$SyncingAfterUncertainAction
-							}),
-						A2(
-							$author$project$Api$fetchGame,
-							snapshot.b6,
-							A2($author$project$Main$SyncResponse, model.G, snapshot.b6)));
-				} else {
+				if ((!_Utils_eq(model.c, $author$project$Main$Idle)) && (!_Utils_eq(model.c, $author$project$Main$SyncFailed))) {
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				} else {
+					var _v1 = model.h;
+					if (_v1.$ === 1) {
+						var snapshot = _v1.a;
+						var nextToken = model.w + 1;
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{
+									i: $elm$core$Maybe$Just('Consultando estado confirmado da partida no servidor...'),
+									c: $author$project$Main$SyncingAfterUncertainAction,
+									w: nextToken
+								}),
+							A2(
+								$author$project$Api$fetchGame,
+								snapshot.b7,
+								A2($author$project$Main$SyncResponse, nextToken, snapshot.b7)));
+					} else {
+						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+					}
 				}
 			case 5:
-				if (model.w) {
+				if (model.x) {
 					var _v2 = model.h;
 					if (_v2.$ === 1) {
 						var snapshot = _v2.a;
 						return (snapshot.cB === 1) ? _Utils_Tuple2(
 							_Utils_update(
 								model,
-								{A: model.A + 1}),
+								{B: model.B + 1}),
 							$elm$core$Platform$Cmd$none) : _Utils_Tuple2(
 							_Utils_update(
 								model,
-								{w: false}),
+								{x: false}),
 							$elm$core$Platform$Cmd$none);
 					} else {
 						return _Utils_Tuple2(
 							_Utils_update(
 								model,
-								{w: false}),
+								{x: false}),
 							$elm$core$Platform$Cmd$none);
 					}
 				} else {
@@ -7080,7 +7183,7 @@ var $author$project$Main$update = F2(
 			case 6:
 				var token = msg.a;
 				var result = msg.b;
-				if (!_Utils_eq(token, model.G)) {
+				if (!_Utils_eq(token, model.w)) {
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				} else {
 					if (!result.$) {
@@ -7089,12 +7192,12 @@ var $author$project$Main$update = F2(
 							_Utils_update(
 								model,
 								{
-									bY: snapshot.bY,
-									A: 0,
+									bZ: snapshot.bZ,
+									B: 0,
 									i: $elm$core$Maybe$Nothing,
-									e: $author$project$Main$Idle,
+									c: $author$project$Main$Idle,
 									h: $author$project$Main$Active(snapshot),
-									w: snapshot.cB === 1
+									x: snapshot.cB === 1
 								}),
 							$elm$core$Platform$Cmd$none);
 					} else {
@@ -7104,10 +7207,10 @@ var $author$project$Main$update = F2(
 								model,
 								{
 									i: $elm$core$Maybe$Nothing,
-									e: $author$project$Main$Idle,
+									c: $author$project$Main$Idle,
 									h: $author$project$Main$Failed(
 										$author$project$Api$errorToMessage(err)),
-									w: false
+									x: false
 								}),
 							$elm$core$Platform$Cmd$none);
 					}
@@ -7116,13 +7219,13 @@ var $author$project$Main$update = F2(
 				var token = msg.a;
 				var gameId = msg.b;
 				var result = msg.c;
-				if (!_Utils_eq(token, model.G)) {
+				if (!_Utils_eq(token, model.w)) {
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				} else {
 					var _v4 = model.h;
 					if (_v4.$ === 1) {
 						var current = _v4.a;
-						return (!_Utils_eq(current.b6, gameId)) ? _Utils_Tuple2(model, $elm$core$Platform$Cmd$none) : A4($author$project$Main$handleActionResult, token, current, result, model);
+						return (!_Utils_eq(current.b7, gameId)) ? _Utils_Tuple2(model, $elm$core$Platform$Cmd$none) : A3($author$project$Main$handleActionResult, current, result, model);
 					} else {
 						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 					}
@@ -7131,13 +7234,13 @@ var $author$project$Main$update = F2(
 				var token = msg.a;
 				var gameId = msg.b;
 				var result = msg.c;
-				if (!_Utils_eq(token, model.G)) {
+				if ((!_Utils_eq(token, model.w)) || (!_Utils_eq(model.c, $author$project$Main$SyncingAfterUncertainAction))) {
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				} else {
 					var _v5 = model.h;
 					if (_v5.$ === 1) {
 						var current = _v5.a;
-						return (!_Utils_eq(current.b6, gameId)) ? _Utils_Tuple2(model, $elm$core$Platform$Cmd$none) : A3($author$project$Main$handleSyncResult, current, result, model);
+						return (!_Utils_eq(current.b7, gameId)) ? _Utils_Tuple2(model, $elm$core$Platform$Cmd$none) : A3($author$project$Main$handleSyncResult, current, result, model);
 					} else {
 						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 					}
@@ -7172,38 +7275,27 @@ var $author$project$Explosion$styles = A3(
 			$elm$html$Html$text('\n@keyframes ms-shake {\n  0%, 100% { transform: translate(0, 0); }\n  15% { transform: translate(-8px, -5px) rotate(-1deg); }\n  30% { transform: translate(8px, 4px) rotate(1deg); }\n  45% { transform: translate(-6px, 5px) rotate(-0.5deg); }\n  60% { transform: translate(6px, -4px) rotate(0.5deg); }\n  75% { transform: translate(-3px, 2px); }\n}\n@keyframes ms-flash {\n  0% { opacity: 0.85; }\n  35% { opacity: 0.15; }\n  55% { opacity: 0.6; }\n  100% { opacity: 0; }\n}\n@keyframes ms-pixel-fly {\n  0% {\n    transform: translate3d(0, 0, 0) rotateX(0deg) rotateY(0deg);\n    opacity: 1;\n  }\n  12% {\n    transform: translate3d(0, 0, 0) scale(1.15);\n    opacity: 1;\n  }\n  100% {\n    transform: translate3d(var(--dx), var(--dy), var(--dz)) rotateX(540deg) rotateY(720deg);\n    opacity: 0;\n  }\n}\n@keyframes ms-cell-boom {\n  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 120, 0, 0.9); }\n  40% { transform: scale(1.35); box-shadow: 0 0 24px 8px rgba(255, 60, 0, 0.9); }\n  100% { transform: scale(1); box-shadow: 0 0 10px 2px rgba(220, 38, 38, 0.7); }\n}\n.minesweeper-app--exploded {\n  animation: ms-shake 0.45s ease-out;\n}\n.ms-explosion-overlay {\n  position: fixed;\n  inset: 0;\n  pointer-events: none;\n  z-index: 9999;\n  overflow: hidden;\n}\n.ms-explosion-flash {\n  position: absolute;\n  inset: 0;\n  background: radial-gradient(circle, rgba(255,234,216,0.95) 0%, rgba(255,102,0,0.5) 45%, transparent 80%);\n  animation: ms-flash 0.5s ease-out forwards;\n}\n.ms-bomb-stage {\n  position: fixed;\n  left: 50%;\n  top: 50%;\n  width: 192px;\n  height: 192px;\n  margin-left: -96px;\n  margin-top: -96px;\n  perspective: 400px;\n}\n.ms-bomb-pixel {\n  position: absolute;\n  width: 12px;\n  height: 12px;\n  animation: ms-pixel-fly 1.35s cubic-bezier(0.18, 0.75, 0.35, 1) forwards;\n}\n.board-cell--exploded {\n  animation: ms-cell-boom 0.5s ease-out forwards;\n}\n')
 		]));
 var $author$project$Main$isBusy = function (model) {
-	return !_Utils_eq(model.e, $author$project$Main$Idle);
+	return !_Utils_eq(model.c, $author$project$Main$Idle);
 };
-var $elm$core$List$filter = F2(
-	function (isGood, list) {
-		return A3(
-			$elm$core$List$foldr,
-			F2(
-				function (x, xs) {
-					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
-				}),
-			_List_Nil,
-			list);
-	});
 var $author$project$Game$flaggedCount = function (snapshot) {
 	return $elm$core$List$length(
 		A2(
 			$elm$core$List$filter,
 			function (cell) {
-				return _Utils_eq(cell.bA, $author$project$Game$Flagged);
+				return _Utils_eq(cell.bC, $author$project$Game$Flagged);
 			},
-			snapshot.aT));
+			snapshot.at));
 };
 var $author$project$Game$remainingMines = function (snapshot) {
-	return snapshot.V - $author$project$Game$flaggedCount(snapshot);
+	return snapshot.bd - $author$project$Game$flaggedCount(snapshot);
 };
 var $author$project$Main$toViewState = function (model) {
 	return {
-		bY: model.bY,
-		A: model.A,
+		bZ: model.bZ,
+		B: model.B,
 		i: model.i,
 		az: $author$project$Main$isBusy(model),
-		e: model.e,
+		c: model.c,
 		aG: function () {
 			var _v0 = model.h;
 			if (_v0.$ === 1) {
@@ -7227,7 +7319,7 @@ var $elm$virtual_dom$VirtualDom$attribute = F2(
 var $elm$html$Html$Attributes$attribute = $elm$virtual_dom$VirtualDom$attribute;
 var $author$project$Explosion$Pixel = F6(
 	function (x, y, color, dx, dy, dz) {
-		return {aV: color, a_: dx, a$: dy, a0: dz, bJ: x, bK: y};
+		return {aU: color, a_: dx, a$: dy, a0: dz, bL: x, bM: y};
 	});
 var $elm$core$Basics$negate = function (n) {
 	return -n;
@@ -7344,12 +7436,12 @@ var $author$project$Explosion$viewPixel = function (p) {
 				A2(
 				$elm$html$Html$Attributes$style,
 				'left',
-				$elm$core$String$fromInt(p.bJ) + 'px'),
+				$elm$core$String$fromInt(p.bL) + 'px'),
 				A2(
 				$elm$html$Html$Attributes$style,
 				'top',
-				$elm$core$String$fromInt(p.bK) + 'px'),
-				A2($elm$html$Html$Attributes$style, 'background-color', p.aV),
+				$elm$core$String$fromInt(p.bM) + 'px'),
+				A2($elm$html$Html$Attributes$style, 'background-color', p.aU),
 				A2(
 				$elm$html$Html$Attributes$style,
 				'--dx',
@@ -7455,7 +7547,7 @@ var $elm$html$Html$Events$preventDefaultOn = F2(
 var $elm$html$Html$Attributes$title = $elm$html$Html$Attributes$stringProperty('title');
 var $author$project$Main$viewCell = F3(
 	function (busy, status, cell) {
-		var coord = {ak: cell.ak, an: cell.an};
+		var coord = {aa: cell.aa, af: cell.af};
 		var onRightClick = A2(
 			$elm$html$Html$Events$preventDefaultOn,
 			'contextmenu',
@@ -7464,12 +7556,12 @@ var $author$project$Main$viewCell = F3(
 					$author$project$Main$ToggleFlag(coord),
 					true)));
 		var _v0 = function () {
-			var _v1 = cell.bA;
+			var _v1 = cell.bC;
 			switch (_v1.$) {
 				case 0:
 					return _Utils_Tuple3('', '#4b5563', '#f9fafb');
 				case 1:
-					return A2($author$project$Game$isWrongFlag, status, cell.bA) ? _Utils_Tuple3('✕', '#7f1d1d', '#fecaca') : _Utils_Tuple3('⚑', '#4b5563', '#facc15');
+					return A2($author$project$Game$isWrongFlag, status, cell.bC) ? _Utils_Tuple3('✕', '#7f1d1d', '#fecaca') : _Utils_Tuple3('⚑', '#4b5563', '#facc15');
 				case 2:
 					if (!_v1.a) {
 						return _Utils_Tuple3('', '#1f2937', '#e5e7eb');
@@ -7495,7 +7587,7 @@ var $author$project$Main$viewCell = F3(
 				[
 					$elm$html$Html$Attributes$type_('button'),
 					$elm$html$Html$Attributes$class(
-					_Utils_eq(cell.bA, $author$project$Game$Exploded) ? 'board-cell board-cell--exploded' : 'board-cell'),
+					_Utils_eq(cell.bC, $author$project$Game$Exploded) ? 'board-cell board-cell--exploded' : 'board-cell'),
 					A2($elm$html$Html$Attributes$style, 'width', '2rem'),
 					A2($elm$html$Html$Attributes$style, 'height', '2rem'),
 					A2($elm$html$Html$Attributes$style, 'padding', '0'),
@@ -7508,7 +7600,7 @@ var $author$project$Main$viewCell = F3(
 					$author$project$Main$RevealCell(coord)),
 					onRightClick,
 					$elm$html$Html$Attributes$title(
-					'Linha ' + ($elm$core$String$fromInt(cell.an + 1) + (', Coluna ' + $elm$core$String$fromInt(cell.ak + 1))))
+					'Linha ' + ($elm$core$String$fromInt(cell.af + 1) + (', Coluna ' + $elm$core$String$fromInt(cell.aa + 1))))
 				]),
 			_List_fromArray(
 				[
@@ -7526,13 +7618,13 @@ var $author$project$Main$viewBoard = F2(
 					A2(
 					$elm$html$Html$Attributes$style,
 					'grid-template-columns',
-					'repeat(' + ($elm$core$String$fromInt(snapshot.bV) + ', 2rem)')),
+					'repeat(' + ($elm$core$String$fromInt(snapshot.aV) + ', 2rem)')),
 					A2($elm$html$Html$Attributes$style, 'gap', '2px')
 				]),
 			A2(
 				$elm$core$List$map,
 				A2($author$project$Main$viewCell, busy, snapshot.cB),
-				snapshot.aT));
+				snapshot.at));
 	});
 var $author$project$Main$viewBody = function (state) {
 	var _v0 = state.h;
@@ -7641,16 +7733,6 @@ var $author$project$Main$viewBody = function (state) {
 };
 var $author$project$Game$allDifficulties = _List_fromArray(
 	[0, 1, 2]);
-var $elm$core$Maybe$map = F2(
-	function (f, maybe) {
-		if (!maybe.$) {
-			var value = maybe.a;
-			return $elm$core$Maybe$Just(
-				f(value));
-		} else {
-			return $elm$core$Maybe$Nothing;
-		}
-	});
 var $elm$html$Html$span = _VirtualDom_node('span');
 var $author$project$Main$SelectDifficulty = function (a) {
 	return {$: 0, a: a};
@@ -7686,15 +7768,6 @@ var $author$project$Main$viewDifficultyButton = F2(
 					$author$project$Game$difficultyLabel(difficulty))
 				]));
 	});
-var $elm$core$Maybe$withDefault = F2(
-	function (_default, maybe) {
-		if (!maybe.$) {
-			var value = maybe.a;
-			return value;
-		} else {
-			return _default;
-		}
-	});
 var $author$project$Main$viewControls = function (state) {
 	return A2(
 		$elm$html$Html$div,
@@ -7712,7 +7785,7 @@ var $author$project$Main$viewControls = function (state) {
 					]),
 				A2(
 					$elm$core$List$map,
-					$author$project$Main$viewDifficultyButton(state.bY),
+					$author$project$Main$viewDifficultyButton(state.bZ),
 					$author$project$Game$allDifficulties)),
 				A2(
 				$elm$html$Html$div,
@@ -7746,7 +7819,7 @@ var $author$project$Main$viewControls = function (state) {
 						_List_fromArray(
 							[
 								$elm$html$Html$text(
-								'Tempo: ' + ($elm$core$String$fromInt(state.A) + 's'))
+								'Tempo: ' + ($elm$core$String$fromInt(state.B) + 's'))
 							])),
 						A2(
 						$elm$html$Html$button,
@@ -7786,18 +7859,39 @@ var $author$project$Main$viewFeedback = function (state) {
 						[
 							$elm$html$Html$text(message)
 						])),
-					_Utils_eq(state.e, $author$project$Main$SyncingAfterUncertainAction) ? A2(
-					$elm$html$Html$button,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$type_('button'),
-							A2($elm$html$Html$Attributes$style, 'color', '#111'),
-							$elm$html$Html$Events$onClick($author$project$Main$SyncGame)
-						]),
-					_List_fromArray(
-						[
-							$elm$html$Html$text('Sincronizar novamente')
-						])) : $elm$html$Html$text('')
+					function () {
+					var _v1 = state.c;
+					switch (_v1.$) {
+						case 3:
+							return A2(
+								$elm$html$Html$button,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$type_('button'),
+										A2($elm$html$Html$Attributes$style, 'color', '#111'),
+										$elm$html$Html$Attributes$disabled(true)
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Sincronizando...')
+									]));
+						case 4:
+							return A2(
+								$elm$html$Html$button,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$type_('button'),
+										A2($elm$html$Html$Attributes$style, 'color', '#111'),
+										$elm$html$Html$Events$onClick($author$project$Main$SyncGame)
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Sincronizar novamente')
+									]));
+						default:
+							return $elm$html$Html$text('');
+					}
+				}()
 				]));
 	} else {
 		return $elm$html$Html$text('');
@@ -7847,5 +7941,5 @@ var $author$project$Main$view = function (model) {
 			]));
 };
 var $author$project$Main$main = $elm$browser$Browser$element(
-	{b9: $author$project$Main$init, cE: $author$project$Main$subscriptions, cJ: $author$project$Main$update, cK: $author$project$Main$view});
+	{ca: $author$project$Main$init, cE: $author$project$Main$subscriptions, cJ: $author$project$Main$update, cK: $author$project$Main$view});
 _Platform_export({'Main':{'init':$author$project$Main$main($elm$json$Json$Decode$value)(0)}});}(this));
