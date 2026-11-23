@@ -2,7 +2,7 @@
 
 Projeto de Campo Minado web desenvolvido com SWI-Prolog e Elm, com interface em português e HTML/CSS.
 
-**Estado atual:** a base Prolog de geometria, geração e motor de regras/transições de Campo Minado (`backend/minesweeper/board.pl` e `backend/minesweeper/game.pl`) está implementada e testada. O servidor e o bundle compilado ainda executam o Sudoku original; API HTTP e interface de Campo Minado permanecem nas respectivas frentes.
+**Estado atual:** a base Prolog de geometria, geração, motor de regras, sessões em memória e API HTTP de Campo Minado está implementada e testada. O bundle compilado ainda apresenta a interface do Sudoku original; o cliente e a interface de Campo Minado permanecem nas respectivas frentes.
 
 ## Escopo planejado
 
@@ -24,7 +24,7 @@ Ranking, contas, multiplayer, desfazer e dicas ficam fora do MVP. O primeiro cli
 | Elm | Modelo da interface, comunicação HTTP, eventos, carregamento e tratamento de erros |
 | HTML/CSS | Apresentação responsiva e controles acessíveis |
 
-O servidor guardará as minas e validará as jogadas. As sessões terão expiração por inatividade e serão perdidas ao reiniciar o servidor. Os endpoints planejados são `POST /api/games`, `GET /api/games/:id` e `POST /api/games/:id/actions`; eles ainda precisam ser implementados.
+O servidor guarda as minas e valida as jogadas. As sessões expiram após duas horas de inatividade e são perdidas ao reiniciar o servidor. Os endpoints implementados são `POST /api/games`, `GET /api/games/:id` e `POST /api/games/:id/actions`; o contrato completo está em [docs/API.md](docs/API.md).
 
 O [plano de migração](docs/PLANO_CAMPO_MINADO.md) detalha o contrato proposto, as regras, as dependências entre frentes e os critérios de conclusão.
 
@@ -50,7 +50,7 @@ Todo PR deve ser revisado e aprovado pelo responsável pela frente seguinte ante
 
 ## Como executar a base atual
 
-Estes comandos ainda executam o **Sudoku existente**. Serão adaptados durante a migração.
+O servidor já expõe a API de Campo Minado e continua servindo o bundle estático existente, que será substituído pelas frentes de cliente e interface.
 
 Requisitos: [SWI-Prolog](https://www.swi-prolog.org/) 9+ e [Elm](https://elm-lang.org/) 0.19.1. Para instalar o compilador Elm via npm:
 
@@ -77,13 +77,13 @@ swipl backend/server.pl 8080
 
 Abra `http://localhost:8080`. O bundle `frontend/public/elm.js` já está versionado; para executar a base sem recompilar, basta iniciar o servidor Prolog.
 
-Para testar o backend atual:
+Para testar todo o backend:
 
 ```sh
-swipl -g run_tests -t halt backend/tests/test_sudoku.pl
+make test
 ```
 
-Os testes do tabuleiro e do motor de Campo Minado podem ser executados com `swipl -g run_tests -t halt backend/tests/test_minesweeper_board.pl` e `swipl -g run_tests -t halt backend/tests/test_minesweeper_game.pl`, ou com `make test-minesweeper`. O comando `make test` executa as suítes de Sudoku e Campo Minado. A API HTTP e o frontend de Campo Minado permanecem nas respectivas frentes.
+`make test-minesweeper` executa as suítes de tabuleiro, motor, sessões e API HTTP. `make test` inclui também a suíte legada de Sudoku durante a coexistência dos domínios.
 
 ## Documentação
 
@@ -92,5 +92,7 @@ O [mapa de migração e integração](docs/MIGRACAO_CAMPO_MINADO.md) identifica 
 O [contrato do tabuleiro](docs/MINESWEEPER_BOARD.md) documenta os predicados implementados em `backend/minesweeper/board.pl` para integração com o motor.
 
 O [contrato do motor](docs/MINESWEEPER_GAME.md) documenta os predicados, ações, erros e projeção pública implementados em `backend/minesweeper/game.pl` para integração com a API HTTP.
+
+O [contrato da API](docs/API.md) documenta endpoints, snapshots, erros, sessões e as fixtures JSON compartilhadas com o cliente Elm.
 
 O documento principal do novo projeto é o [plano de Campo Minado](docs/PLANO_CAMPO_MINADO.md). Os arquivos [FEATURES.md](docs/FEATURES.md) e [EXPLICACAO.md](docs/EXPLICACAO.md) ainda descrevem o Sudoku e serão atualizados na integração final.

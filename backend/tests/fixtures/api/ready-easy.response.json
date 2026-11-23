@@ -1,0 +1,416 @@
+{
+  "id": "00000000-0000-4000-8000-000000000001",
+  "difficulty": "easy",
+  "rows": 9,
+  "cols": 9,
+  "mineCount": 10,
+  "status": "ready",
+  "revision": 0,
+  "cells": [
+    {
+      "row": 0,
+      "col": 0,
+      "state": "hidden"
+    },
+    {
+      "row": 0,
+      "col": 1,
+      "state": "hidden"
+    },
+    {
+      "row": 0,
+      "col": 2,
+      "state": "hidden"
+    },
+    {
+      "row": 0,
+      "col": 3,
+      "state": "hidden"
+    },
+    {
+      "row": 0,
+      "col": 4,
+      "state": "hidden"
+    },
+    {
+      "row": 0,
+      "col": 5,
+      "state": "hidden"
+    },
+    {
+      "row": 0,
+      "col": 6,
+      "state": "hidden"
+    },
+    {
+      "row": 0,
+      "col": 7,
+      "state": "hidden"
+    },
+    {
+      "row": 0,
+      "col": 8,
+      "state": "hidden"
+    },
+    {
+      "row": 1,
+      "col": 0,
+      "state": "hidden"
+    },
+    {
+      "row": 1,
+      "col": 1,
+      "state": "hidden"
+    },
+    {
+      "row": 1,
+      "col": 2,
+      "state": "hidden"
+    },
+    {
+      "row": 1,
+      "col": 3,
+      "state": "hidden"
+    },
+    {
+      "row": 1,
+      "col": 4,
+      "state": "hidden"
+    },
+    {
+      "row": 1,
+      "col": 5,
+      "state": "hidden"
+    },
+    {
+      "row": 1,
+      "col": 6,
+      "state": "hidden"
+    },
+    {
+      "row": 1,
+      "col": 7,
+      "state": "hidden"
+    },
+    {
+      "row": 1,
+      "col": 8,
+      "state": "hidden"
+    },
+    {
+      "row": 2,
+      "col": 0,
+      "state": "hidden"
+    },
+    {
+      "row": 2,
+      "col": 1,
+      "state": "hidden"
+    },
+    {
+      "row": 2,
+      "col": 2,
+      "state": "hidden"
+    },
+    {
+      "row": 2,
+      "col": 3,
+      "state": "hidden"
+    },
+    {
+      "row": 2,
+      "col": 4,
+      "state": "hidden"
+    },
+    {
+      "row": 2,
+      "col": 5,
+      "state": "hidden"
+    },
+    {
+      "row": 2,
+      "col": 6,
+      "state": "hidden"
+    },
+    {
+      "row": 2,
+      "col": 7,
+      "state": "hidden"
+    },
+    {
+      "row": 2,
+      "col": 8,
+      "state": "hidden"
+    },
+    {
+      "row": 3,
+      "col": 0,
+      "state": "hidden"
+    },
+    {
+      "row": 3,
+      "col": 1,
+      "state": "hidden"
+    },
+    {
+      "row": 3,
+      "col": 2,
+      "state": "hidden"
+    },
+    {
+      "row": 3,
+      "col": 3,
+      "state": "hidden"
+    },
+    {
+      "row": 3,
+      "col": 4,
+      "state": "hidden"
+    },
+    {
+      "row": 3,
+      "col": 5,
+      "state": "hidden"
+    },
+    {
+      "row": 3,
+      "col": 6,
+      "state": "hidden"
+    },
+    {
+      "row": 3,
+      "col": 7,
+      "state": "hidden"
+    },
+    {
+      "row": 3,
+      "col": 8,
+      "state": "hidden"
+    },
+    {
+      "row": 4,
+      "col": 0,
+      "state": "hidden"
+    },
+    {
+      "row": 4,
+      "col": 1,
+      "state": "hidden"
+    },
+    {
+      "row": 4,
+      "col": 2,
+      "state": "hidden"
+    },
+    {
+      "row": 4,
+      "col": 3,
+      "state": "hidden"
+    },
+    {
+      "row": 4,
+      "col": 4,
+      "state": "hidden"
+    },
+    {
+      "row": 4,
+      "col": 5,
+      "state": "hidden"
+    },
+    {
+      "row": 4,
+      "col": 6,
+      "state": "hidden"
+    },
+    {
+      "row": 4,
+      "col": 7,
+      "state": "hidden"
+    },
+    {
+      "row": 4,
+      "col": 8,
+      "state": "hidden"
+    },
+    {
+      "row": 5,
+      "col": 0,
+      "state": "hidden"
+    },
+    {
+      "row": 5,
+      "col": 1,
+      "state": "hidden"
+    },
+    {
+      "row": 5,
+      "col": 2,
+      "state": "hidden"
+    },
+    {
+      "row": 5,
+      "col": 3,
+      "state": "hidden"
+    },
+    {
+      "row": 5,
+      "col": 4,
+      "state": "hidden"
+    },
+    {
+      "row": 5,
+      "col": 5,
+      "state": "hidden"
+    },
+    {
+      "row": 5,
+      "col": 6,
+      "state": "hidden"
+    },
+    {
+      "row": 5,
+      "col": 7,
+      "state": "hidden"
+    },
+    {
+      "row": 5,
+      "col": 8,
+      "state": "hidden"
+    },
+    {
+      "row": 6,
+      "col": 0,
+      "state": "hidden"
+    },
+    {
+      "row": 6,
+      "col": 1,
+      "state": "hidden"
+    },
+    {
+      "row": 6,
+      "col": 2,
+      "state": "hidden"
+    },
+    {
+      "row": 6,
+      "col": 3,
+      "state": "hidden"
+    },
+    {
+      "row": 6,
+      "col": 4,
+      "state": "hidden"
+    },
+    {
+      "row": 6,
+      "col": 5,
+      "state": "hidden"
+    },
+    {
+      "row": 6,
+      "col": 6,
+      "state": "hidden"
+    },
+    {
+      "row": 6,
+      "col": 7,
+      "state": "hidden"
+    },
+    {
+      "row": 6,
+      "col": 8,
+      "state": "hidden"
+    },
+    {
+      "row": 7,
+      "col": 0,
+      "state": "hidden"
+    },
+    {
+      "row": 7,
+      "col": 1,
+      "state": "hidden"
+    },
+    {
+      "row": 7,
+      "col": 2,
+      "state": "hidden"
+    },
+    {
+      "row": 7,
+      "col": 3,
+      "state": "hidden"
+    },
+    {
+      "row": 7,
+      "col": 4,
+      "state": "hidden"
+    },
+    {
+      "row": 7,
+      "col": 5,
+      "state": "hidden"
+    },
+    {
+      "row": 7,
+      "col": 6,
+      "state": "hidden"
+    },
+    {
+      "row": 7,
+      "col": 7,
+      "state": "hidden"
+    },
+    {
+      "row": 7,
+      "col": 8,
+      "state": "hidden"
+    },
+    {
+      "row": 8,
+      "col": 0,
+      "state": "hidden"
+    },
+    {
+      "row": 8,
+      "col": 1,
+      "state": "hidden"
+    },
+    {
+      "row": 8,
+      "col": 2,
+      "state": "hidden"
+    },
+    {
+      "row": 8,
+      "col": 3,
+      "state": "hidden"
+    },
+    {
+      "row": 8,
+      "col": 4,
+      "state": "hidden"
+    },
+    {
+      "row": 8,
+      "col": 5,
+      "state": "hidden"
+    },
+    {
+      "row": 8,
+      "col": 6,
+      "state": "hidden"
+    },
+    {
+      "row": 8,
+      "col": 7,
+      "state": "hidden"
+    },
+    {
+      "row": 8,
+      "col": 8,
+      "state": "hidden"
+    }
+  ]
+}
