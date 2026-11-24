@@ -48,18 +48,24 @@ O módulo de fixtures `backend/tests/fixtures/minesweeper.pl` pode ser importado
 nos testes do motor. Ele fornece dimensões, minas e contagens esperadas sem
 definir um termo de estado de partida nem abrir uma API de teste.
 
-### Frente 03 — API e sessões de Davi
+**Implementado na frente 02:** `backend/minesweeper/game.pl` (`minesweeper_game`),
+com testes em `backend/tests/test_minesweeper_game.pl` e contrato detalhado em
+[MINESWEEPER_GAME.md](MINESWEEPER_GAME.md).
 
-O servidor atual usa `/api/new` e `/api/hint` e inclui semente e solução no fluxo
-de Sudoku. Esses handlers não devem ser adaptados por simples renomeação: o novo
-servidor guarda o estado real da partida e produz uma projeção pública.
+### Frente 03 — API e sessões
 
-O contrato planejado usa `POST /api/games`, `GET /api/games/:id` e
-`POST /api/games/:id/actions`. Converter `row`/`col` inteiros para `cell/2`, validar
-com as dimensões da sessão e mapear erros conforme o plano. Enquanto `ready` ou
-`playing`, não expor minas, semente ou números de células ocultas. Sessões,
-sincronização de ações e expiração ficam nesta frente; `board.pl` não tem estado
-global mutável de partidas. `docs/API.md` será produzido pela frente 03.
+**Implementado na frente 03:** `backend/server.pl` expõe somente a nova API de
+Campo Minado e preserva o serviço de arquivos estáticos. O armazenamento em
+`backend/minesweeper/sessions.pl` guarda o estado real da partida em memória e
+produz apenas a projeção pública do motor.
+
+O contrato usa `POST /api/games`, `GET /api/games/:id` e
+`POST /api/games/:id/actions`, documentados em [API.md](API.md). Sessões usam
+UUID v4 opaco, expiram após duas horas, têm limite padrão de 1.000 partidas e
+serializam ações por partida. As suítes `test_minesweeper_sessions.pl` e
+`test_minesweeper_http.pl` cobrem expiração, isolamento, concorrência, erros e
+ausência de vazamento. `board.pl` e `game.pl` continuam sem estado global mutável
+de partidas.
 
 ### Frentes 04 e 05 — cliente e apresentação
 
@@ -82,10 +88,11 @@ o código fonte. Preservar o histórico e as evidências de revisão de cada PR.
 
 ```sh
 swipl -g run_tests -t halt backend/tests/test_minesweeper_board.pl
+swipl -g run_tests -t halt backend/tests/test_minesweeper_game.pl
 swipl -g run_tests -t halt backend/tests/test_sudoku.pl
 ```
 
-Com make disponível, `make test-minesweeper` verifica a frente 01 e `make test`
-executa as duas suítes. O aceite de HTTP, Elm, interface, sessões e regras do
-motor depende das entregas correspondentes. A base não promete região inicial
-vazia ou partidas sem adivinhação.
+Com make disponível, `make test-minesweeper` verifica as frentes 01 e 02 e
+`make test` executa todas as suítes. O aceite de HTTP, Elm, interface, sessões e
+integração final depende das entregas correspondentes. A base não promete região
+inicial vazia ou partidas sem adivinhação.

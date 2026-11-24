@@ -1,316 +1,465 @@
 module Api exposing
-    ( Difficulty(..)
-    , HintResult(..)
-    , HintStep
-    , Puzzle
-    , Rating
-    , TechniqueUse
-    , allDifficulties
-    , difficultyId
-    , difficultyName
-    , Error
-    , errorToString
-    , requestHint
-    , requestPuzzle
+    ( Action(..)
+    , ApiError(..)
+    , ApiErrorPayload
+    , actionDecoder
+    , cellDecoder
+    , cellStateDecoder
+    , createGame
+    , difficultyDecoder
+    , encodeAction
+    , encodeCreateGame
+    , errorPayloadDecoder
+    , errorToMessage
+    , fetchGame
+    , isSessionLost
+    , isUncertainOutcome
+    , sendAction
+    , snapshotDecoder
+    , statusDecoder
     )
 
-{-| Comunicação com o servidor Prolog (`backend/server.pl`).
+{-| Cliente HTTP e decoders JSON da API v1 do Campo Minado (`/api/games`).
+
+Contrato de referência: `docs/API.md` (Frente 03).
+
 -}
 
-import Array exposing (Array)
+import Game exposing (Cell, CellState(..), Coord, Difficulty(..), Snapshot, Status(..))
 import Http
-import Json.Decode as D
-import Json.Encode as E
-import Local exposing (Extra)
-import Variant exposing (Cage, Rule)
+import Json.Decode as Decode exposing (Decoder)
+import Json.Encode as Encode
 
 
-type Difficulty
-    = Facil
-    | Medio
-    | Dificil
-    | Extremo
+type Action
+    = Reveal Coord
+    | ToggleFlag Coord
 
 
-allDifficulties : List Difficulty
-allDifficulties =
-    [ Facil, Medio, Dificil, Extremo ]
-
-
-difficultyId : Difficulty -> String
-difficultyId d =
-    case d of
-        Facil ->
-            "facil"
-
-        Medio ->
-            "medio"
-
-        Dificil ->
-            "dificil"
-
-        Extremo ->
-            "extremo"
-
-
-difficultyName : Difficulty -> String
-difficultyName d =
-    case d of
-        Facil ->
-            "Fácil"
-
-        Medio ->
-            "Médio"
-
-        Dificil ->
-            "Difícil"
-
-        Extremo ->
-            "Extremo"
-
-
-type alias TechniqueUse =
-    { id : String
-    , name : String
-    , level : Int
-    , count : Int
-    }
-
-
-type alias Rating =
-    { level : Int
-    , label : String
-    , techniques : List TechniqueUse
-    }
-
-
-type alias Puzzle =
-    { rules : List Rule
-    , difficulty : String
-    , seed : Int
-    , givens : List Int
-    , solution : Array Int
-    , cages : List Cage
-    , parity : Array Int
-    , extras : List Extra
-    , constraints : Int
-    , rating : Rating
-    }
-
-
-type alias HintStep =
-    { technique : String
-    , name : String
-    , level : Int
+type alias ApiErrorPayload =
+    { code : String
     , message : String
-    , focus : List Int
-    , unit : List Int
-    , eliminations : List ( Int, Int )
-    , placement : Maybe ( Int, Int )
     }
 
 
-type HintResult
-    = HintSolved
-    | HintErrors (List Int)
-    | HintSteps (List HintStep)
+type ApiError
+    = BadUrl String
+    | Timeout
+    | NetworkError
+    | HttpError Int (Maybe ApiErrorPayload)
+    | BadBody String
+
+
+requestTimeoutMs : Float
+requestTimeoutMs =
+    10000
 
 
 
--- REQUISIÇÕES
+-- REQUISIÇÕES HTTP
 
 
-{-| Erro de rede ou a mensagem de erro (em português) enviada pelo servidor.
--}
-type Error
-    = HttpError Http.Error
-    | ServerError String
+createGame : Difficulty -> (Result ApiError Snapshot -> msg) -> Cmd msg
+createGame difficulty toMsg =
+    Http.request
+        { method = "POST"
+        , headers = []
+        , url = "/api/games"
+        , body = Http.jsonBody (encodeCreateGame difficulty)
+        , expect = expectJsonWithError toMsg snapshotDecoder
+        , timeout = Just requestTimeoutMs
+        , tracker = Nothing
+        }
 
 
-expectJson : (Result Error a -> msg) -> D.Decoder a -> Http.Expect msg
-expectJson toMsg decoder =
+fetchGame : String -> (Result ApiError Snapshot -> msg) -> Cmd msg
+fetchGame gameId toMsg =
+    Http.request
+        { method = "GET"
+        , headers = []
+        , url = "/api/games/" ++ gameId
+        , body = Http.emptyBody
+        , expect = expectJsonWithError toMsg snapshotDecoder
+        , timeout = Just requestTimeoutMs
+        , tracker = Nothing
+        }
+
+
+sendAction : String -> Action -> (Result ApiError Snapshot -> msg) -> Cmd msg
+sendAction gameId action toMsg =
+    Http.request
+        { method = "POST"
+        , headers = []
+        , url = "/api/games/" ++ gameId ++ "/actions"
+        , body = Http.jsonBody (encodeAction action)
+        , expect = expectJsonWithError toMsg snapshotDecoder
+        , timeout = Just requestTimeoutMs
+        , tracker = Nothing
+        }
+
+
+expectJsonWithError : (Result ApiError a -> msg) -> Decoder a -> Http.Expect msg
+expectJsonWithError toMsg decoder =
     Http.expectStringResponse toMsg <|
         \response ->
             case response of
-                Http.GoodStatus_ _ body ->
-                    D.decodeString decoder body
-                        |> Result.mapError (HttpError << Http.BadBody << D.errorToString)
-
-                Http.BadStatus_ meta body ->
-                    case D.decodeString (D.field "error" D.string) body of
-                        Ok msg ->
-                            Err (ServerError msg)
-
-                        Err _ ->
-                            Err (HttpError (Http.BadStatus meta.statusCode))
-
-                Http.BadUrl_ u ->
-                    Err (HttpError (Http.BadUrl u))
+                Http.BadUrl_ url ->
+                    Err (BadUrl url)
 
                 Http.Timeout_ ->
-                    Err (HttpError Http.Timeout)
+                    Err Timeout
 
                 Http.NetworkError_ ->
-                    Err (HttpError Http.NetworkError)
+                    Err NetworkError
+
+                Http.BadStatus_ metadata body ->
+                    let
+                        parsedError =
+                            Decode.decodeString errorPayloadDecoder body
+                                |> Result.toMaybe
+                    in
+                    Err (HttpError metadata.statusCode parsedError)
+
+                Http.GoodStatus_ _ body ->
+                    case Decode.decodeString decoder body of
+                        Ok value ->
+                            Ok value
+
+                        Err err ->
+                            Err (BadBody (Decode.errorToString err))
 
 
-requestPuzzle : List Rule -> Difficulty -> Maybe Int -> (Result Error Puzzle -> msg) -> Cmd msg
-requestPuzzle rules difficulty seed toMsg =
-    Http.post
-        { url = "/api/new"
-        , body =
-            Http.jsonBody <|
-                E.object
-                    [ ( "rules", E.list (E.string << Variant.ruleId) rules )
-                    , ( "difficulty", E.string (difficultyId difficulty) )
-                    , ( "seed", Maybe.map E.int seed |> Maybe.withDefault E.null )
-                    ]
-        , expect = expectJson toMsg puzzleDecoder
-        }
+
+-- CLASSIFICAÇÃO E MENSAGENS DE ERRO EM PORTUGUÊS
 
 
-requestHint : Puzzle -> List Int -> (Result Error HintResult -> msg) -> Cmd msg
-requestHint puzzle board toMsg =
-    Http.post
-        { url = "/api/hint"
-        , body =
-            Http.jsonBody <|
-                E.object
-                    [ ( "rules", E.list (E.string << Variant.ruleId) puzzle.rules )
-                    , ( "cages", E.list encodeCage puzzle.cages )
-                    , ( "parity", E.array E.int puzzle.parity )
-                    , ( "extras", E.list Local.encode puzzle.extras )
-                    , ( "board", E.list E.int board )
-                    , ( "solution", E.array E.int puzzle.solution )
-                    ]
-        , expect = expectJson toMsg hintDecoder
-        }
+isSessionLost : ApiError -> Bool
+isSessionLost err =
+    case err of
+        HttpError 404 (Just payload) ->
+            payload.code == "game_not_found"
+
+        HttpError 404 Nothing ->
+            True
+
+        _ ->
+            False
 
 
-encodeCage : Cage -> E.Value
-encodeCage cage =
-    E.object
-        [ ( "sum", E.int cage.sum )
-        , ( "cells", E.list E.int cage.cells )
+{-| Indica que a requisição pode ou não ter sido aplicada no servidor
+(ex.: timeout ou queda de rede). Nesse caso, o cliente deve consultar GET
+antes de liberar comandos e nunca repetir `toggle_flag` automaticamente.
+-}
+isUncertainOutcome : ApiError -> Bool
+isUncertainOutcome err =
+    case err of
+        Timeout ->
+            True
+
+        NetworkError ->
+            True
+
+        _ ->
+            False
+
+
+errorToMessage : ApiError -> String
+errorToMessage err =
+    case err of
+        BadUrl url ->
+            "Endereço da API inválido: " ++ url
+
+        Timeout ->
+            "Tempo esgotado ao aguardar resposta do servidor."
+
+        NetworkError ->
+            "Falha de conexão com o servidor. Verifique se o backend está ativo."
+
+        BadBody _ ->
+            "Resposta inesperada recebida do servidor."
+
+        HttpError status maybePayload ->
+            case maybePayload of
+                Just payload ->
+                    errorCodeToMessage payload
+
+                Nothing ->
+                    if status == 404 then
+                        "Partida não encontrada ou sessão expirada. Inicie um novo jogo."
+
+                    else if status == 503 then
+                        "Servidor cheio no momento. Tente novamente em instantes."
+
+                    else
+                        "Erro no servidor (HTTP " ++ String.fromInt status ++ ")."
+
+
+errorCodeToMessage : ApiErrorPayload -> String
+errorCodeToMessage payload =
+    case payload.code of
+        "game_not_found" ->
+            "Sessão expirada ou partida não encontrada. Inicie um novo jogo."
+
+        "game_over" ->
+            "A partida já foi encerrada."
+
+        "cell_flagged" ->
+            "Não é possível revelar uma célula marcada com bandeira."
+
+        "cell_revealed" ->
+            "Não é possível marcar uma célula já revelada."
+
+        "invalid_cell" ->
+            "Coordenada de célula inválida."
+
+        "invalid_difficulty" ->
+            "Dificuldade selecionada não reconhecida pelo servidor."
+
+        "invalid_action" ->
+            "Ação não reconhecida pelo servidor."
+
+        "session_limit_reached" ->
+            "Limite de partidas ativas no servidor atingido. Tente novamente em breve."
+
+        "internal_error" ->
+            "Erro interno no servidor ao processar a jogada."
+
+        _ ->
+            if String.isEmpty payload.message then
+                "Erro ao comunicar com o servidor (" ++ payload.code ++ ")."
+
+            else
+                payload.message
+
+
+
+-- ENCODERS
+
+
+encodeCreateGame : Difficulty -> Encode.Value
+encodeCreateGame difficulty =
+    Encode.object
+        [ ( "difficulty", Encode.string (Game.difficultyToString difficulty) )
         ]
 
 
-errorToString : Error -> String
-errorToString error =
-    case error of
-        ServerError msg ->
-            msg
+encodeAction : Action -> Encode.Value
+encodeAction action =
+    case action of
+        Reveal coord ->
+            Encode.object
+                [ ( "action", Encode.string "reveal" )
+                , ( "row", Encode.int coord.row )
+                , ( "col", Encode.int coord.col )
+                ]
 
-        HttpError err ->
-            httpErrorToString err
-
-
-httpErrorToString : Http.Error -> String
-httpErrorToString err =
-    case err of
-        Http.BadUrl u ->
-            "URL inválida: " ++ u
-
-        Http.Timeout ->
-            "O servidor demorou demais para responder."
-
-        Http.NetworkError ->
-            "Sem conexão com o servidor Prolog. Ele está rodando?"
-
-        Http.BadStatus code ->
-            "O servidor respondeu com erro " ++ String.fromInt code ++ "."
-
-        Http.BadBody msg ->
-            "Resposta inesperada do servidor: " ++ msg
+        ToggleFlag coord ->
+            Encode.object
+                [ ( "action", Encode.string "toggle_flag" )
+                , ( "row", Encode.int coord.row )
+                , ( "col", Encode.int coord.col )
+                ]
 
 
 
 -- DECODERS
 
 
-{-| `D.map8` vai só até 8 campos e o puzzle tem 10. `andMap` aplica um
-decoder de função a mais um campo: é o mesmo padrão de "applicative"
-que `Json.Decode.Pipeline` usa por baixo.
--}
-andMap : D.Decoder a -> D.Decoder (a -> b) -> D.Decoder b
-andMap =
-    D.map2 (|>)
+difficultyDecoder : Decoder Difficulty
+difficultyDecoder =
+    Decode.string
+        |> Decode.andThen
+            (\raw ->
+                case Game.difficultyFromString raw of
+                    Just difficulty ->
+                        Decode.succeed difficulty
 
-
-puzzleDecoder : D.Decoder Puzzle
-puzzleDecoder =
-    D.succeed Puzzle
-        |> andMap (D.field "rules" (D.list D.string) |> D.map (List.filterMap Variant.ruleFromId))
-        |> andMap (D.field "difficulty" D.string)
-        |> andMap (D.field "seed" D.int)
-        |> andMap (D.field "puzzle" (D.list D.int))
-        |> andMap (D.field "solution" (D.array D.int))
-        |> andMap (D.field "cages" (D.list cageDecoder))
-        |> andMap (D.field "parity" (D.array D.int))
-        |> andMap (D.oneOf [ D.field "extras" (D.list Local.decoder), D.succeed [] ])
-        |> andMap (D.oneOf [ D.field "constraints" D.int, D.succeed 0 ])
-        |> andMap (D.field "rating" ratingDecoder)
-
-
-cageDecoder : D.Decoder Cage
-cageDecoder =
-    D.map2 Cage
-        (D.field "sum" D.int)
-        (D.field "cells" (D.list D.int))
-
-
-ratingDecoder : D.Decoder Rating
-ratingDecoder =
-    D.map3 Rating
-        (D.field "level" D.int)
-        (D.field "label" D.string)
-        (D.field "techniques"
-            (D.list
-                (D.map4 TechniqueUse
-                    (D.field "id" D.string)
-                    (D.field "name" D.string)
-                    (D.field "level" D.int)
-                    (D.field "count" D.int)
-                )
+                    Nothing ->
+                        Decode.fail ("Dificuldade inválida: " ++ raw)
             )
+
+
+statusDecoder : Decoder Status
+statusDecoder =
+    Decode.string
+        |> Decode.andThen
+            (\raw ->
+                case Game.statusFromString raw of
+                    Just status ->
+                        Decode.succeed status
+
+                    Nothing ->
+                        Decode.fail ("Status de partida inválido: " ++ raw)
+            )
+
+
+cellStateDecoder : Decoder CellState
+cellStateDecoder =
+    Decode.field "state" Decode.string
+        |> Decode.andThen
+            (\state ->
+                case state of
+                    "hidden" ->
+                        Decode.succeed Hidden
+
+                    "flagged" ->
+                        Decode.succeed Flagged
+
+                    "revealed" ->
+                        Decode.field "adjacentMines" Decode.int
+                            |> Decode.andThen
+                                (\count ->
+                                    if count >= 0 && count <= 8 then
+                                        Decode.succeed (Revealed count)
+
+                                    else
+                                        Decode.fail ("adjacentMines fora de 0..8: " ++ String.fromInt count)
+                                )
+
+                    "mine" ->
+                        Decode.succeed Mine
+
+                    "exploded" ->
+                        Decode.succeed Exploded
+
+                    other ->
+                        Decode.fail ("Estado de célula inválido: " ++ other)
+            )
+
+
+cellDecoder : Decoder Cell
+cellDecoder =
+    Decode.map3 Cell
+        (Decode.field "row" nonNegativeIntDecoder)
+        (Decode.field "col" nonNegativeIntDecoder)
+        cellStateDecoder
+
+
+snapshotDecoder : Decoder Snapshot
+snapshotDecoder =
+    Decode.map8 Snapshot
+        (Decode.field "id" nonEmptyStringDecoder)
+        (Decode.field "difficulty" difficultyDecoder)
+        (Decode.field "rows" positiveIntDecoder)
+        (Decode.field "cols" positiveIntDecoder)
+        (Decode.field "mineCount" nonNegativeIntDecoder)
+        (Decode.field "status" statusDecoder)
+        (Decode.field "revision" nonNegativeIntDecoder)
+        (Decode.field "cells" (Decode.list cellDecoder))
+        |> Decode.andThen validateSnapshot
+
+
+validateSnapshot : Snapshot -> Decoder Snapshot
+validateSnapshot snapshot =
+    let
+        expectedCount =
+            snapshot.rows * snapshot.cols
+
+        actualCount =
+            List.length snapshot.cells
+
+        hasOutOfBoundsCell =
+            List.any
+                (\cell -> cell.row >= snapshot.rows || cell.col >= snapshot.cols)
+                snapshot.cells
+
+        hasLeakedMine =
+            not (Game.isFinished snapshot.status)
+                && List.any
+                    (\cell -> cell.state == Mine || cell.state == Exploded)
+                    snapshot.cells
+    in
+    if actualCount /= expectedCount then
+        Decode.fail
+            ("Quantidade de células inconsistente: esperado "
+                ++ String.fromInt expectedCount
+                ++ ", recebido "
+                ++ String.fromInt actualCount
+            )
+
+    else if snapshot.mineCount >= expectedCount then
+        Decode.fail
+            ("Quantidade de minas inválida: mineCount ("
+                ++ String.fromInt snapshot.mineCount
+                ++ ") deve ser menor que rows * cols ("
+                ++ String.fromInt expectedCount
+                ++ ")"
+            )
+
+    else if hasOutOfBoundsCell then
+        Decode.fail "Snapshot contém célula com coordenada fora dos limites do tabuleiro"
+
+    else if hasLeakedMine then
+        Decode.fail "Snapshot ativo não pode expor células mine/exploded"
+
+    else
+        Decode.succeed snapshot
+
+
+errorPayloadDecoder : Decoder ApiErrorPayload
+errorPayloadDecoder =
+    Decode.field "error"
+        (Decode.map2 ApiErrorPayload
+            (Decode.field "code" Decode.string)
+            (Decode.field "message" Decode.string)
         )
 
 
-hintDecoder : D.Decoder HintResult
-hintDecoder =
-    D.field "status" D.string
-        |> D.andThen
-            (\status ->
-                case status of
-                    "solved" ->
-                        D.succeed HintSolved
+actionDecoder : Decoder Action
+actionDecoder =
+    Decode.field "action" Decode.string
+        |> Decode.andThen
+            (\kind ->
+                case kind of
+                    "reveal" ->
+                        Decode.map2 (\r c -> Reveal { row = r, col = c })
+                            (Decode.field "row" nonNegativeIntDecoder)
+                            (Decode.field "col" nonNegativeIntDecoder)
 
-                    "errors" ->
-                        D.map HintErrors (D.field "cells" (D.list D.int))
-
-                    "steps" ->
-                        D.map HintSteps (D.field "steps" (D.list stepDecoder))
+                    "toggle_flag" ->
+                        Decode.map2 (\r c -> ToggleFlag { row = r, col = c })
+                            (Decode.field "row" nonNegativeIntDecoder)
+                            (Decode.field "col" nonNegativeIntDecoder)
 
                     other ->
-                        D.fail ("status desconhecido: " ++ other)
+                        Decode.fail ("Ação inválida: " ++ other)
             )
 
 
-cellDigit : D.Decoder ( Int, Int )
-cellDigit =
-    D.map2 Tuple.pair
-        (D.field "cell" D.int)
-        (D.field "digit" D.int)
+nonEmptyStringDecoder : Decoder String
+nonEmptyStringDecoder =
+    Decode.string
+        |> Decode.andThen
+            (\s ->
+                if String.isEmpty (String.trim s) then
+                    Decode.fail "String vazia não permitida"
+
+                else
+                    Decode.succeed s
+            )
 
 
-stepDecoder : D.Decoder HintStep
-stepDecoder =
-    D.map8 HintStep
-        (D.field "technique" D.string)
-        (D.field "name" D.string)
-        (D.field "level" D.int)
-        (D.field "message" D.string)
-        (D.field "focus" (D.list D.int))
-        (D.field "unit" (D.list D.int))
-        (D.field "eliminations" (D.list cellDigit))
-        (D.field "placement" (D.nullable cellDigit))
+positiveIntDecoder : Decoder Int
+positiveIntDecoder =
+    Decode.int
+        |> Decode.andThen
+            (\n ->
+                if n > 0 then
+                    Decode.succeed n
+
+                else
+                    Decode.fail ("Esperado inteiro positivo, recebido " ++ String.fromInt n)
+            )
+
+
+nonNegativeIntDecoder : Decoder Int
+nonNegativeIntDecoder =
+    Decode.int
+        |> Decode.andThen
+            (\n ->
+                if n >= 0 then
+                    Decode.succeed n
+
+                else
+                    Decode.fail ("Esperado inteiro não negativo, recebido " ++ String.fromInt n)
+            )

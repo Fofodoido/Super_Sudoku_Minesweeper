@@ -1,0 +1,6 @@
+{
+  "error": {
+    "code": "invalid_cell",
+    "message": "Coordenadas ausentes, inválidas ou fora do tabuleiro"
+  }
+}

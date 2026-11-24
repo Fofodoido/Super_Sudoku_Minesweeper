@@ -17,9 +17,15 @@ run: build
 test:
 	swipl -g run_tests -t halt backend/tests/test_sudoku.pl
 	swipl -g run_tests -t halt backend/tests/test_minesweeper_board.pl
+	swipl -g run_tests -t halt backend/tests/test_minesweeper_game.pl
+	swipl -g run_tests -t halt backend/tests/test_minesweeper_sessions.pl
+	swipl -g run_tests -t halt backend/tests/test_minesweeper_http.pl
 
 test-minesweeper:
 	swipl -g run_tests -t halt backend/tests/test_minesweeper_board.pl
+	swipl -g run_tests -t halt backend/tests/test_minesweeper_game.pl
+	swipl -g run_tests -t halt backend/tests/test_minesweeper_sessions.pl
+	swipl -g run_tests -t halt backend/tests/test_minesweeper_http.pl
 
 validar:
 	$(UV) run scripts/validar_entrega.py
