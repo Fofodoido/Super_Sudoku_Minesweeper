@@ -1,8 +1,14 @@
 # Mapa de migração e integração — frente 01
 
+> **Situação atual (frente 06, 23/11/2026):** a migração foi concluída. Servidor
+> e frontend executam apenas Campo Minado, e os módulos do Super Sudoku foram
+> retirados do repositório (continuam no histórico Git). A tabela de destino
+> abaixo é o registro histórico do plano de migração; o estado integrado está
+> em [ACEITE.md](ACEITE.md).
+
 A base de geometria e geração está em `backend/minesweeper/board.pl`, módulo
-`minesweeper_board`. O servidor e o frontend ainda executam Sudoku. Esta entrega
-prepara o novo domínio; a troca do produto ativo ocorre na integração da frente 06.
+`minesweeper_board`. Esta entrega da frente 01 preparou o novo domínio; a troca
+do produto ativo ocorreu na integração da frente 06.
 
 O [contrato do tabuleiro](MINESWEEPER_BOARD.md) define as seis exportações, os
 modos e as fixtures. O [plano compartilhado](PLANO_CAMPO_MINADO.md) continua sendo
@@ -25,8 +31,12 @@ a referência para o MVP e o contrato HTTP a ser detalhado pela frente 03.
 | `backend/python/exemplo_janus.py` | Exemplo legado, sem dependência funcional no MVP; retirar das referências ativas do novo produto na integração | Gabriel, frente 06 |
 | `docs/FEATURES.md`, `EXPLICACAO.md`, imagens de Sudoku | Atualizar para o produto efetivamente integrado | Gabriel, frente 06 |
 
-Nenhum arquivo legado será excluído nesta frente. As mudanças são aditivas e não
-reescrevem o histórico Git. Não criar módulos vazios de motor/API/Elm: cada frente
+Nenhum arquivo legado foi excluído na frente 01; as mudanças foram aditivas e
+não reescreveram o histórico Git. Na frente 06, todos os itens legados desta
+tabela foram retirados: `backend/sudoku/`, `test_sudoku.pl`,
+`backend/python/exemplo_janus.py`, `Variant.elm`, `Local.elm` e `Overlay.elm`;
+`Api.elm`, `Main.elm`, o bundle e a documentação foram substituídos pelo Campo
+Minado. Não criar módulos vazios de motor/API/Elm: cada frente
 implementa seus arquivos com seus próprios testes.
 
 ## Pontos de integração
@@ -84,21 +94,21 @@ testes integrados passarem. Conferir imports Prolog/Elm, endpoints, título,
 textos, favicon, exemplos, documentação e correspondência do bundle servido com
 o código fonte. Preservar o histórico e as evidências de revisão de cada PR.
 
-**Em andamento na frente 06:** Makefile com descoberta automática das suítes,
+**Concluído na frente 06:** Makefile com descoberta automática das suítes,
 ferramentas Elm fixadas em `frontend/package.json`, CI em
 `.github/workflows/ci.yml`, conferência do bundle (`make check-bundle`) e
 testes integrados via HTTP em `backend/tests/test_minesweeper_acceptance.pl`.
 Versões, matriz de cenários e procedimento de navegador em [ACEITE.md](ACEITE.md).
+Os módulos do Sudoku foram retirados após o fluxo novo passar.
 
-## Comandos e limites desta entrega
+## Comandos e limites
 
 ```sh
 swipl -g run_tests -t halt backend/tests/test_minesweeper_board.pl
 swipl -g run_tests -t halt backend/tests/test_minesweeper_game.pl
-swipl -g run_tests -t halt backend/tests/test_sudoku.pl
 ```
 
-Com make disponível, `make test-minesweeper` verifica as frentes 01 e 02 e
-`make test` executa todas as suítes. O aceite de HTTP, Elm, interface, sessões e
-integração final depende das entregas correspondentes. A base não promete região
-inicial vazia ou partidas sem adivinhação.
+Com make disponível, `make test-prolog` executa todas as suítes Prolog e
+`make test` inclui também os testes Elm. Comandos completos em
+[ACEITE.md](ACEITE.md). A base não promete região inicial vazia ou partidas sem
+adivinhação.

@@ -1,5 +1,10 @@
 # Validação da frente 01
 
+> **Documento histórico.** Registro da entrega da frente 01 (17/11/2026), quando
+> o Sudoku ainda coexistia com o Campo Minado. A suíte `test_sudoku.pl` e os
+> módulos legados citados aqui foram retirados na frente 06; o estado atual está
+> em [ACEITE.md](ACEITE.md).
+
 Validação local em 17/11/2026, Windows, SWI-Prolog 10.0.2 x64.
 Escopo: geometria, geração e migração estrutural inicial de Campo Minado.
 

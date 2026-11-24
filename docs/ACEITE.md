@@ -89,7 +89,7 @@ comparado com `adjacent_mines/5`.
 | 17 | Ações concorrentes na mesma partida são serializadas | `http:concurrent_actions`, `sessions:concurrent_toggles_are_serialized` | Automatizado |
 | 18 | Bundle servido corresponde ao fonte Elm | `make check-bundle` (CI) | Automatizado |
 | 19 | Cliente Elm: uma ação pendente por vez, timeout → GET, ignorar partida antiga, sessão perdida | `elm:Concorrência e recuperação após resultado incerto`, `elm:Sessão perdida e reinício` | Automatizado |
-| 20 | Navegador: mouse, teclado, toque, grade difícil em viewport móvel | Lógica em `elm:BoardTest` (foco, atalhos, modo bandeira, rótulos); uso real pelo procedimento abaixo | Manual: registrar abaixo |
+| 20 | Navegador: mouse, teclado, toque, grade difícil em viewport móvel | Lógica em `elm:BoardTest` (foco, atalhos, modo bandeira, rótulos); uso real pelo procedimento abaixo | Manual: passou em 23/11/2026 |
 
 Prefixos: `acceptance` = `test_minesweeper_acceptance.pl`, `game` =
 `test_minesweeper_game.pl`, `http` = `test_minesweeper_http.pl`, `sessions` =
@@ -139,25 +139,22 @@ navegador, versão e resultado de cada item na tabela ao fim desta seção.
    jogo antes da resposta; a resposta antiga não altera o tabuleiro novo.
 9. **Sem vazamento no navegador**: na aba Network, nenhuma resposta de partida
    ativa contém `mine`, `exploded` ou `adjacentMines` em célula oculta.
-10. **Página de Campo Minado**: título, favicon e textos sem referências ao
-    Sudoku.
 
 ### Registro do aceite no navegador
 
-Data: ____ · Navegador e versão: ____ · Dispositivo/emulação: ____
+Data: 23/11/2026 · Navegador: Google Chrome 157.0.8103.79 · Dispositivo: monitor de 17"; itens 3 e 4 via emulação móvel do DevTools (360×740) · Servidor: `swipl:10.0.2` em Docker (WSL)
 
 | Item | Resultado | Observação |
 | --- | --- | --- |
-| 1. Mouse (fácil, médio, difícil) | | |
-| 2. Teclado | | |
-| 3. Toque / modo bandeira | | |
-| 4. Grade difícil em 360×740 | | |
-| 5. Estados sem depender de cor | | |
-| 6. Falha de rede | | |
-| 7. Sessão perdida | | |
-| 8. Resposta atrasada | | |
-| 9. Sem vazamento no Network | | |
-| 10. Página sem Sudoku | | |
+| 1. Mouse (fácil, médio, difícil) | Passou | |
+| 2. Teclado | Passou | |
+| 3. Toque / modo bandeira | Passou | |
+| 4. Grade difícil em 360×740 | Passou | |
+| 5. Estados sem depender de cor | Passou | |
+| 6. Falha de rede | Passou | |
+| 7. Sessão perdida | Passou | |
+| 8. Resposta atrasada | Passou | |
+| 9. Sem vazamento no Network | Passou | |
 
 ## Módulos retirados
 
@@ -172,5 +169,4 @@ integração opcional.
 
 ## Pendências para fechar a issue #6
 
-- Executar o procedimento de navegador e preencher a tabela acima.
 - CI verde e aprovação do PR #13 por @guxvr (frente 01).
