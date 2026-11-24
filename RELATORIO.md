@@ -4,17 +4,17 @@
 
 | Nome completo | Matrícula | Turma (14h/16h) | Usuário GitHub |
 |---------------|-----------|-----------------|----------------|
-| Gustavo Xavier Evangelista | 241025247 | 14h | @guxvr |
-| Rodrigo Henrique Donato de Souza | 000000000 | 14h | @Fofodoido |
-| Davi Araujo Bady Casseb | 211031682 | 14h | @CK753 |
-| Mateus de Siqueira Silva | 200024787 | 14h | @siqueira-prog |
-| Carlos Eduardo Mendes de Mesquita | 190085584 | 14h | @CarlosEduardoMendesdeMesquita |
-| Gabriel Basto Bertolazi | 202023663 | 14h | @Bertolazi |
+| Gustavo Xavier Evangelista | 241025247 | 16h | @guxvr |
+| Rodrigo Henrique Donato de Souza | 241012384 | 16h | @Fofodoido |
+| Davi Araujo Bady Casseb | 211031682 | 16h | @CK753 |
+| Mateus de Siqueira Silva | 200024787 | 16h | @siqueira-prog |
+| Carlos Eduardo Mendes de Mesquita | 190085584 | 16h | @CarlosEduardoMendesdeMesquita |
+| Gabriel Basto Bertolazi | 202023663 | 16h | @Bertolazi |
 
 - **Nome do projeto:** Campo Minado — Prolog + Elm
 - **Nome do grupo:** SuperSMs
 - **Repositório:** https://github.com/Fofodoido/Super_Sudoku_Minesweeper
-- **Commit ou tag entregue:** `8e45ca9`
+- **Commit ou tag entregue:** `eeed6af`
 - **Ponto de partida:** outro jogo conhecido
 - **Slides da apresentação oral:** não há
 
