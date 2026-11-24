@@ -36,18 +36,20 @@ registros `Config msg` e `HudConfig msg`, mantendo desacoplamento claro entre
 estado de comunicação (`Main`/`Api`) e camada de apresentação (`Board`).
 
 Navegação completa por teclado:
-- Link de salto ("Ir para o tabuleiro") e atalho global `G` levam o foco direto
-  para a célula ativa da grade.
-- Grade semântica WAI-ARIA (`role="grid"`, `role="row"`, `role="gridcell"`) com
-  roving tabindex (1 único ponto de Tab para entrar/sair do tabuleiro).
-- Dentro da grade: Setas/WASD movem célula a célula, Home/End vão às pontas da
-  linha, PageUp/PageDown vão às pontas da coluna, Enter/Espaço aplicam o modo
-  ativo, `R` revela, `F` marca bandeira, `M` alterna modo e `Esc` devolve o foco
-  aos controles do HUD.
-- Fora da grade: `Tab`/`Shift+Tab`, setas esquerda/direita no seletor de
-  dificuldade e no seletor de modo, atalhos `1`/`2`/`3` (dificuldade), `N`
-  (nova partida), `M` (modo), `G` (ir ao tabuleiro), `U` (ressincronizar) e `?`
-  (abrir/fechar painel de atalhos).
+
+  - Link de salto ("Ir para o tabuleiro") e atalho global `G` levam o foco direto
+    para a célula ativa da grade.
+  - Grade semântica WAI-ARIA (`role="grid"`, `role="row"`, `role="gridcell"`) com
+    roving tabindex (1 único ponto de Tab para entrar/sair do tabuleiro).
+  - Dentro da grade: Setas/WASD movem célula a célula, Home/End vão às pontas da
+    linha, PageUp/PageDown vão às pontas da coluna, Enter/Espaço aplicam o modo
+    ativo, `R` revela, `F` marca bandeira, `M` alterna modo e `Esc` devolve o foco
+    aos controles do HUD.
+  - Fora da grade: `Tab`/`Shift+Tab`, setas esquerda/direita no seletor de
+    dificuldade e no seletor de modo, atalhos `1`/`2`/`3` (dificuldade), `N`
+    (nova partida), `M` (modo), `G` (ir ao tabuleiro), `U` (ressincronizar) e `?`
+    (abrir/fechar painel de atalhos).
+
 -}
 
 import Game exposing (Cell, CellState(..), Coord, Difficulty(..), Snapshot, Status(..))

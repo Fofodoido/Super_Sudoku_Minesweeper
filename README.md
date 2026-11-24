@@ -34,7 +34,7 @@ O [plano de migração](docs/PLANO_CAMPO_MINADO.md) detalha o contrato proposto,
 | --- | --- | --- | --- | --- |
 | 01 | Gustavo Xavier Evangelista | [guxvr](https://github.com/guxvr) | Migração inicial do projeto, geometria e geração do tabuleiro em Prolog | Rodrigo |
 | 02 | Rodrigo Henrique Donato de Souza | [fofodoido](https://github.com/fofodoido) | Motor de regras e transições em Prolog | Davi |
-| 03 | Davi Araujo Bady Casseb | [dcasseb](https://github.com/dcasseb) | Contrato JSON, API HTTP e sessões | Mateus |
+| 03 | Davi Araujo Bady Casseb | [CK753](https://github.com/CK753) | Contrato JSON, API HTTP e sessões | Mateus |
 | 04 | Mateus de Siqueira Silva | [siqueira-prog](https://github.com/siqueira-prog) | Modelo Elm, cliente HTTP e ciclo da partida | Carlos |
 | 05 | Carlos Eduardo Mendes de Mesquita | [CarlosEduardoMendesdeMesquita](https://github.com/CarlosEduardoMendesdeMesquita) | Tabuleiro e interface acessível e responsiva | Gabriel |
 | 06 | Gabriel Basto Bertolazi | [Bertolazi](https://github.com/Bertolazi) | Integração, CI, testes de aceite e documentação | Gustavo |
@@ -50,12 +50,12 @@ Todo PR deve ser revisado e aprovado pelo responsável pela frente seguinte ante
 
 ## Como executar
 
-O servidor já expõe a API de Campo Minado e continua servindo o bundle estático existente, que será substituído pelas frentes de cliente e interface.
+O bundle JavaScript (`frontend/public/elm.js`) não fica versionado no Git: ele é compilado automaticamente a partir dos módulos Elm ao executar `make build` ou `make run`, mantendo o repositório concentrado apenas em código-fonte Prolog e Elm.
 
 Requisitos:
 
 - [SWI-Prolog](https://www.swi-prolog.org/) **10 ou superior** (o CI usa 10.0.2). A série 9 não carrega `library(json)`, usada nos testes HTTP.
-- [Node.js](https://nodejs.org/) 18+ apenas para instalar as ferramentas Elm. As versões de [Elm](https://elm-lang.org/) 0.19.1 e `elm-test` ficam fixadas em `frontend/package.json`; não é preciso instalação global.
+- [Node.js](https://nodejs.org/) 18+ apenas para instalar as ferramentas Elm. As versões de [Elm](https://elm-lang.org/) 0.19.1, `elm-test` e `elm-format` ficam fixadas em `frontend/package.json`; não é preciso instalação global.
 - `make` é opcional.
 
 As partidas ficam só na memória do servidor: **reiniciar o servidor perde todas as partidas em andamento**, e uma partida sem atividade por duas horas expira.
@@ -70,7 +70,7 @@ make test
 make ci
 ```
 
-Outros alvos: `make test-acceptance` (fluxos integrados via HTTP), `make check-bundle` e `make help`.
+Outros alvos: `make test-acceptance` (fluxos integrados via HTTP), `make check-format`, `make validar` e `make help`.
 
 ### Sem make
 
@@ -82,7 +82,7 @@ cd ..
 swipl backend/server.pl 8080
 ```
 
-O bundle `frontend/public/elm.js` está versionado e corresponde ao fonte; para só executar, basta `swipl backend/server.pl 8080` e abrir `http://localhost:8080`.
+Após gerar `frontend/public/elm.js`, abra `http://localhost:8080` no navegador.
 
 Testes sem make:
 
@@ -98,7 +98,7 @@ cd frontend && npx elm-test
 
 ### Integração contínua
 
-O workflow [`.github/workflows/ci.yml`](.github/workflows/ci.yml) roda em todo PR e em `main`: testes Prolog no contêiner `swipl:10.0.2` e, no job Elm, instalação fixada, conferência de que `elm.js` corresponde ao fonte e `elm-test`. Comandos, versões, matriz de cenários e procedimento de aceite no navegador estão em [docs/ACEITE.md](docs/ACEITE.md).
+O workflow [`.github/workflows/ci.yml`](.github/workflows/ci.yml) roda em todo PR e em `main`: testes Prolog no contêiner `swipl:10.0.2` e, no job Elm, instalação fixada, conferência de formatação (`elm-format`), compilação limpa de `elm.js` (`elm make --optimize`) e `elm-test`. Comandos, versões, matriz de cenários e procedimento de aceite no navegador estão em [docs/ACEITE.md](docs/ACEITE.md).
 
 ## Documentação
 
@@ -112,4 +112,4 @@ O [contrato da API](docs/API.md) documenta endpoints, snapshots, erros, sessões
 
 O [aceite integrado](docs/ACEITE.md) registra versões, comandos, a matriz de cenários com a suíte que cobre cada um e o procedimento de aceite no navegador.
 
-O documento principal do novo projeto é o [plano de Campo Minado](docs/PLANO_CAMPO_MINADO.md). [FEATURES.md](docs/FEATURES.md) lista as funcionalidades por camada e [EXPLICACAO.md](docs/EXPLICACAO.md) liga os tópicos da disciplina ao código; as seções de Elm serão completadas quando o cliente for integrado.
+O documento principal do novo projeto é o [plano de Campo Minado](docs/PLANO_CAMPO_MINADO.md). [FEATURES.md](docs/FEATURES.md) lista as funcionalidades por camada e [EXPLICACAO.md](docs/EXPLICACAO.md) liga os tópicos da disciplina ao código Prolog e Elm integrado.

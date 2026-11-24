@@ -14,7 +14,7 @@
 - **Nome do projeto:** Campo Minado — Prolog + Elm
 - **Nome do grupo:** SuperSMs
 - **Repositório:** https://github.com/Fofodoido/Super_Sudoku_Minesweeper
-- **Commit ou tag entregue:** `eeed6af`
+- **Commit ou tag entregue:** `473f7d2`
 - **Ponto de partida:** outro jogo conhecido
 - **Slides da apresentação oral:** não há
 
@@ -28,21 +28,21 @@ O projeto implementa uma aplicação web completa de Campo Minado (*Minesweeper*
 
 **Requisitos** (com as versões que o grupo usou):
 
-- SWI-Prolog 10.0.2 (compatível com 9.1.12 ou superior)
-- Node.js 22.x e Elm 0.19.1 / 0.19.2
+- SWI-Prolog 10.0.2 (requer série 10 ou superior para `library(json)` nos testes HTTP)
+- Node.js 22.x (instala `elm@0.19.1`, `elm-test` e `elm-format` localmente via `npm ci`)
 - uv e Python 3.12 (para o script validador de entrega)
 
 **Instalação e execução:**
 
 ```sh
-make build
+make deps
 make run
 ```
 
 **Testes:**
 
 ```sh
-make test
+make ci
 make validar
 ```
 
@@ -174,19 +174,19 @@ type Msg
     | SyncResponse Int String (Result ApiError Snapshot)
 ```
 
-A modelagem em `frontend/src/Main.elm:55-83` e `frontend/src/Game.elm:34-84` utiliza *Custom Types* para tornar estados impossíveis irrepresentáveis. Em vez de flags booleanas soltas (`isLoading`, `isError`, `isSessionExpired`), `ScreenState` separa de forma mutuamente exclusiva o carregamento inicial (`Loading`), a partida ativa com seu `Snapshot` (`Active Snapshot`), falhas de criação (`Failed String`) e perda de sessão (`SessionLost String`). Da mesma forma, `CellState` (`Hidden | Flagged | Revealed Int | Mine | Exploded` em `frontend/src/Game.elm:54-59`) só carrega o inteiro `adjacentMines` no construtor `Revealed Int`, garantindo em tempo de compilação que células ocultas ou com bandeira nunca exponham contagens numéricas, enquanto `PendingRequest` e `requestToken` impedem condições de corrida entre respostas HTTP atrasadas.
+A modelagem em `frontend/src/Main.elm:56-84` e `frontend/src/Game.elm:34-84` utiliza *Custom Types* para tornar estados impossíveis irrepresentáveis. Em vez de flags booleanas soltas (`isLoading`, `isError`, `isSessionExpired`), `ScreenState` separa de forma mutuamente exclusiva o carregamento inicial (`Loading`), a partida ativa com seu `Snapshot` (`Active Snapshot`), falhas de criação (`Failed String`) e perda de sessão (`SessionLost String`). Da mesma forma, `CellState` (`Hidden | Flagged | Revealed Int | Mine | Exploded` em `frontend/src/Game.elm:54-59`) só carrega o inteiro `adjacentMines` no construtor `Revealed Int`, garantindo em tempo de compilação que células ocultas ou com bandeira nunca exponham contagens numéricas, enquanto `PendingRequest` e `requestToken` impedem condições de corrida entre respostas HTTP atrasadas.
 
 ### 6.2 Conceitos do paradigma funcional utilizados
 
-- [x] Arquitetura Elm (Model, update, view): ciclo completo `Browser.element` em `frontend/src/Main.elm:41-48`, `update` em `frontend/src/Main.elm:185` e `view` delegando a `Board.view` em `frontend/src/Main.elm:565`.
-- [x] Custom types e `case` exaustivo: `Difficulty`, `Status`, `CellState` (`frontend/src/Game.elm:34-60`), `Action`, `ApiError` (`frontend/src/Api.elm:34-51`), `InputMode`, `VisualKind` (`frontend/src/Board.elm:66-83`) e `ScreenState`, `PendingRequest` (`frontend/src/Main.elm:55-68`).
-- [x] `Maybe` e `Result` no lugar de null e exceções: `difficultyFromString` e `statusFromString` retornando `Maybe` (`frontend/src/Game.elm:105-169`), respostas HTTP tipadas com `Result ApiError Snapshot` (`frontend/src/Api.elm:86-130`) e campos opcionais de interface em `HudConfig` (`frontend/src/Board.elm:105-118`).
-- [x] Funções de ordem superior e aplicação parcial: `List.filter`, `List.any`, `List.map` e `List.indexedMap` em `frontend/src/Game.elm:187-237`, `frontend/src/Api.elm:361-371` e `frontend/src/Board.elm:334-365`.
-- [x] Composição (`|>`, `>>`): pipelines de decodificação e validação em `frontend/src/Api.elm:270-350` e transformação de coordenadas em `frontend/src/Board.elm:184-215`.
+- [x] Arquitetura Elm (Model, update, view): ciclo completo `Browser.element` em `frontend/src/Main.elm:42-49`, `update` em `frontend/src/Main.elm:186` e `view` delegando a `Board.view` em `frontend/src/Main.elm:792`.
+- [x] Custom types e `case` exaustivo: `Difficulty`, `Status`, `CellState` (`frontend/src/Game.elm:34-60`), `Action`, `ApiError` (`frontend/src/Api.elm:34-51`), `InputMode`, `VisualKind` (`frontend/src/Board.elm:68-85`) e `ScreenState`, `PendingRequest` (`frontend/src/Main.elm:56-69`).
+- [x] `Maybe` e `Result` no lugar de null e exceções: `difficultyFromString` e `statusFromString` retornando `Maybe` (`frontend/src/Game.elm:105-169`), respostas HTTP tipadas com `Result ApiError Snapshot` (`frontend/src/Api.elm:86-130`) e campos opcionais de interface em `HudConfig` (`frontend/src/Board.elm:107-120`).
+- [x] Funções de ordem superior e aplicação parcial: `List.filter`, `List.any`, `List.map` e `List.indexedMap` em `frontend/src/Game.elm:187-237`, `frontend/src/Api.elm:361-371` e `frontend/src/Board.elm:716`.
+- [x] Composição (`|>`, `>>`): pipelines de decodificação e validação em `frontend/src/Api.elm:270-350` e transformação de coordenadas em `frontend/src/Board.elm:166-205`.
 - [x] Decoders e encoders JSON: `encodeCreateGame`, `encodeAction`, `cellStateDecoder` e `snapshotDecoder` com validação estrutural pós-decodificação (`validateSnapshot`) em `frontend/src/Api.elm:239-412`.
-- [x] Comandos e subscriptions (efeitos controlados): chamadas `Http.request` (`frontend/src/Api.elm:56-106`), foco assíncrono via `Task.attempt (\_ -> FocusCompleted) (Dom.focus id)` (`frontend/src/Main.elm:532-534`) e `Time.every 1000` + `Browser.Events.onKeyDown` em `subscriptions` (`frontend/src/Main.elm:542-558`).
-- [x] Imutabilidade e atualização de records: transições puras de `Model` e `ViewState` em `frontend/src/Main.elm:106-126` e `frontend/src/Main.elm:185-530`.
-- [x] Outro: acessibilidade declarativa com *roving tabindex*, grade WAI-ARIA (`role="grid"`, `role="gridcell"`, `aria-live`) em `frontend/src/Board.elm:318-430` e partículas vetoriais determinísticas em SVG (`frontend/src/Explosion.elm:33-155`).
+- [x] Comandos e subscriptions (efeitos controlados): chamadas `Http.request` (`frontend/src/Api.elm:56-106`), foco assíncrono via `Dom.focus elementId |> Task.attempt (\_ -> FocusCompleted)` (`frontend/src/Main.elm:491-495`) e `Time.every 1000` + `Browser.Events.onKeyDown` em `subscriptions` (`frontend/src/Main.elm:701-711`).
+- [x] Imutabilidade e atualização de records: transições puras de `Model` e `ViewState` em `frontend/src/Main.elm:107-127` e `frontend/src/Main.elm:186-485`.
+- [x] Outro: acessibilidade declarativa com *roving tabindex*, grade WAI-ARIA (`role="grid"`, `role="gridcell"`, `aria-live`) em `frontend/src/Board.elm:669-826` e animação vetorial determinística em `frontend/src/Explosion.elm:26-60`.
 
 ### 6.3 Trecho em destaque
 
@@ -242,9 +242,10 @@ O frontend Elm comunica-se diretamente com o servidor HTTP do SWI-Prolog (`libra
 - **Testes unitários e de integração em Prolog (`library(plunit)`):**
   - `backend/tests/test_minesweeper_board.pl`: 24 testes cobrindo presets, validação de coordenadas, vizinhança em cantos/bordas/grades 1×1, contagem de minas adjacentes e geração segura de minas com restauração determinística do estado do RNG (`setup_call_cleanup(getrand/1, ..., setrand/1)`).
   - `backend/tests/test_minesweeper_game.pl`: 16 testes cobrindo criação de partida, bandeiras antes e durante o jogo, geração preguiçosa na primeira revelação, expansão BFS com preservação de bandeiras, idempotência de `reveal` em célula aberta, vitória, derrota e ausência de vazamento de minas em `public_snapshot/2,3`.
-  - `backend/tests/test_minesweeper_sessions.pl` e `backend/tests/test_minesweeper_http.pl`: testes de ciclo de vida de sessões, expiração por TTL com relógio injetado, limite de sessões ativas (HTTP 503), concorrência sob mutex e contratos HTTP/JSON de todos os endpoints e códigos de erro.
-- **Testes automatizados em Elm (`elm-test`):**
-  - `frontend/tests/MinesweeperTest.elm` (27 testes) e `frontend/tests/BoardTest.elm`: testam decoders JSON (incluindo rejeição de minas vazadas, coordenadas fora da grade e `mineCount` inválido), máquina de estados TEA, bloqueio durante requisições pendentes, descarte de respostas de partidas antigas (`requestToken`), ressincronização via `GET` após falha de rede/timeout e navegação por teclado/acessibilidade do tabuleiro.
+  - `backend/tests/test_minesweeper_sessions.pl` (9 testes) e `backend/tests/test_minesweeper_http.pl` (11 testes): ciclo de vida de sessões, expiração por TTL com relógio injetado, limite de sessões ativas (HTTP 503), concorrência sob mutex e contratos HTTP/JSON de todos os endpoints e códigos de erro.
+  - `backend/tests/test_minesweeper_acceptance.pl` (5 testes + 4 sub-testes): fluxos completos ponta a ponta de vitória, derrota, recuperação de falha de rede, sessão expirada e isolamento de partida antiga contra o servidor HTTP real nas três dificuldades, validando ausência total de vazamento de minas.
+- **Testes automatizados e formatação em Elm (`elm-test` e `elm-format`):**
+  - `frontend/tests/MinesweeperTest.elm` e `frontend/tests/BoardTest.elm` (46 testes no total): testam decoders JSON (incluindo rejeição de minas vazadas, coordenadas fora da grade e `mineCount` inválido), máquina de estados TEA, bloqueio durante requisições pendentes, descarte de respostas de partidas antigas (`requestToken`), ressincronização via `GET` após falha de rede/timeout e navegação por teclado/acessibilidade do tabuleiro, além de verificação automática de `elm-format` no CI (`make ci`).
 - **Casos de borda verificados:** primeiro clique sempre seguro em qualquer célula; tentativa de revelar célula com bandeira (`409 cell_flagged`); tentativa de colocar bandeira em célula já revelada (`409 cell_revealed`); cliques repetidos ou respostas atrasadas após `RestartGame`; preservação visual de bandeiras erradas (`VisualWrongFlag`) ao final da partida.
 
 ## 9. Limitações e problemas conhecidos
