@@ -11,7 +11,6 @@ ELM_TEST ?= $(if $(wildcard $(ELM_BIN)/elm-test),$(abspath $(ELM_BIN)/elm-test),
 ELM_SRC    := $(wildcard $(FRONTEND)/src/*.elm)
 ELM_TESTS  := $(shell find $(FRONTEND)/tests -name '*.elm' 2>/dev/null)
 PL_TESTS   := $(sort $(wildcard backend/tests/test_*.pl))
-MS_TESTS   := $(sort $(wildcard backend/tests/test_minesweeper_*.pl))
 BUNDLE     := $(FRONTEND)/public/elm.js
 BUNDLE_TMP := elm-stuff/elm.check.js
 
@@ -24,7 +23,7 @@ help:
 	@echo "make run [PORT=8080]   compila e inicia o servidor"
 	@echo "make test              testes Prolog e Elm"
 	@echo "make test-prolog       todas as suítes backend/tests/test_*.pl"
-	@echo "make test-minesweeper  suítes de Campo Minado (sem o legado Sudoku)"
+	@echo "make test-minesweeper  o mesmo que test-prolog (mantido por compatibilidade)"
 	@echo "make test-acceptance   fluxos integrados via HTTP"
 	@echo "make test-elm          elm-test em frontend/tests"
 	@echo "make check-bundle      confere se $(BUNDLE) corresponde ao fonte"
@@ -48,10 +47,7 @@ test-prolog:
 	  echo "== $$t"; $(SWIPL) -g run_tests -t halt $$t; \
 	done
 
-test-minesweeper:
-	@set -e; for t in $(MS_TESTS); do \
-	  echo "== $$t"; $(SWIPL) -g run_tests -t halt $$t; \
-	done
+test-minesweeper: test-prolog
 
 test-acceptance:
 	$(SWIPL) -g run_tests -t halt backend/tests/test_minesweeper_acceptance.pl
