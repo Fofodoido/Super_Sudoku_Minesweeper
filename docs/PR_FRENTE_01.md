@@ -1,5 +1,10 @@
 # Frente 01: prepara Campo Minado com geometria e geração Prolog
 
+> **Documento histórico.** Registro da entrega da frente 01 (17/11/2026), quando
+> o Sudoku ainda coexistia com o Campo Minado. A suíte `test_sudoku.pl` e os
+> módulos legados citados aqui foram retirados na frente 06; o estado atual está
+> em [ACEITE.md](ACEITE.md).
+
 Descrição preparada para publicação do PR após os commits das etapas locais.
 Revisor obrigatório a solicitar no GitHub: Rodrigo (@fofodoido).
 

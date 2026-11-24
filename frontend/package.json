@@ -1,0 +1,13 @@
+{
+  "name": "campo-minado-frontend",
+  "private": true,
+  "description": "Ferramentas Elm fixadas para build e testes do Campo Minado",
+  "scripts": {
+    "build": "elm make src/Main.elm --optimize --output=public/elm.js",
+    "test": "elm-test"
+  },
+  "devDependencies": {
+    "elm": "0.19.1-5",
+    "elm-test": "0.19.1-revision18"
+  }
+}

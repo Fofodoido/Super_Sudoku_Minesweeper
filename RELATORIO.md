@@ -86,7 +86,7 @@ make validar
 - [x] Backtracking e múltiplas soluções: geração de coordenadas e vizinhanças via `between/3` em `backend/minesweeper/board.pl:46-60` e busca de sessão única com `repeat` em `backend/minesweeper/sessions.pl:180-184`.
 - [x] `findall/3`, `bagof/3`, `setof/3` ou similares: enumeração da grade e vizinhos em `backend/minesweeper/board.pl:46-60` e coleta de sessões com `findall/3` e `aggregate_all/3` em `backend/minesweeper/sessions.pl:48` e `backend/minesweeper/sessions.pl:212`.
 - [x] Corte (`!`) ou negação (`\+`), e por que foram necessários: compromissos determinísticos após validação de guarda em `backend/minesweeper/game.pl:93`, `backend/minesweeper/game.pl:173` e `backend/minesweeper/game.pl:210` (evitando *choicepoints* residuais e vazamento de cláusulas de fim de jogo) e `\+ game_session(Id, _, _)` em `backend/minesweeper/sessions.pl:183`.
-- [ ] Programação por restrições (CLP(FD) ou outra): não utilizada no domínio do Campo Minado (mantida apenas nos módulos legados de Sudoku).
+- [ ] Programação por restrições (CLP(FD) ou outra): não utilizada no domínio do Campo Minado (os módulos legados de Sudoku que a usavam foram retirados no PR #13).
 - [x] Predicados de ordem superior (`maplist`, `foldl`, `include` e `exclude`): `maplist/2`, `include/3` e `exclude/3` em `backend/minesweeper/board.pl:81-84` e `backend/minesweeper/game.pl:182-204`.
 - [x] Outro: conjuntos ordenados (`library(ordsets)`) para invariantes de células reveladas, bandeiras e minas em `backend/minesweeper/game.pl:140-186`, e concorrência declarativa com `with_mutex/2` em `backend/minesweeper/sessions.pl:63-135`.
 

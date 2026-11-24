@@ -1,148 +1,81 @@
-# Super Sudoku — desenho das features
+# Campo Minado — funcionalidades
 
-O objetivo é que o jogo seja substancialmente mais complexo que um Sudoku
-comum, tanto para quem joga quanto na engenharia por trás. A divisão de
-responsabilidades segue a força de cada linguagem:
+Lista do que o produto faz e em que camada cada coisa vive. A divisão segue a
+força de cada linguagem:
 
-- **Prolog** faz o que é busca e dedução: modelar regras como restrições,
-  gerar puzzles com solução única, resolver como uma pessoa resolveria e
-  explicar o raciocínio.
-- **Elm** faz o que é estado e interação: a partida, os modos de jogo, a
-  pontuação, a verificação imediata de regras e a interface.
-- **HTML/CSS** cuidam de toda a apresentação (gaiolas, marcas de paridade,
-  regiões extras, destaques das dicas, tema escuro, celular).
+- **Prolog** é a autoridade da partida: gera as minas, aplica as regras, guarda
+  as sessões e decide vitória ou derrota.
+- **Elm** guarda só a projeção pública recebida do servidor, controla
+  requisições, carregamento e erros, e desenha a interface.
+- **HTML/CSS** cuidam da apresentação, do foco visível e do layout responsivo.
 
-## 1. Regras combináveis (implementado)
+O cliente nunca recebe as minas enquanto a partida está em andamento, então não
+há como trapacear lendo a resposta da API.
 
-Qualquer subconjunto das regras abaixo pode ser ligado ao mesmo tempo.
+Situação em 23/11/2026: servidor, regras, API, cliente Elm e interface
+integrados e testados. Os módulos do Super Sudoku foram retirados do produto.
 
-| Regra | Restrição no CLP(FD) | Efeito no raciocínio |
+## Regras do jogo (implementado em Prolog)
+
+| Funcionalidade | Como funciona | Onde |
 | --- | --- | --- |
-| Diagonal (X) | `all_distinct/1` nas duas diagonais | 2 casas novas de 9 células |
-| Hyper | `all_distinct/1` em 4 janelas 3×3 | 4 casas novas; interseções com blocos |
-| Anti-cavalo | `#\=` entre células a um salto de cavalo | até 8 vizinhos extras por célula |
-| Killer | `all_distinct/1` + `sum/3` por gaiola | combinações de soma, regra dos 45 |
-| Par/Ímpar | domínio restrito a `1\/3\/5\/7\/9` ou `2\/4\/6\/8` | candidatos iniciais menores |
-| Anti-rei | `#\=` entre vizinhas na diagonal | até 4 vizinhos extras por célula |
-| Disjunto | `all_distinct/1` nas 9 posições relativas dos blocos | 9 casas novas |
-| Não-consecutivo | `abs(A-B) #\= 1` entre vizinhas lado a lado | técnica "Regra local" |
-| Termômetros | `chain(Vs, #<)` | técnica "Regra local" |
-| Setas | `sum(Haste, #=, Circulo)` | técnica "Regra local" |
-| Kropki | branco `abs(A-B) #= 1`; preto `A #= 2*B #\/ B #= 2*A` | técnica "Regra local" |
-| X e V | `A + B #= 10` ou `5` | técnica "Regra local" |
-| Sussurro | `abs(A-B) #>= 5` entre vizinhos da linha | técnica "Regra local" |
-| Renban | `all_distinct` + diferenças par a par `#=< N-1` | técnica "Regra local" |
-| Palíndromo | só unificação: `reverse(Vs, Vs)` | técnica "Regra local" |
-| Entre-pontas | meio `#>` min e `#<` max das pontas | técnica "Regra local" |
+| Três dificuldades | fácil 9×9 com 10 minas, médio 16×16 com 40, difícil 16×30 com 99 | `preset/4` em `board.pl` |
+| Primeiro clique seguro | as minas só são sorteadas na primeira revelação, excluindo a célula clicada | `ensure_mines/7` em `game.pl`, `generate_mines/5` em `board.pl` |
+| Números | cada célula segura revelada mostra quantas das até 8 vizinhas são minas | `adjacent_mines/5` em `board.pl` |
+| Expansão | revelar uma célula 0 abre a região vazia conectada e sua borda numerada, em largura, sem abrir bandeiras | `expand_safe/7` em `game.pl` |
+| Bandeiras | alternam em célula oculta, inclusive antes do primeiro clique; bloqueiam a revelação | `apply_valid_action/4` em `game.pl` |
+| Vitória | todas as células seguras reveladas; bandeiras não são obrigatórias | `apply_valid_action/4` em `game.pl` |
+| Derrota | revelar uma mina; a mina clicada é marcada como detonada | `apply_valid_action/4` em `game.pl` |
+| Fim de partida | após vitória ou derrota nenhuma ação altera o tabuleiro | `execute_action/3` em `game.pl` |
+| Projeção pública | em partida ativa só saem `hidden`, `flagged` e `revealed` com número; no fim aparecem `mine`, `exploded` e bandeiras erradas | `public_cells/2` em `game.pl` |
 
-As regras locais (termômetros a entre-pontas) são desenhadas pelo
-gerador a partir da solução, como as gaiolas do Killer: `extras.pl`
-sorteia caminhos de células e fica com os que a solução satisfaz
-("gerar e testar"). O motor lógico ganhou uma técnica genérica, "Regra
-local": um candidato sai se, fixando-o, nenhuma combinação dos
-candidatos restantes cumpre a regra, testado com as MESMAS restrições
-CLP(FD) do resolvedor. Combinações de não-consecutivo usam a grade do
-"Milagre" (Mitchell Lee) como modelo, embaralhada só por simetrias e
-pela troca d → 10 − d, que preservam "ser seguido".
+O primeiro clique é seguro, mas não há garantia de área inicial vazia nem de
+partida resolvível sem adivinhação.
 
-Toda a lógica é escrita sobre conceitos genéricos — *casas* (9 células
-com 1..9), *grupos* (dígitos distintos: casas e gaiolas) e *vizinhos*
-(quem enxerga quem) — então uma regra nova só precisa dizer quais casas,
-grupos ou vizinhos acrescenta. O Elm espelha a mesma geometria em
-`Variant.elm` para detectar conflitos sem ir ao servidor.
+## Servidor e sessões (implementado em Prolog)
 
-Algumas combinações têm busca de cauda pesada (anti-cavalo + diagonal).
-O gerador usa reinícios aleatórios com limite de tempo e, quando existe,
-uma grade-modelo embaralhada por permutação de dígitos e pelas 8
-simetrias do quadrado, que preservam todas as regras geométricas.
-Diagonal + Hyper + Anti-cavalo ao mesmo tempo não teve grade encontrada
-(possivelmente é inviável); o servidor responde com uma mensagem clara.
+| Funcionalidade | Como funciona | Onde |
+| --- | --- | --- |
+| API JSON | `POST /api/games`, `GET /api/games/:id`, `POST /api/games/:id/actions`; erros padronizados | `server.pl`, [API.md](API.md) |
+| Sessões em memória | identificador UUID v4, expiração após 2 h sem atividade, limite de 1.000 partidas | `sessions.pl` |
+| Uma ação por vez | ações da mesma partida são serializadas por mutex | `session_mutex/2` em `sessions.pl` |
+| Revisão | número que cresce a cada mudança, para o cliente detectar respostas antigas | `game_state/10` em `game.pl` |
 
-## 2. Gerador com dificuldade real (implementado)
+Reiniciar o servidor perde todas as partidas: não há persistência, contas nem
+autenticação.
 
-1. Grade completa aleatória (CLP(FD), rotulação *first-fail* com ordem de
-   valores embaralhada).
-2. Gaiolas do Killer crescidas aleatoriamente sobre a solução (conexas,
-   sem repetir dígito, 2–6 células); marcas de paridade em ~35% das casas.
-3. Escavação: remove pistas (em pares simétricos, exceto no Killer)
-   enquanto o **motor lógico** consegue resolver usando apenas as técnicas
-   permitidas para a dificuldade. Como as técnicas são deduções corretas,
-   isso também prova que a solução é única — só no nível Extremo, que
-   admite bifurcação, é preciso contar soluções com CLP(FD).
-4. Avaliação final; se o puzzle ficou fácil demais, gera outro (até um
-   prazo) e devolve o melhor.
+## Cliente (implementado em Elm)
 
-Mesma semente → mesmo puzzle (o servidor guarda o resultado em cache,
-porque os prazos de relógio poderiam variar entre máquinas).
+| Funcionalidade | Como funciona | Onde |
+| --- | --- | --- |
+| Nova partida e reinício | escolher a dificuldade cria uma partida; reiniciar cria outra na mesma dificuldade | `startNewGame` em `Main.elm` |
+| Uma ação por vez | enquanto há requisição pendente (`PendingRequest`), novas ações são bloqueadas | `sendPlayerAction`, `isBusy` em `Main.elm` |
+| Validação antes de enviar | não envia revelação em célula com bandeira nem ação em partida encerrada | `Game.canReveal`, `Game.canToggleFlag` |
+| Timeout e falha de rede | a ação não é repetida; o cliente consulta `GET` e só libera o tabuleiro com o estado confirmado; se o `GET` também falhar, oferece sincronizar de novo | `handleActionResult`, `handleSyncResult`, estado `SyncFailed` |
+| Respostas atrasadas | cada requisição leva um `requestToken`; respostas de token ou partida antiga são ignoradas | `update` em `Main.elm` |
+| Sessão perdida | 404 `game_not_found` mostra aviso, para o cronômetro e oferece novo jogo | `Api.isSessionLost`, estado `SessionLost` |
+| Validação do JSON | decoders rejeitam dificuldade/status desconhecidos, contagem de células errada, coordenadas fora da grade e minas expostas em partida ativa | `snapshotDecoder`, `validateSnapshot` em `Api.elm` |
+| Contador e cronômetro | minas restantes = minas − bandeiras; cronômetro local começa na primeira revelação confirmada e para no fim | `Game.remainingMines`, `subscriptions` |
 
-## 3. Motor de raciocínio e dicas explicadas (implementado)
+## Interface (Elm + HTML/CSS)
 
-Repertório, em ordem de dificuldade:
+- **Mouse:** clique revela; botão direito marca/desmarca bandeira.
+- **Toque:** botão de modo (revelar ↔ bandeira) troca o que o toque faz; nenhum
+  toque longo é necessário.
+- **Teclado:** setas ou WASD movem o foco na grade; Home/End e PageUp/PageDown
+  vão às bordas; Enter/Espaço fazem a ação do modo atual; `R` revela; `F` marca
+  bandeira. Atalhos globais: `1`/`2`/`3` dificuldade, `N` novo jogo, `G` foca a
+  grade, `M` troca o modo, `U` sincroniza após falha, `?` abre a ajuda, Esc fecha.
+- **Acessibilidade:** cada célula tem rótulo em português (linha e coluna a
+  partir de 1, estado e número); estados distinguidos por ícone, não só por cor;
+  anúncios em região `aria-live`.
+- **Fim de partida:** na derrota, mina detonada, minas restantes, bandeiras
+  certas e bandeiras erradas aparecem distintas (`Board.visualKind`).
+- **Responsivo:** a grade difícil (16×30) rola horizontalmente em telas
+  estreitas; a densidade das células se ajusta à dificuldade
+  (`Board.boardDensityClass`).
 
-| Nível | Técnicas |
-| --- | --- |
-| 1 | Candidato único, Posição única, Soma restante da gaiola |
-| 2 | Combinações da gaiola, Interseção (generalizada para qualquer regra) |
-| 3 | Regra dos 45, Par nu, Par escondido, Trio nu |
-| 4 | Trio escondido, X-Wing |
-| 5 | Bifurcação (tentativa e erro) |
+## Fora do MVP
 
-A "Interseção" é generalizada: se todas as posições possíveis de um
-dígito numa casa enxergam uma célula X, X perde esse candidato. Isso
-cobre *pointing*, *box/line reduction*, interseções de diagonais e
-janelas, e interações com anti-cavalo e gaiolas, com um único código.
-
-Ao pedir uma dica, o Prolog:
-
-1. confere o tabuleiro contra a solução e, se houver erro, aponta as
-   células erradas (sem revelar o valor certo);
-2. encadeia passos lógicos até a primeira colocação;
-3. **poda** a cadeia de trás para frente: cada passo depende só dos
-   candidatos das suas células de foco e da sua região, então os passos
-   cujas eliminações não tocam nenhuma premissa posterior são removidos.
-
-O Elm mostra os passos um a um, destacando a região, as células-chave,
-os candidatos eliminados (riscados) e a colocação final; "Aplicar"
-executa a cadeia nas anotações e no tabuleiro.
-
-## 4. Camada de jogo em Elm (implementado)
-
-- **Modos:** Relaxado (sem limites), Sobrevivência (3 vidas), Contra o
-  relógio (tempo inicial proporcional às casas vazias e ao nível; acertos
-  somam tempo, erros tiram 20 s).
-- **Pontuação:** pontos-base crescem com o nível lógico e o número de
-  regras; acertos em até 15 s seguidos formam combo (até ×8); dicas
-  custam pontos; bônus de conclusão desconta tempo, erros e dicas.
-- **Ferramentas:** anotações, auto-notas (respeitando todas as regras,
-  inclusive limite de soma da gaiola), limpeza automática das anotações
-  dos vizinhos, desfazer/refazer (200 níveis), atalhos de teclado.
-- **Conflitos visíveis:** repetição entre vizinhos (inclusive cavalo e
-  gaiola), paridade violada, soma de gaiola estourada.
-- **Meta-jogo:** desafio diário (regras rotativas, semente = data),
-  sequência de dias, recordes por combinação regras/dificuldade/modo.
-
-## 5. Próximas features (roteiro)
-
-Ideias que encaixam na arquitetura atual, da mais barata para a mais cara:
-
-1. **Mais regras** — feito: Termômetro, Setas, Kropki, X/V, Anti-rei,
-   Disjunto, Não-consecutivo, Sussurro, Renban, Palíndromo e
-   Entre-pontas. Falta: Sandwich e técnicas específicas por regra (hoje
-   todas passam pela técnica genérica "Regra local").
-2. **Técnicas avançadas** — Swordfish, XY-Wing, cadeias simples
-   (*coloring*) e "inies/outies" do Killer com mais de uma célula; isso
-   refina a escala entre os níveis 4 e 5.
-3. **Modo Névoa** — células reveladas só quando um vizinho é resolvido;
-   o gerador precisa garantir que a ordem de revelação permite progresso
-   lógico (bom uso do motor de passos).
-4. **Editor de puzzles** — o jogador monta um puzzle e o Prolog verifica
-   unicidade, classifica e explica por que não é único (mostrando duas
-   soluções diferentes).
-5. **Replay e análise pós-jogo** — gravar a sequência de jogadas no Elm e
-   comparar com o caminho lógico do Prolog, apontando onde o jogador
-   chutou.
-6. **Multijogador** — corrida no mesmo puzzle via WebSocket
-   (`library(http/websocket)` no SWI-Prolog); o servidor valida as
-   jogadas.
-7. **Tamanhos variáveis** — 6×6 (iniciante) e 16×16 (hexadecimal); exige
-   parametrizar a geometria (hoje fixa em 9×9) nos dois lados.
+Ranking, contas, multiplayer, desfazer, dicas/solver, desafio diário, variantes
+e abertura por acorde (chording).

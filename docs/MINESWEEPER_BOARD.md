@@ -148,7 +148,8 @@ Suíte: `backend/tests/test_minesweeper_board.pl`, com plunit.
   seguro em todas as posições, com aleatoriedade controlada.
 - Cobrir zero minas, capacidade máxima, quantidade impossível, lista de minas
   inválida e reprodutibilidade; restaurar o estado aleatório após cada teste.
-- Manter e executar a suíte de Sudoku durante a coexistência dos domínios.
+- Durante a coexistência dos domínios, a suíte de Sudoku foi mantida; ela foi
+  retirada na integração da frente 06.
 
 ## Integração e revisão
 
@@ -169,5 +170,5 @@ Para executar a suíte desta frente:
 swipl -g run_tests -t halt backend/tests/test_minesweeper_board.pl
 ```
 
-Com make disponível, `make test-minesweeper` executa essa suíte e `make test`
-executa também a suíte legada de Sudoku.
+Com make disponível, `make test-prolog` executa todas as suítes Prolog e
+`make test` inclui também os testes Elm.
