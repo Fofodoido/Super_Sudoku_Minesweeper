@@ -14,9 +14,9 @@
 - **Nome do projeto:** Campo Minado — Prolog + Elm
 - **Nome do grupo:** SuperSMs
 - **Repositório:** https://github.com/Fofodoido/Super_Sudoku_Minesweeper
-- **Commit ou tag entregue:** `473f7d2`
+- **Commit ou tag entregue:** `v1.0`
 - **Ponto de partida:** outro jogo conhecido
-- **Slides da apresentação oral:** não há
+- **Slides da apresentação oral:** `docs/apresentacao.pdf`
 
 ## 2. Resumo
 
@@ -280,17 +280,18 @@ O frontend Elm comunica-se diretamente com o servidor HTTP do SWI-Prolog (`libra
 
 ## 12. Apresentação oral
 
-- **Slides:** não há
+- **Slides:** `docs/apresentacao.pdf`
 - **Roteiro:**
 
 | Parte | Duração | Quem apresenta |
 |-------|:-------:|----------------|
-| Contexto, arquitetura geral e geometria do tabuleiro em Prolog (Frente 01) | 2 min | Gustavo Xavier Evangelista |
-| Motor de regras em Prolog, expansão BFS e projeção pública segura (Frente 02) | 3 min | Rodrigo Henrique Donato de Souza |
-| Contrato JSON, API HTTP e gerenciamento concorrente de sessões (Frente 03) | 2 min | Davi Araujo Bady Casseb |
-| Demonstração do sistema e interface Elm acessível/responsiva (Frente 05) | 3 min | Carlos Eduardo Mendes de Mesquita |
-| Modelo algébrico Elm, decoders JSON e sincronização resiliente (Frente 04) | 3 min | Mateus de Siqueira Silva |
-| Testes de aceite, pipeline CI, limitações e aprendizados do grupo (Frente 06) | 2 min | Gabriel Basto Bertolazi |
+| Problema e organização das seis frentes (Slides 2 e 3) | 1,5 min | Gabriel Basto Bertolazi |
+| Arquitetura geral e geometria/geração em Prolog — Frente 01 (Slides 4 e 5) | 2,5 min | Gustavo Xavier Evangelista |
+| Motor de regras e expansão BFS com ordsets em Prolog — Frente 02 (Slides 6 e 7) | 2,5 min | Rodrigo Henrique Donato de Souza |
+| Contrato JSON v1, rotas HTTP e sessões concorrentes — Frente 03 (Slides 8 a 10) | 2,5 min | Davi Araujo Bady Casseb |
+| Modelo algébrico Elm, decoders JSON e ciclo da partida — Frente 04 (Slides 11 e 12) | 2 min | Mateus de Siqueira Silva |
+| Interface acessível, fluxo completo e demonstração ao vivo — Frente 05 (Slides 13 a 15) | 2,5 min | Carlos Eduardo Mendes de Mesquita |
+| Garantias verificadas por testes, limitações e próximos passos — Frente 06 (Slides 16 a 18) | 1,5 min | Gabriel Basto Bertolazi |
 
 ## 13. Reflexão sobre os paradigmas
 

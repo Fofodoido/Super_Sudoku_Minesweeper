@@ -112,4 +112,6 @@ O [contrato da API](docs/API.md) documenta endpoints, snapshots, erros, sessões
 
 O [aceite integrado](docs/ACEITE.md) registra versões, comandos, a matriz de cenários com a suíte que cobre cada um e o procedimento de aceite no navegador.
 
+Os [slides da apresentação](docs/apresentacao.pdf) e o [roteiro detalhado](docs/ROTEIRO_APRESENTACAO.md) consolidam a exposição de 15 minutos do grupo.
+
 O documento principal do novo projeto é o [plano de Campo Minado](docs/PLANO_CAMPO_MINADO.md). [FEATURES.md](docs/FEATURES.md) lista as funcionalidades por camada e [EXPLICACAO.md](docs/EXPLICACAO.md) liga os tópicos da disciplina ao código Prolog e Elm integrado.
