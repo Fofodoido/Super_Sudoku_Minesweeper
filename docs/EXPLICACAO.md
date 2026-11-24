@@ -1,8 +1,7 @@
 # Campo Minado — explicação dos conceitos usados
 
 Este documento liga os tópicos da disciplina ao código do Campo Minado que
-existe hoje. Só aparece aqui o que está de fato no código; o que depende de
-frentes ainda não integradas está marcado como pendente.
+existe hoje. Só aparece aqui o que está de fato no código.
 
 A versão anterior deste arquivo descrevia o Super Sudoku e continua no
 histórico Git (`git log -- docs/EXPLICACAO.md`).
@@ -23,8 +22,14 @@ Navegador (Elm)  ──JSON──▶  server.pl  ──▶  sessions.pl  ──�
   cada UUID ao `game_state` atual, com expiração e exclusão mútua.
 - `backend/server.pl`: traduz HTTP/JSON para chamadas às sessões e os
   resultados `ok/1` e `error/1` para respostas e códigos HTTP.
-- Elm (`frontend/src`): pendente das frentes 04 e 05; hoje o bundle ainda é o
-  do Sudoku.
+- `frontend/src/Game.elm`: tipos do domínio (`Difficulty`, `Status`,
+  `CellState`, `Snapshot`) e funções puras sobre eles.
+- `frontend/src/Api.elm`: requisições HTTP, encoders e decoders JSON com
+  validação do snapshot.
+- `frontend/src/Main.elm`: a arquitetura Elm (`Model`, `Msg`, `update`,
+  `subscriptions`, `view`) e o ciclo de requisições.
+- `frontend/src/Board.elm`: a grade, o painel, o teclado e a acessibilidade.
+  `Explosion.elm` desenha a animação de derrota.
 
 A separação faz com que as regras sejam testadas sem servidor (`game.pl` é
 puro) e que o servidor seja a única fonte da verdade: o cliente recebe só o que
@@ -55,24 +60,34 @@ pode ser mostrado.
 | Integração com outras linguagens | Prolog serve HTTP/JSON consumido pelo Elm (`server.pl`, [API.md](API.md)) |
 | Testes | `plunit` em `backend/tests`, com `forall/1` para repetir um teste por dificuldade e `setup`/`cleanup` subindo o servidor real |
 
-### Elm (pendente: frentes 04 e 05)
+### Elm
 
-Quando o cliente for integrado, esta seção deve mapear: TEA (`Model`,
-`update`, `view`), tipos algébricos para estado da partida e das requisições,
-`Maybe`/`Result`, decoders e encoders JSON do snapshot, efeitos HTTP com
-`Cmd`, controle de uma requisição pendente por vez e descarte de respostas de
-partida antiga. Nada disso está escrito ainda.
+| Tópico | Onde está |
+| --- | --- |
+| Arquitetura Elm (TEA) | `Browser.element` em `Main.main`; `init`, `update : Msg -> Model -> ( Model, Cmd Msg )`, `subscriptions`, `view` |
+| Tipos algébricos (custom types) | `Difficulty`, `Status`, `CellState` (`Revealed Int` carrega o número) em `Game.elm`; `Action` e `ApiError` em `Api.elm`; `ScreenState`, `PendingRequest` e `Msg` em `Main.elm`; `VisualKind` em `Board.elm` |
+| Estados inválidos não representáveis | `PendingRequest` (`Idle`, `CreatingGame`, `MutatingAction Action`, `SyncingAfterUncertainAction`, `SyncFailed`) impede duas ações simultâneas; `ScreenState` separa carregando, ativo, falha e sessão perdida |
+| Casamento de padrões com `case` | `update` trata cada `Msg`; `visualKind` combina `Status` e `CellState` para decidir o desenho (ex.: bandeira em célula segura na derrota vira `VisualWrongFlag`) |
+| Records e atualização imutável | `Model`, `Snapshot`, `Cell`, `Coord`; `{ model \| pending = Idle }` sempre devolve um modelo novo |
+| `Maybe` e `Result` | `difficultyFromString : String -> Maybe Difficulty`; `findCell` devolve `Maybe Cell`; respostas HTTP chegam como `Result ApiError Snapshot` |
+| Decoders e encoders JSON | `snapshotDecoder` com `Decode.andThen` e `Decode.fail` para validar invariantes (`validateSnapshot`); `encodeAction` serializa `reveal`/`toggle_flag` |
+| Efeitos com `Cmd` e `Sub` | `Http.request` com timeout em `Api.elm`; `Time.every` para o cronômetro e `Browser.Events.onKeyDown` para atalhos; `Browser.Dom.focus` para mover o foco |
+| Respostas fora de ordem | `requestToken` incrementado a cada nova partida; `CreateGameResponse`, `ActionResponse` e `SyncResponse` com token ou `gameId` antigo são descartadas |
+| Funções de ordem superior | `List.map`, `List.filter` sobre as células; `chunkList` agrupa a lista plana em linhas da grade; `Set` guarda as bandeiras antes do fim da partida |
+| Composição de funções puras | `Board` recebe um `Config msg` com as mensagens e não conhece o `Model`; `Game` não depende de HTTP nem de HTML |
+| Testes | `elm-test` em `frontend/tests`: `MinesweeperTest.elm` (decoders, encoders, ciclo de requisições, respostas atrasadas, sessão perdida) e `BoardTest.elm` (estados visuais, rótulos acessíveis, foco e atalhos) |
 
 ## Conceitos que o Campo Minado não usa
 
 O Super Sudoku usava CLP(FD), meta-interpretador e um exemplo de Prolog chamado
 do Python (janus). O Campo Minado não precisa de nenhum deles: as regras são
-contagem de vizinhos e busca em largura. Esses módulos (`backend/sudoku`,
-`backend/python/exemplo_janus.py`) saem do produto ativo na integração final.
+contagem de vizinhos e busca em largura. Os módulos `backend/sudoku` e
+`backend/python/exemplo_janus.py` foram retirados e continuam no histórico Git.
 
-Se a disciplina exigir algum desses tópicos, isso precisa ser confirmado antes
-de ser prometido. Dicas com CLP(FD) estão previstas apenas como extensão após o
-MVP ([PLANO_CAMPO_MINADO.md](PLANO_CAMPO_MINADO.md)).
+Os critérios da disciplina (`AVALIACAO.md`) citam CLP(FD) apenas como um dos
+exemplos de uso idiomático de Prolog e tratam Python como integração opcional;
+nenhum deles é obrigatório. Dicas com CLP(FD) ficam como extensão possível após
+o MVP ([PLANO_CAMPO_MINADO.md](PLANO_CAMPO_MINADO.md)).
 
 ## Como verificar
 

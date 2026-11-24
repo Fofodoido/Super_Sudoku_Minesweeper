@@ -12,9 +12,8 @@ força de cada linguagem:
 O cliente nunca recebe as minas enquanto a partida está em andamento, então não
 há como trapacear lendo a resposta da API.
 
-Situação em 23/11/2026: servidor, regras e API implementados e testados; cliente
-Elm e interface de Campo Minado pendentes das frentes 04 e 05. O bundle servido
-ainda é a interface do Sudoku.
+Situação em 23/11/2026: servidor, regras, API, cliente Elm e interface
+integrados e testados. Os módulos do Super Sudoku foram retirados do produto.
 
 ## Regras do jogo (implementado em Prolog)
 
@@ -45,19 +44,36 @@ partida resolvível sem adivinhação.
 Reiniciar o servidor perde todas as partidas: não há persistência, contas nem
 autenticação.
 
-## Interface (pendente: frentes 04 e 05)
+## Cliente (implementado em Elm)
 
-Planejado em [PLANO_CAMPO_MINADO.md](PLANO_CAMPO_MINADO.md):
+| Funcionalidade | Como funciona | Onde |
+| --- | --- | --- |
+| Nova partida e reinício | escolher a dificuldade cria uma partida; reiniciar cria outra na mesma dificuldade | `startNewGame` em `Main.elm` |
+| Uma ação por vez | enquanto há requisição pendente (`PendingRequest`), novas ações são bloqueadas | `sendPlayerAction`, `isBusy` em `Main.elm` |
+| Validação antes de enviar | não envia revelação em célula com bandeira nem ação em partida encerrada | `Game.canReveal`, `Game.canToggleFlag` |
+| Timeout e falha de rede | a ação não é repetida; o cliente consulta `GET` e só libera o tabuleiro com o estado confirmado; se o `GET` também falhar, oferece sincronizar de novo | `handleActionResult`, `handleSyncResult`, estado `SyncFailed` |
+| Respostas atrasadas | cada requisição leva um `requestToken`; respostas de token ou partida antiga são ignoradas | `update` em `Main.elm` |
+| Sessão perdida | 404 `game_not_found` mostra aviso, para o cronômetro e oferece novo jogo | `Api.isSessionLost`, estado `SessionLost` |
+| Validação do JSON | decoders rejeitam dificuldade/status desconhecidos, contagem de células errada, coordenadas fora da grade e minas expostas em partida ativa | `snapshotDecoder`, `validateSnapshot` em `Api.elm` |
+| Contador e cronômetro | minas restantes = minas − bandeiras; cronômetro local começa na primeira revelação confirmada e para no fim | `Game.remainingMines`, `subscriptions` |
 
-- Nova partida, reinício na mesma dificuldade, contador de bandeiras restantes e
-  cronômetro local que começa na primeira revelação confirmada.
-- Mouse, teclado e modo explícito de bandeira para toque.
-- Uma requisição de ação por vez; após timeout, consultar o estado com GET em vez
-  de repetir a ação; ignorar respostas de partida antiga depois de novo jogo.
-- Estados distinguíveis sem depender só de cor; grade difícil utilizável em
-  celular com rolagem.
+## Interface (Elm + HTML/CSS)
 
-Esta seção será substituída pela descrição real quando o cliente for integrado.
+- **Mouse:** clique revela; botão direito marca/desmarca bandeira.
+- **Toque:** botão de modo (revelar ↔ bandeira) troca o que o toque faz; nenhum
+  toque longo é necessário.
+- **Teclado:** setas ou WASD movem o foco na grade; Home/End e PageUp/PageDown
+  vão às bordas; Enter/Espaço fazem a ação do modo atual; `R` revela; `F` marca
+  bandeira. Atalhos globais: `1`/`2`/`3` dificuldade, `N` novo jogo, `G` foca a
+  grade, `M` troca o modo, `U` sincroniza após falha, `?` abre a ajuda, Esc fecha.
+- **Acessibilidade:** cada célula tem rótulo em português (linha e coluna a
+  partir de 1, estado e número); estados distinguidos por ícone, não só por cor;
+  anúncios em região `aria-live`.
+- **Fim de partida:** na derrota, mina detonada, minas restantes, bandeiras
+  certas e bandeiras erradas aparecem distintas (`Board.visualKind`).
+- **Responsivo:** a grade difícil (16×30) rola horizontalmente em telas
+  estreitas; a densidade das células se ajusta à dificuldade
+  (`Board.boardDensityClass`).
 
 ## Fora do MVP
 

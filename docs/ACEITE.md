@@ -84,37 +84,39 @@ comparado com `adjacent_mines/5`.
 | 12 | Falha de rede após ação: GET recupera o estado confirmado | `acceptance:network_failure_recovery` | Automatizado (servidor) |
 | 13 | `toggle_flag` repetido às cegas desfaz a jogada (não é idempotente) | `acceptance:network_failure_recovery` | Automatizado (servidor) |
 | 14 | Sessão expirada no meio da partida: 404 em GET e ação; novo jogo funciona | `acceptance:expired_session_mid_game`, `sessions:expiration_boundary_and_renewal` | Automatizado |
-| 15 | Resposta antiga após novo jogo não afeta a partida nova | `acceptance:stale_game_isolated_after_new_game` | Servidor automatizado; descarte no cliente pendente da frente 04 |
+| 15 | Resposta antiga após novo jogo não afeta a partida nova | `acceptance:stale_game_isolated_after_new_game`, `elm:Descarte de respostas atrasadas` | Automatizado (servidor e cliente) |
 | 16 | Nenhuma mina, semente ou número oculto no JSON de partida ativa | `acceptance` (todas as respostas), `http:create_get_and_action` | Automatizado |
 | 17 | Ações concorrentes na mesma partida são serializadas | `http:concurrent_actions`, `sessions:concurrent_toggles_are_serialized` | Automatizado |
 | 18 | Bundle servido corresponde ao fonte Elm | `make check-bundle` (CI) | Automatizado |
-| 19 | Cliente Elm: uma ação pendente por vez, timeout → GET, ignorar partida antiga | Testes Elm da frente 04 | Pendente (frente 04) |
-| 20 | Navegador: mouse, teclado, toque, grade difícil em viewport móvel | Procedimento abaixo | Pendente (frentes 04 e 05) |
+| 19 | Cliente Elm: uma ação pendente por vez, timeout → GET, ignorar partida antiga, sessão perdida | `elm:Concorrência e recuperação após resultado incerto`, `elm:Sessão perdida e reinício` | Automatizado |
+| 20 | Navegador: mouse, teclado, toque, grade difícil em viewport móvel | Lógica em `elm:BoardTest` (foco, atalhos, modo bandeira, rótulos); uso real pelo procedimento abaixo | Manual: registrar abaixo |
 
 Prefixos: `acceptance` = `test_minesweeper_acceptance.pl`, `game` =
 `test_minesweeper_game.pl`, `http` = `test_minesweeper_http.pl`, `sessions` =
-`test_minesweeper_sessions.pl`.
+`test_minesweeper_sessions.pl`, `elm` = `frontend/tests/*.elm`
+(`describe` correspondente).
 
 ## Resultados registrados
 
-23/11/2026, branch `issue-6-integracao` sobre o PR #10, SWI-Prolog 10.0.2:
+23/11/2026, branch `issue-6-integracao` com `main` após os PRs #12 (frente 04)
+e #14 (frente 05), Sudoku retirado, SWI-Prolog 10.0.2 (Docker) e Elm 0.19.1:
 
 | Suíte | Resultado |
 | --- | --- |
-| `test_minesweeper_acceptance.pl` | 5 testes (+4 subtestes) passaram; estável em 3 execuções seguidas |
+| `test_minesweeper_acceptance.pl` | 5 testes (+4 subtestes) passaram |
 | `test_minesweeper_board.pl` | 24 (+51) passaram |
 | `test_minesweeper_game.pl` | 16 (+7) passaram |
 | `test_minesweeper_http.pl` | 11 (+2) passaram |
 | `test_minesweeper_sessions.pl` | 9 (+2) passaram |
-| `test_sudoku.pl` (legado) | 27 (+19) passaram |
-| `make check-bundle` | Passa depois de recompilar; o `elm.js` versionado antes desta entrega **não** correspondia ao fonte |
-| `make deps && make check-bundle && make test-elm` em cópia limpa, cache Elm vazio | Passou |
+| `elm-test` (`MinesweeperTest.elm`, `BoardTest.elm`) | 46 passaram |
+| `swipl backend/server.pl` | Carrega sem avisos |
+| `make check-bundle` | `elm.js` corresponde ao fonte |
+| Servidor real (`docker … swipl backend/server.pl 8080`) | `/` serve "Campo Minado — Prolog + Elm", `/elm.js` 200, partida difícil criada e primeiro clique seguro via API |
 
 ## Procedimento de aceite no navegador
 
-Executar quando as frentes 04 e 05 estiverem integradas, com `make run` e o
-navegador em `http://localhost:8080`. Registrar data, navegador, versão e
-resultado de cada item nesta seção.
+Com `make run` e o navegador em `http://localhost:8080`. Registrar data,
+navegador, versão e resultado de cada item na tabela ao fim desta seção.
 
 1. **Fluxo completo com mouse**, em cada dificuldade: criar, marcar bandeira,
    revelar, observar expansão, vencer ou perder, reiniciar. Conferir contador de
@@ -140,12 +142,35 @@ resultado de cada item nesta seção.
 10. **Página de Campo Minado**: título, favicon e textos sem referências ao
     Sudoku.
 
+### Registro do aceite no navegador
+
+Data: ____ · Navegador e versão: ____ · Dispositivo/emulação: ____
+
+| Item | Resultado | Observação |
+| --- | --- | --- |
+| 1. Mouse (fácil, médio, difícil) | | |
+| 2. Teclado | | |
+| 3. Toque / modo bandeira | | |
+| 4. Grade difícil em 360×740 | | |
+| 5. Estados sem depender de cor | | |
+| 6. Falha de rede | | |
+| 7. Sessão perdida | | |
+| 8. Resposta atrasada | | |
+| 9. Sem vazamento no Network | | |
+| 10. Página sem Sudoku | | |
+
+## Módulos retirados
+
+Com o fluxo novo passando, saíram do produto ativo (continuam no histórico Git):
+`backend/sudoku/`, `backend/tests/test_sudoku.pl`, `backend/python/exemplo_janus.py`,
+`frontend/src/Variant.elm`, `Local.elm` e `Overlay.elm`. Nenhum deles era
+importado pelo `Main.elm` nem pelo `server.pl`; o bundle não mudou.
+
+CLP(FD), meta-interpretador e Python não são exigidos: o `AVALIACAO.md` da
+disciplina cita CLP(FD) só como exemplo de uso idiomático e trata Python como
+integração opcional.
+
 ## Pendências para fechar a issue #6
 
-- Aceite final depende das frentes 04 (cliente Elm) e 05 (grade e interface).
-- Executar o procedimento de navegador e registrar os resultados acima.
-- Depois do fluxo novo passar: retirar `backend/sudoku`, `test_sudoku.pl`,
-  `Variant.elm`, `Local.elm`, `Overlay.elm` e o exemplo Janus do produto
-  ativo; recompilar o bundle e conferir `make check-bundle`.
-- Confirmar com a disciplina se CLP(FD), meta-interpretador ou Python são
-  exigidos antes de prometê-los: o Campo Minado atual não usa nenhum deles.
+- Executar o procedimento de navegador e preencher a tabela acima.
+- CI verde e aprovação do PR #13 por @guxvr (frente 01).

@@ -2,9 +2,9 @@
 
 Projeto de Campo Minado web desenvolvido com SWI-Prolog e Elm, com interface em português e HTML/CSS.
 
-**Estado atual:** a base Prolog de geometria, geração, motor de regras, sessões em memória e API HTTP de Campo Minado está implementada e testada. O bundle compilado ainda apresenta a interface do Sudoku original; o cliente e a interface de Campo Minado permanecem nas respectivas frentes.
+**Estado atual:** backend Prolog (geometria, geração, motor de regras, sessões e API HTTP), cliente Elm e interface de Campo Minado estão integrados e testados. O código do Super Sudoku foi retirado; ele continua no histórico Git.
 
-## Escopo planejado
+## Escopo
 
 - Três dificuldades: fácil (9x9, 10 minas), médio (16x16, 40 minas) e difícil (16x30, 99 minas).
 - Primeiro clique seguro, revelação de células e expansão de áreas vazias.
@@ -15,7 +15,7 @@ Projeto de Campo Minado web desenvolvido com SWI-Prolog e Elm, com interface em 
 
 Ranking, contas, multiplayer, desfazer e dicas ficam fora do MVP. O primeiro clique seguro não garante que toda partida possa ser resolvida sem adivinhação.
 
-## Arquitetura planejada
+## Arquitetura
 
 | Camada | Responsabilidade |
 | --- | --- |
@@ -70,7 +70,7 @@ make test
 make ci
 ```
 
-Outros alvos: `make test-minesweeper` (suítes de Campo Minado, sem o legado), `make test-acceptance` (fluxos integrados via HTTP), `make check-bundle` e `make help`.
+Outros alvos: `make test-acceptance` (fluxos integrados via HTTP), `make check-bundle` e `make help`.
 
 ### Sem make
 
@@ -90,7 +90,11 @@ Testes sem make:
 for t in backend/tests/test_*.pl; do swipl -g run_tests -t halt "$t" || exit 1; done
 ```
 
-`test_sudoku.pl` é a suíte legada e sai junto com o Sudoku na integração final.
+Testes Elm sem make:
+
+```sh
+cd frontend && npx elm-test
+```
 
 ### Integração contínua
 
