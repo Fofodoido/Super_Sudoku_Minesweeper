@@ -784,11 +784,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.aI.ad === region.a1.ad)
+	if (region.a$.ai === region.bk.ai)
 	{
-		return 'on line ' + region.aI.ad;
+		return 'on line ' + region.a$.ai;
 	}
-	return 'on lines ' + region.aI.ad + ' through ' + region.a1.ad;
+	return 'on lines ' + region.a$.ai + ' through ' + region.bk.ai;
 }
 
 
@@ -1857,9 +1857,9 @@ var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, args)
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.ca,
-		impl.cJ,
 		impl.cE,
+		impl.da,
+		impl.c6,
 		function() { return function() {} }
 	);
 });
@@ -2719,9 +2719,9 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		aA: func(record.aA),
-		aJ: record.aJ,
-		aF: record.aF
+		aL: func(record.aL),
+		aA: record.aA,
+		aw: record.aw
 	}
 });
 
@@ -2989,11 +2989,11 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.aA;
-		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.aJ;
+		var message = !tag ? value : tag < 3 ? value.a : value.aL;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.aA;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.aF) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.aw) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -3943,11 +3943,11 @@ var _Browser_element = _Debugger_element || F4(function(impl, flagDecoder, debug
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.ca,
-		impl.cJ,
 		impl.cE,
+		impl.da,
+		impl.c6,
 		function(sendToApp, initialModel) {
-			var view = impl.cK;
+			var view = impl.db;
 			/**/
 			var domNode = args['node'];
 			//*/
@@ -3979,12 +3979,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.ca,
-		impl.cJ,
 		impl.cE,
+		impl.da,
+		impl.c6,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.aH && impl.aH(sendToApp)
-			var view = impl.cK;
+			var divertHrefToApp = impl.aZ && impl.aZ(sendToApp)
+			var view = impl.db;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
 			var currNode = _VirtualDom_virtualize(bodyNode);
@@ -3992,12 +3992,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 			{
 				_VirtualDom_divertHrefToApp = divertHrefToApp;
 				var doc = view(model);
-				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.as);
+				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.aD);
 				var patches = _VirtualDom_diff(currNode, nextNode);
 				bodyNode = _VirtualDom_applyPatches(bodyNode, currNode, patches, sendToApp);
 				currNode = nextNode;
 				_VirtualDom_divertHrefToApp = 0;
-				(title !== doc.cH) && (_VirtualDom_doc.title = title = doc.cH);
+				(title !== doc.Z) && (_VirtualDom_doc.title = title = doc.Z);
 			});
 		}
 	);
@@ -4053,12 +4053,12 @@ function _Browser_makeAnimator(model, draw)
 
 function _Browser_application(impl)
 {
-	var onUrlChange = impl.cp;
-	var onUrlRequest = impl.cq;
+	var onUrlChange = impl.cT;
+	var onUrlRequest = impl.cU;
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		aH: function(sendToApp)
+		aZ: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -4074,9 +4074,9 @@ function _Browser_application(impl)
 					var next = $elm$url$Url$fromString(href).a;
 					sendToApp(onUrlRequest(
 						(next
-							&& curr.bp === next.bp
-							&& curr.a8 === next.a8
-							&& curr.bm.a === next.bm.a
+							&& curr.bQ === next.bQ
+							&& curr.bs === next.bs
+							&& curr.bN.a === next.bN.a
 						)
 							? $elm$browser$Browser$Internal(next)
 							: $elm$browser$Browser$External(href)
@@ -4084,13 +4084,13 @@ function _Browser_application(impl)
 				}
 			});
 		},
-		ca: function(flags)
+		cE: function(flags)
 		{
-			return A3(impl.ca, flags, _Browser_getUrl(), key);
+			return A3(impl.cE, flags, _Browser_getUrl(), key);
 		},
-		cK: impl.cK,
-		cJ: impl.cJ,
-		cE: impl.cE
+		db: impl.db,
+		da: impl.da,
+		c6: impl.c6
 	});
 }
 
@@ -4156,17 +4156,17 @@ var _Browser_decodeEvent = F2(function(decoder, event)
 function _Browser_visibilityInfo()
 {
 	return (typeof _VirtualDom_doc.hidden !== 'undefined')
-		? { b6: 'hidden', bV: 'visibilitychange' }
+		? { cA: 'hidden', cm: 'visibilitychange' }
 		:
 	(typeof _VirtualDom_doc.mozHidden !== 'undefined')
-		? { b6: 'mozHidden', bV: 'mozvisibilitychange' }
+		? { cA: 'mozHidden', cm: 'mozvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.msHidden !== 'undefined')
-		? { b6: 'msHidden', bV: 'msvisibilitychange' }
+		? { cA: 'msHidden', cm: 'msvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.webkitHidden !== 'undefined')
-		? { b6: 'webkitHidden', bV: 'webkitvisibilitychange' }
-		: { b6: 'hidden', bV: 'visibilitychange' };
+		? { cA: 'webkitHidden', cm: 'webkitvisibilitychange' }
+		: { cA: 'hidden', cm: 'visibilitychange' };
 }
 
 
@@ -4247,12 +4247,12 @@ var _Browser_call = F2(function(functionName, id)
 function _Browser_getViewport()
 {
 	return {
-		bx: _Browser_getScene(),
-		bI: {
-			bL: _Browser_window.pageXOffset,
-			bM: _Browser_window.pageYOffset,
-			bK: _Browser_doc.documentElement.clientWidth,
-			a7: _Browser_doc.documentElement.clientHeight
+		b_: _Browser_getScene(),
+		b9: {
+			cc: _Browser_window.pageXOffset,
+			cd: _Browser_window.pageYOffset,
+			cb: _Browser_doc.documentElement.clientWidth,
+			br: _Browser_doc.documentElement.clientHeight
 		}
 	};
 }
@@ -4262,8 +4262,8 @@ function _Browser_getScene()
 	var body = _Browser_doc.body;
 	var elem = _Browser_doc.documentElement;
 	return {
-		bK: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
-		a7: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
+		cb: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
+		br: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
 	};
 }
 
@@ -4286,15 +4286,15 @@ function _Browser_getViewportOf(id)
 	return _Browser_withNode(id, function(node)
 	{
 		return {
-			bx: {
-				bK: node.scrollWidth,
-				a7: node.scrollHeight
+			b_: {
+				cb: node.scrollWidth,
+				br: node.scrollHeight
 			},
-			bI: {
-				bL: node.scrollLeft,
-				bM: node.scrollTop,
-				bK: node.clientWidth,
-				a7: node.clientHeight
+			b9: {
+				cc: node.scrollLeft,
+				cd: node.scrollTop,
+				cb: node.clientWidth,
+				br: node.clientHeight
 			}
 		};
 	});
@@ -4324,18 +4324,18 @@ function _Browser_getElement(id)
 		var x = _Browser_window.pageXOffset;
 		var y = _Browser_window.pageYOffset;
 		return {
-			bx: _Browser_getScene(),
-			bI: {
-				bL: x,
-				bM: y,
-				bK: _Browser_doc.documentElement.clientWidth,
-				a7: _Browser_doc.documentElement.clientHeight
+			b_: _Browser_getScene(),
+			b9: {
+				cc: x,
+				cd: y,
+				cb: _Browser_doc.documentElement.clientWidth,
+				br: _Browser_doc.documentElement.clientHeight
 			},
-			b0: {
-				bL: x + rect.left,
-				bM: y + rect.top,
-				bK: rect.width,
-				a7: rect.height
+			cu: {
+				cc: x + rect.left,
+				cd: y + rect.top,
+				cb: rect.width,
+				br: rect.height
 			}
 		};
 	});
@@ -4380,25 +4380,25 @@ var _Http_toTask = F3(function(router, toTask, request)
 	return _Scheduler_binding(function(callback)
 	{
 		function done(response) {
-			callback(toTask(request.av.a(response)));
+			callback(toTask(request.aG.a(response)));
 		}
 
 		var xhr = new XMLHttpRequest();
 		xhr.addEventListener('error', function() { done($elm$http$Http$NetworkError_); });
 		xhr.addEventListener('timeout', function() { done($elm$http$Http$Timeout_); });
-		xhr.addEventListener('load', function() { done(_Http_toResponse(request.av.b, xhr)); });
-		$elm$core$Maybe$isJust(request.aN) && _Http_track(router, xhr, request.aN.a);
+		xhr.addEventListener('load', function() { done(_Http_toResponse(request.aG.b, xhr)); });
+		$elm$core$Maybe$isJust(request.a3) && _Http_track(router, xhr, request.a3.a);
 
 		try {
-			xhr.open(request.aC, request.aO, true);
+			xhr.open(request.aN, request.a4, true);
 		} catch (e) {
-			return done($elm$http$Http$BadUrl_(request.aO));
+			return done($elm$http$Http$BadUrl_(request.a4));
 		}
 
 		_Http_configureRequest(xhr, request);
 
-		request.as.a && xhr.setRequestHeader('Content-Type', request.as.a);
-		xhr.send(request.as.b);
+		request.aD.a && xhr.setRequestHeader('Content-Type', request.aD.a);
+		xhr.send(request.aD.b);
 
 		return function() { xhr.c = true; xhr.abort(); };
 	});
@@ -4409,13 +4409,13 @@ var _Http_toTask = F3(function(router, toTask, request)
 
 function _Http_configureRequest(xhr, request)
 {
-	for (var headers = request.ax; headers.b; headers = headers.b) // WHILE_CONS
+	for (var headers = request.aJ; headers.b; headers = headers.b) // WHILE_CONS
 	{
 		xhr.setRequestHeader(headers.a.a, headers.a.b);
 	}
-	xhr.timeout = request.aM.a || 0;
-	xhr.responseType = request.av.d;
-	xhr.withCredentials = request.bP;
+	xhr.timeout = request.a2.a || 0;
+	xhr.responseType = request.aG.d;
+	xhr.withCredentials = request.cg;
 }
 
 
@@ -4436,10 +4436,10 @@ function _Http_toResponse(toBody, xhr)
 function _Http_toMetadata(xhr)
 {
 	return {
-		aO: xhr.responseURL,
-		cC: xhr.status,
-		cD: xhr.statusText,
-		ax: _Http_parseHeaders(xhr.getAllResponseHeaders())
+		a4: xhr.responseURL,
+		c4: xhr.status,
+		c5: xhr.statusText,
+		aJ: _Http_parseHeaders(xhr.getAllResponseHeaders())
 	};
 }
 
@@ -4534,15 +4534,15 @@ function _Http_track(router, xhr, tracker)
 	xhr.upload.addEventListener('progress', function(event) {
 		if (xhr.c) { return; }
 		_Scheduler_rawSpawn(A2($elm$core$Platform$sendToSelf, router, _Utils_Tuple2(tracker, $elm$http$Http$Sending({
-			cA: event.loaded,
-			bA: event.total
+			c2: event.loaded,
+			b1: event.total
 		}))));
 	});
 	xhr.addEventListener('progress', function(event) {
 		if (xhr.c) { return; }
 		_Scheduler_rawSpawn(A2($elm$core$Platform$sendToSelf, router, _Utils_Tuple2(tracker, $elm$http$Http$Receiving({
-			ct: event.loaded,
-			bA: event.lengthComputable ? $elm$core$Maybe$Just(event.total) : $elm$core$Maybe$Nothing
+			cX: event.loaded,
+			b1: event.lengthComputable ? $elm$core$Maybe$Just(event.total) : $elm$core$Maybe$Nothing
 		}))));
 	});
 }
@@ -4997,7 +4997,7 @@ var $elm$core$Array$treeFromBuilder = F2(
 	});
 var $elm$core$Array$builderToArray = F2(
 	function (reverseNodeList, builder) {
-		if (!builder.g) {
+		if (!builder.h) {
 			return A4(
 				$elm$core$Array$Array_elm_builtin,
 				$elm$core$Elm$JsArray$length(builder.k),
@@ -5005,11 +5005,11 @@ var $elm$core$Array$builderToArray = F2(
 				$elm$core$Elm$JsArray$empty,
 				builder.k);
 		} else {
-			var treeLen = builder.g * $elm$core$Array$branchFactor;
+			var treeLen = builder.h * $elm$core$Array$branchFactor;
 			var depth = $elm$core$Basics$floor(
 				A2($elm$core$Basics$logBase, $elm$core$Array$branchFactor, treeLen - 1));
 			var correctNodeList = reverseNodeList ? $elm$core$List$reverse(builder.l) : builder.l;
-			var tree = A2($elm$core$Array$treeFromBuilder, correctNodeList, builder.g);
+			var tree = A2($elm$core$Array$treeFromBuilder, correctNodeList, builder.h);
 			return A4(
 				$elm$core$Array$Array_elm_builtin,
 				$elm$core$Elm$JsArray$length(builder.k) + treeLen,
@@ -5028,7 +5028,7 @@ var $elm$core$Array$initializeHelp = F5(
 				return A2(
 					$elm$core$Array$builderToArray,
 					false,
-					{l: nodeList, g: (len / $elm$core$Array$branchFactor) | 0, k: tail});
+					{l: nodeList, h: (len / $elm$core$Array$branchFactor) | 0, k: tail});
 			} else {
 				var leaf = $elm$core$Array$Leaf(
 					A3($elm$core$Elm$JsArray$initialize, $elm$core$Array$branchFactor, fromIndex, fn));
@@ -5095,7 +5095,7 @@ var $elm$url$Url$Http = 0;
 var $elm$url$Url$Https = 1;
 var $elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {
-		return {a3: fragment, a8: host, bk: path, bm: port_, bp: protocol, bq: query};
+		return {bn: fragment, bs: host, bL: path, bN: port_, bQ: protocol, bR: query};
 	});
 var $elm$core$String$contains = _String_contains;
 var $elm$core$String$length = _String_length;
@@ -5377,9 +5377,14 @@ var $elm$browser$Browser$element = _Browser_element;
 var $author$project$Main$CreatingGame = {$: 1};
 var $author$project$Game$Easy = 0;
 var $author$project$Main$Loading = {$: 0};
+var $author$project$Board$RevealMode = 0;
+var $elm$core$Set$Set_elm_builtin = $elm$core$Basics$identity;
+var $elm$core$Dict$RBEmpty_elm_builtin = {$: -2};
+var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
+var $elm$core$Set$empty = $elm$core$Dict$empty;
 var $author$project$Main$CreateGameResponse = F2(
 	function (a, b) {
-		return {$: 6, a: a, b: b};
+		return {$: 19, a: a, b: b};
 	});
 var $author$project$Game$difficultyToString = function (difficulty) {
 	switch (difficulty) {
@@ -5430,7 +5435,7 @@ var $author$project$Api$Timeout = {$: 1};
 var $elm$json$Json$Decode$decodeString = _Json_runOnString;
 var $author$project$Api$ApiErrorPayload = F2(
 	function (code, message) {
-		return {ak: code, aA: message};
+		return {aq: code, aL: message};
 	});
 var $elm$json$Json$Decode$field = _Json_decodeField;
 var $elm$json$Json$Decode$string = _Json_decodeString;
@@ -5461,8 +5466,6 @@ var $elm$http$Http$Sending = function (a) {
 	return {$: 0, a: a};
 };
 var $elm$http$Http$Timeout_ = {$: 1};
-var $elm$core$Dict$RBEmpty_elm_builtin = {$: -2};
-var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
 var $elm$core$Maybe$isJust = function (maybe) {
 	if (!maybe.$) {
 		return true;
@@ -6026,7 +6029,7 @@ var $author$project$Api$expectJsonWithError = F2(
 						var parsedError = $elm$core$Result$toMaybe(
 							A2($elm$json$Json$Decode$decodeString, $author$project$Api$errorPayloadDecoder, body));
 						return $elm$core$Result$Err(
-							A2($author$project$Api$HttpError, metadata.cC, parsedError));
+							A2($author$project$Api$HttpError, metadata.c4, parsedError));
 					default:
 						var body = response.b;
 						var _v1 = A2($elm$json$Json$Decode$decodeString, decoder, body);
@@ -6053,7 +6056,7 @@ var $elm$http$Http$Request = function (a) {
 };
 var $elm$http$Http$State = F2(
 	function (reqs, subs) {
-		return {bs: reqs, bF: subs};
+		return {bT: reqs, b6: subs};
 	});
 var $elm$http$Http$init = $elm$core$Task$succeed(
 	A2($elm$http$Http$State, $elm$core$Dict$empty, _List_Nil));
@@ -6097,7 +6100,7 @@ var $elm$http$Http$updateReqs = F3(
 					return A2(
 						$elm$core$Task$andThen,
 						function (pid) {
-							var _v4 = req.aN;
+							var _v4 = req.a3;
 							if (_v4.$ === 1) {
 								return A3($elm$http$Http$updateReqs, router, otherCmds, reqs);
 							} else {
@@ -6127,7 +6130,7 @@ var $elm$http$Http$onEffects = F4(
 				return $elm$core$Task$succeed(
 					A2($elm$http$Http$State, reqs, subs));
 			},
-			A3($elm$http$Http$updateReqs, router, cmds, state.bs));
+			A3($elm$http$Http$updateReqs, router, cmds, state.bT));
 	});
 var $elm$core$List$maybeCons = F3(
 	function (f, mx, xs) {
@@ -6170,7 +6173,7 @@ var $elm$http$Http$onSelfMsg = F3(
 				A2(
 					$elm$core$List$filterMap,
 					A3($elm$http$Http$maybeSend, router, tracker, progress),
-					state.bF)));
+					state.b6)));
 	});
 var $elm$http$Http$Cancel = function (a) {
 	return {$: 0, a: a};
@@ -6184,14 +6187,14 @@ var $elm$http$Http$cmdMap = F2(
 			var r = cmd.a;
 			return $elm$http$Http$Request(
 				{
-					bP: r.bP,
-					as: r.as,
-					av: A2(_Http_mapExpect, func, r.av),
-					ax: r.ax,
-					aC: r.aC,
-					aM: r.aM,
+					cg: r.cg,
+					aD: r.aD,
+					aG: A2(_Http_mapExpect, func, r.aG),
+					aJ: r.aJ,
 					aN: r.aN,
-					aO: r.aO
+					a2: r.a2,
+					a3: r.a3,
+					a4: r.a4
 				});
 		}
 	});
@@ -6214,17 +6217,17 @@ var $elm$http$Http$subscription = _Platform_leaf('Http');
 var $elm$http$Http$request = function (r) {
 	return $elm$http$Http$command(
 		$elm$http$Http$Request(
-			{bP: false, as: r.as, av: r.av, ax: r.ax, aC: r.aC, aM: r.aM, aN: r.aN, aO: r.aO}));
+			{cg: false, aD: r.aD, aG: r.aG, aJ: r.aJ, aN: r.aN, a2: r.a2, a3: r.a3, a4: r.a4}));
 };
 var $author$project$Api$requestTimeoutMs = 10000;
 var $author$project$Game$Snapshot = F8(
 	function (id, difficulty, rows, cols, mineCount, status, revision, cells) {
-		return {at: cells, aV: cols, bZ: difficulty, b7: id, bd: mineCount, cx: revision, bv: rows, cB: status};
+		return {aE: cells, bb: cols, cr: difficulty, cB: id, by: mineCount, c$: revision, bX: rows, c3: status};
 	});
 var $elm$json$Json$Decode$andThen = _Json_andThen;
 var $author$project$Game$Cell = F3(
 	function (row, col, state) {
-		return {aa: col, af: row, bC: state};
+		return {af: col, ak: row, b3: state};
 	});
 var $author$project$Game$Exploded = {$: 4};
 var $author$project$Game$Flagged = {$: 1};
@@ -6389,20 +6392,20 @@ var $author$project$Api$validateSnapshot = function (snapshot) {
 	var hasOutOfBoundsCell = A2(
 		$elm$core$List$any,
 		function (cell) {
-			return (_Utils_cmp(cell.af, snapshot.bv) > -1) || (_Utils_cmp(cell.aa, snapshot.aV) > -1);
+			return (_Utils_cmp(cell.ak, snapshot.bX) > -1) || (_Utils_cmp(cell.af, snapshot.bb) > -1);
 		},
-		snapshot.at);
-	var hasLeakedMine = (!$author$project$Game$isFinished(snapshot.cB)) && A2(
+		snapshot.aE);
+	var hasLeakedMine = (!$author$project$Game$isFinished(snapshot.c3)) && A2(
 		$elm$core$List$any,
 		function (cell) {
-			return _Utils_eq(cell.bC, $author$project$Game$Mine) || _Utils_eq(cell.bC, $author$project$Game$Exploded);
+			return _Utils_eq(cell.b3, $author$project$Game$Mine) || _Utils_eq(cell.b3, $author$project$Game$Exploded);
 		},
-		snapshot.at);
-	var expectedCount = snapshot.bv * snapshot.aV;
-	var actualCount = $elm$core$List$length(snapshot.at);
+		snapshot.aE);
+	var expectedCount = snapshot.bX * snapshot.bb;
+	var actualCount = $elm$core$List$length(snapshot.aE);
 	return (!_Utils_eq(actualCount, expectedCount)) ? $elm$json$Json$Decode$fail(
-		'Quantidade de células inconsistente: esperado ' + ($elm$core$String$fromInt(expectedCount) + (', recebido ' + $elm$core$String$fromInt(actualCount)))) : ((_Utils_cmp(snapshot.bd, expectedCount) > -1) ? $elm$json$Json$Decode$fail(
-		'Quantidade de minas inválida: mineCount (' + ($elm$core$String$fromInt(snapshot.bd) + (') deve ser menor que rows * cols (' + ($elm$core$String$fromInt(expectedCount) + ')')))) : (hasOutOfBoundsCell ? $elm$json$Json$Decode$fail('Snapshot contém célula com coordenada fora dos limites do tabuleiro') : (hasLeakedMine ? $elm$json$Json$Decode$fail('Snapshot ativo não pode expor células mine/exploded') : $elm$json$Json$Decode$succeed(snapshot))));
+		'Quantidade de células inconsistente: esperado ' + ($elm$core$String$fromInt(expectedCount) + (', recebido ' + $elm$core$String$fromInt(actualCount)))) : ((_Utils_cmp(snapshot.by, expectedCount) > -1) ? $elm$json$Json$Decode$fail(
+		'Quantidade de minas inválida: mineCount (' + ($elm$core$String$fromInt(snapshot.by) + (') deve ser menor que rows * cols (' + ($elm$core$String$fromInt(expectedCount) + ')')))) : (hasOutOfBoundsCell ? $elm$json$Json$Decode$fail('Snapshot contém célula com coordenada fora dos limites do tabuleiro') : (hasLeakedMine ? $elm$json$Json$Decode$fail('Snapshot ativo não pode expor células mine/exploded') : $elm$json$Json$Decode$succeed(snapshot))));
 };
 var $author$project$Api$snapshotDecoder = A2(
 	$elm$json$Json$Decode$andThen,
@@ -6425,23 +6428,33 @@ var $author$project$Api$createGame = F2(
 	function (difficulty, toMsg) {
 		return $elm$http$Http$request(
 			{
-				as: $elm$http$Http$jsonBody(
+				aD: $elm$http$Http$jsonBody(
 					$author$project$Api$encodeCreateGame(difficulty)),
-				av: A2($author$project$Api$expectJsonWithError, toMsg, $author$project$Api$snapshotDecoder),
-				ax: _List_Nil,
-				aC: 'POST',
-				aM: $elm$core$Maybe$Just($author$project$Api$requestTimeoutMs),
-				aN: $elm$core$Maybe$Nothing,
-				aO: '/api/games'
+				aG: A2($author$project$Api$expectJsonWithError, toMsg, $author$project$Api$snapshotDecoder),
+				aJ: _List_Nil,
+				aN: 'POST',
+				a2: $elm$core$Maybe$Just($author$project$Api$requestTimeoutMs),
+				a3: $elm$core$Maybe$Nothing,
+				a4: '/api/games'
 			});
 	});
 var $author$project$Main$startNewGame = F2(
 	function (difficulty, model) {
-		var nextToken = model.w + 1;
+		var nextToken = model.y + 1;
 		return _Utils_Tuple2(
 			_Utils_update(
 				model,
-				{bZ: difficulty, B: 0, i: $elm$core$Maybe$Nothing, c: $author$project$Main$CreatingGame, w: nextToken, h: $author$project$Main$Loading, x: false}),
+				{
+					cr: difficulty,
+					bj: 0,
+					i: $elm$core$Maybe$Nothing,
+					aH: $elm$core$Set$empty,
+					bm: {af: 0, ak: 0},
+					c: $author$project$Main$CreatingGame,
+					y: nextToken,
+					d: $author$project$Main$Loading,
+					z: false
+				}),
 			A2(
 				$author$project$Api$createGame,
 				difficulty,
@@ -6451,16 +6464,30 @@ var $author$project$Main$init = function (_v0) {
 	return A2(
 		$author$project$Main$startNewGame,
 		0,
-		{bZ: 0, B: 0, i: $elm$core$Maybe$Nothing, c: $author$project$Main$CreatingGame, w: 0, h: $author$project$Main$Loading, x: false});
+		{
+			cr: 0,
+			bj: 0,
+			i: $elm$core$Maybe$Nothing,
+			aH: $elm$core$Set$empty,
+			bm: {af: 0, ak: 0},
+			P: 0,
+			x: '',
+			c: $author$project$Main$CreatingGame,
+			y: 0,
+			d: $author$project$Main$Loading,
+			a_: false,
+			z: false
+		});
 };
-var $author$project$Main$Tick = {$: 5};
+var $author$project$Main$Tick = {$: 18};
+var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$time$Time$Every = F2(
 	function (a, b) {
 		return {$: 0, a: a, b: b};
 	});
 var $elm$time$Time$State = F2(
 	function (taggers, processes) {
-		return {bo: processes, bG: taggers};
+		return {bP: processes, b7: taggers};
 	});
 var $elm$time$Time$init = $elm$core$Task$succeed(
 	A2($elm$time$Time$State, $elm$core$Dict$empty, $elm$core$Dict$empty));
@@ -6607,7 +6634,7 @@ var $elm$time$Time$spawnHelp = F3(
 	});
 var $elm$time$Time$onEffects = F3(
 	function (router, subs, _v0) {
-		var processes = _v0.bo;
+		var processes = _v0.bP;
 		var rightStep = F3(
 			function (_v6, id, _v7) {
 				var spawns = _v7.a;
@@ -6676,7 +6703,7 @@ var $elm$time$Time$millisToPosix = $elm$core$Basics$identity;
 var $elm$time$Time$now = _Time_now($elm$time$Time$millisToPosix);
 var $elm$time$Time$onSelfMsg = F3(
 	function (router, interval, state) {
-		var _v0 = A2($elm$core$Dict$get, interval, state.bG);
+		var _v0 = A2($elm$core$Dict$get, interval, state.b7);
 		if (_v0.$ === 1) {
 			return $elm$core$Task$succeed(state);
 		} else {
@@ -6722,15 +6749,271 @@ var $elm$time$Time$every = F2(
 		return $elm$time$Time$subscription(
 			A2($elm$time$Time$Every, interval, tagger));
 	});
-var $elm$core$Platform$Sub$batch = _Platform_batch;
-var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
-var $author$project$Main$subscriptions = function (model) {
-	return model.x ? A2(
-		$elm$time$Time$every,
-		1000,
+var $author$project$Main$FocusBoard = {$: 11};
+var $author$project$Main$HandleEscape = {$: 15};
+var $author$project$Main$RestartGame = {$: 1};
+var $author$project$Main$SelectDifficulty = function (a) {
+	return {$: 0, a: a};
+};
+var $author$project$Main$SyncFailed = {$: 4};
+var $author$project$Main$SyncGame = {$: 17};
+var $author$project$Main$ToggleInputMode = {$: 6};
+var $author$project$Main$ToggleShortcutsHelp = {$: 14};
+var $elm$json$Json$Decode$bool = _Json_decodeBool;
+var $elm$json$Json$Decode$map4 = _Json_map4;
+var $author$project$Main$globalKeyDecoder = function (model) {
+	return A2(
+		$elm$json$Json$Decode$andThen,
 		function (_v0) {
-			return $author$project$Main$Tick;
-		}) : $elm$core$Platform$Sub$none;
+			var key = _v0.a;
+			var hasModifier = _v0.b;
+			if (hasModifier) {
+				return $elm$json$Json$Decode$fail('modificador ativo');
+			} else {
+				switch (key) {
+					case '1':
+						return $elm$json$Json$Decode$succeed(
+							$author$project$Main$SelectDifficulty(0));
+					case '2':
+						return $elm$json$Json$Decode$succeed(
+							$author$project$Main$SelectDifficulty(1));
+					case '3':
+						return $elm$json$Json$Decode$succeed(
+							$author$project$Main$SelectDifficulty(2));
+					case 'n':
+						return $elm$json$Json$Decode$succeed($author$project$Main$RestartGame);
+					case 'N':
+						return $elm$json$Json$Decode$succeed($author$project$Main$RestartGame);
+					case 'g':
+						return $elm$json$Json$Decode$succeed($author$project$Main$FocusBoard);
+					case 'G':
+						return $elm$json$Json$Decode$succeed($author$project$Main$FocusBoard);
+					case 'm':
+						return $elm$json$Json$Decode$succeed($author$project$Main$ToggleInputMode);
+					case 'M':
+						return $elm$json$Json$Decode$succeed($author$project$Main$ToggleInputMode);
+					case 'u':
+						return _Utils_eq(model.c, $author$project$Main$SyncFailed) ? $elm$json$Json$Decode$succeed($author$project$Main$SyncGame) : $elm$json$Json$Decode$fail('sincronização não está em falha');
+					case 'U':
+						return _Utils_eq(model.c, $author$project$Main$SyncFailed) ? $elm$json$Json$Decode$succeed($author$project$Main$SyncGame) : $elm$json$Json$Decode$fail('sincronização não está em falha');
+					case '?':
+						return $elm$json$Json$Decode$succeed($author$project$Main$ToggleShortcutsHelp);
+					case 'Escape':
+						return model.a_ ? $elm$json$Json$Decode$succeed($author$project$Main$HandleEscape) : $elm$json$Json$Decode$fail('nenhum painel aberto');
+					default:
+						return $elm$json$Json$Decode$fail('tecla não mapeada globalmente');
+				}
+			}
+		},
+		A5(
+			$elm$json$Json$Decode$map4,
+			F4(
+				function (key, ctrl, alt, meta) {
+					return _Utils_Tuple2(key, ctrl || (alt || meta));
+				}),
+			A2($elm$json$Json$Decode$field, 'key', $elm$json$Json$Decode$string),
+			A2($elm$json$Json$Decode$field, 'ctrlKey', $elm$json$Json$Decode$bool),
+			A2($elm$json$Json$Decode$field, 'altKey', $elm$json$Json$Decode$bool),
+			A2($elm$json$Json$Decode$field, 'metaKey', $elm$json$Json$Decode$bool)));
+};
+var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
+var $elm$browser$Browser$Events$Document = 0;
+var $elm$browser$Browser$Events$MySub = F3(
+	function (a, b, c) {
+		return {$: 0, a: a, b: b, c: c};
+	});
+var $elm$browser$Browser$Events$State = F2(
+	function (subs, pids) {
+		return {bM: pids, b6: subs};
+	});
+var $elm$browser$Browser$Events$init = $elm$core$Task$succeed(
+	A2($elm$browser$Browser$Events$State, _List_Nil, $elm$core$Dict$empty));
+var $elm$browser$Browser$Events$nodeToKey = function (node) {
+	if (!node) {
+		return 'd_';
+	} else {
+		return 'w_';
+	}
+};
+var $elm$browser$Browser$Events$addKey = function (sub) {
+	var node = sub.a;
+	var name = sub.b;
+	return _Utils_Tuple2(
+		_Utils_ap(
+			$elm$browser$Browser$Events$nodeToKey(node),
+			name),
+		sub);
+};
+var $elm$core$Dict$fromList = function (assocs) {
+	return A3(
+		$elm$core$List$foldl,
+		F2(
+			function (_v0, dict) {
+				var key = _v0.a;
+				var value = _v0.b;
+				return A3($elm$core$Dict$insert, key, value, dict);
+			}),
+		$elm$core$Dict$empty,
+		assocs);
+};
+var $elm$browser$Browser$Events$Event = F2(
+	function (key, event) {
+		return {bl: event, bv: key};
+	});
+var $elm$browser$Browser$Events$spawn = F3(
+	function (router, key, _v0) {
+		var node = _v0.a;
+		var name = _v0.b;
+		var actualNode = function () {
+			if (!node) {
+				return _Browser_doc;
+			} else {
+				return _Browser_window;
+			}
+		}();
+		return A2(
+			$elm$core$Task$map,
+			function (value) {
+				return _Utils_Tuple2(key, value);
+			},
+			A3(
+				_Browser_on,
+				actualNode,
+				name,
+				function (event) {
+					return A2(
+						$elm$core$Platform$sendToSelf,
+						router,
+						A2($elm$browser$Browser$Events$Event, key, event));
+				}));
+	});
+var $elm$core$Dict$union = F2(
+	function (t1, t2) {
+		return A3($elm$core$Dict$foldl, $elm$core$Dict$insert, t2, t1);
+	});
+var $elm$browser$Browser$Events$onEffects = F3(
+	function (router, subs, state) {
+		var stepRight = F3(
+			function (key, sub, _v6) {
+				var deads = _v6.a;
+				var lives = _v6.b;
+				var news = _v6.c;
+				return _Utils_Tuple3(
+					deads,
+					lives,
+					A2(
+						$elm$core$List$cons,
+						A3($elm$browser$Browser$Events$spawn, router, key, sub),
+						news));
+			});
+		var stepLeft = F3(
+			function (_v4, pid, _v5) {
+				var deads = _v5.a;
+				var lives = _v5.b;
+				var news = _v5.c;
+				return _Utils_Tuple3(
+					A2($elm$core$List$cons, pid, deads),
+					lives,
+					news);
+			});
+		var stepBoth = F4(
+			function (key, pid, _v2, _v3) {
+				var deads = _v3.a;
+				var lives = _v3.b;
+				var news = _v3.c;
+				return _Utils_Tuple3(
+					deads,
+					A3($elm$core$Dict$insert, key, pid, lives),
+					news);
+			});
+		var newSubs = A2($elm$core$List$map, $elm$browser$Browser$Events$addKey, subs);
+		var _v0 = A6(
+			$elm$core$Dict$merge,
+			stepLeft,
+			stepBoth,
+			stepRight,
+			state.bM,
+			$elm$core$Dict$fromList(newSubs),
+			_Utils_Tuple3(_List_Nil, $elm$core$Dict$empty, _List_Nil));
+		var deadPids = _v0.a;
+		var livePids = _v0.b;
+		var makeNewPids = _v0.c;
+		return A2(
+			$elm$core$Task$andThen,
+			function (pids) {
+				return $elm$core$Task$succeed(
+					A2(
+						$elm$browser$Browser$Events$State,
+						newSubs,
+						A2(
+							$elm$core$Dict$union,
+							livePids,
+							$elm$core$Dict$fromList(pids))));
+			},
+			A2(
+				$elm$core$Task$andThen,
+				function (_v1) {
+					return $elm$core$Task$sequence(makeNewPids);
+				},
+				$elm$core$Task$sequence(
+					A2($elm$core$List$map, $elm$core$Process$kill, deadPids))));
+	});
+var $elm$browser$Browser$Events$onSelfMsg = F3(
+	function (router, _v0, state) {
+		var key = _v0.bv;
+		var event = _v0.bl;
+		var toMessage = function (_v2) {
+			var subKey = _v2.a;
+			var _v3 = _v2.b;
+			var node = _v3.a;
+			var name = _v3.b;
+			var decoder = _v3.c;
+			return _Utils_eq(subKey, key) ? A2(_Browser_decodeEvent, decoder, event) : $elm$core$Maybe$Nothing;
+		};
+		var messages = A2($elm$core$List$filterMap, toMessage, state.b6);
+		return A2(
+			$elm$core$Task$andThen,
+			function (_v1) {
+				return $elm$core$Task$succeed(state);
+			},
+			$elm$core$Task$sequence(
+				A2(
+					$elm$core$List$map,
+					$elm$core$Platform$sendToApp(router),
+					messages)));
+	});
+var $elm$browser$Browser$Events$subMap = F2(
+	function (func, _v0) {
+		var node = _v0.a;
+		var name = _v0.b;
+		var decoder = _v0.c;
+		return A3(
+			$elm$browser$Browser$Events$MySub,
+			node,
+			name,
+			A2($elm$json$Json$Decode$map, func, decoder));
+	});
+_Platform_effectManagers['Browser.Events'] = _Platform_createManager($elm$browser$Browser$Events$init, $elm$browser$Browser$Events$onEffects, $elm$browser$Browser$Events$onSelfMsg, 0, $elm$browser$Browser$Events$subMap);
+var $elm$browser$Browser$Events$subscription = _Platform_leaf('Browser.Events');
+var $elm$browser$Browser$Events$on = F3(
+	function (node, name, decoder) {
+		return $elm$browser$Browser$Events$subscription(
+			A3($elm$browser$Browser$Events$MySub, node, name, decoder));
+	});
+var $elm$browser$Browser$Events$onKeyDown = A2($elm$browser$Browser$Events$on, 0, 'keydown');
+var $author$project$Main$subscriptions = function (model) {
+	return $elm$core$Platform$Sub$batch(
+		_List_fromArray(
+			[
+				model.z ? A2(
+				$elm$time$Time$every,
+				1000,
+				function (_v0) {
+					return $author$project$Main$Tick;
+				}) : $elm$core$Platform$Sub$none,
+				$elm$browser$Browser$Events$onKeyDown(
+				$author$project$Main$globalKeyDecoder(model))
+			]));
 };
 var $author$project$Main$Active = function (a) {
 	return {$: 1, a: a};
@@ -6738,21 +7021,50 @@ var $author$project$Main$Active = function (a) {
 var $author$project$Main$Failed = function (a) {
 	return {$: 2, a: a};
 };
+var $author$project$Board$FlagMode = 1;
 var $author$project$Main$Idle = {$: 0};
 var $author$project$Api$Reveal = function (a) {
 	return {$: 0, a: a};
 };
-var $author$project$Main$SyncFailed = {$: 4};
 var $author$project$Main$SyncResponse = F3(
 	function (a, b, c) {
-		return {$: 8, a: a, b: b, c: c};
+		return {$: 21, a: a, b: b, c: c};
 	});
 var $author$project$Main$SyncingAfterUncertainAction = {$: 3};
 var $author$project$Api$ToggleFlag = function (a) {
 	return {$: 1, a: a};
 };
+var $elm$core$Basics$clamp = F3(
+	function (low, high, number) {
+		return (_Utils_cmp(number, low) < 0) ? low : ((_Utils_cmp(number, high) > 0) ? high : number);
+	});
+var $author$project$Board$clampCoord = F2(
+	function (snapshot, coord) {
+		return {
+			af: A3(
+				$elm$core$Basics$clamp,
+				0,
+				A2($elm$core$Basics$max, 0, snapshot.bb - 1),
+				coord.af),
+			ak: A3(
+				$elm$core$Basics$clamp,
+				0,
+				A2($elm$core$Basics$max, 0, snapshot.bX - 1),
+				coord.ak)
+		};
+	});
+var $author$project$Game$difficultyLabel = function (difficulty) {
+	switch (difficulty) {
+		case 0:
+			return 'Fácil (9×9)';
+		case 1:
+			return 'Médio (16×16)';
+		default:
+			return 'Difícil (16×30)';
+	}
+};
 var $author$project$Api$errorCodeToMessage = function (payload) {
-	var _v0 = payload.ak;
+	var _v0 = payload.aq;
 	switch (_v0) {
 		case 'game_not_found':
 			return 'Sessão expirada ou partida não encontrada. Inicie um novo jogo.';
@@ -6773,7 +7085,7 @@ var $author$project$Api$errorCodeToMessage = function (payload) {
 		case 'internal_error':
 			return 'Erro interno no servidor ao processar a jogada.';
 		default:
-			return $elm$core$String$isEmpty(payload.aA) ? ('Erro ao comunicar com o servidor (' + (payload.ak + ').')) : payload.aA;
+			return $elm$core$String$isEmpty(payload.aL) ? ('Erro ao comunicar com o servidor (' + (payload.aq + ').')) : payload.aL;
 	}
 };
 var $author$project$Api$errorToMessage = function (err) {
@@ -6803,22 +7115,77 @@ var $author$project$Api$fetchGame = F2(
 	function (gameId, toMsg) {
 		return $elm$http$Http$request(
 			{
-				as: $elm$http$Http$emptyBody,
-				av: A2($author$project$Api$expectJsonWithError, toMsg, $author$project$Api$snapshotDecoder),
-				ax: _List_Nil,
-				aC: 'GET',
-				aM: $elm$core$Maybe$Just($author$project$Api$requestTimeoutMs),
-				aN: $elm$core$Maybe$Nothing,
-				aO: '/api/games/' + gameId
+				aD: $elm$http$Http$emptyBody,
+				aG: A2($author$project$Api$expectJsonWithError, toMsg, $author$project$Api$snapshotDecoder),
+				aJ: _List_Nil,
+				aN: 'GET',
+				a2: $elm$core$Maybe$Just($author$project$Api$requestTimeoutMs),
+				a3: $elm$core$Maybe$Nothing,
+				a4: '/api/games/' + gameId
 			});
 	});
+var $elm$core$Set$insert = F2(
+	function (key, _v0) {
+		var dict = _v0;
+		return A3($elm$core$Dict$insert, key, 0, dict);
+	});
+var $elm$core$Set$fromList = function (list) {
+	return A3($elm$core$List$foldl, $elm$core$Set$insert, $elm$core$Set$empty, list);
+};
+var $author$project$Main$flaggedCoords = function (snapshot) {
+	return $elm$core$Set$fromList(
+		A2(
+			$elm$core$List$filterMap,
+			function (cell) {
+				return _Utils_eq(cell.b3, $author$project$Game$Flagged) ? $elm$core$Maybe$Just(
+					_Utils_Tuple2(cell.ak, cell.af)) : $elm$core$Maybe$Nothing;
+			},
+			snapshot.aE));
+};
+var $author$project$Board$cellDomId = function (_v0) {
+	var row = _v0.ak;
+	var col = _v0.af;
+	return 'ms-cell-' + ($elm$core$String$fromInt(row) + ('-' + $elm$core$String$fromInt(col)));
+};
+var $author$project$Main$FocusCompleted = {$: 16};
+var $elm$core$Task$onError = _Scheduler_onError;
+var $elm$core$Task$attempt = F2(
+	function (resultToMessage, task) {
+		return $elm$core$Task$command(
+			A2(
+				$elm$core$Task$onError,
+				A2(
+					$elm$core$Basics$composeL,
+					A2($elm$core$Basics$composeL, $elm$core$Task$succeed, resultToMessage),
+					$elm$core$Result$Err),
+				A2(
+					$elm$core$Task$andThen,
+					A2(
+						$elm$core$Basics$composeL,
+						A2($elm$core$Basics$composeL, $elm$core$Task$succeed, resultToMessage),
+						$elm$core$Result$Ok),
+					task)));
+	});
+var $elm$browser$Browser$Dom$focus = _Browser_call('focus');
+var $author$project$Main$focusElementCmd = function (elementId) {
+	return A2(
+		$elm$core$Task$attempt,
+		function (_v0) {
+			return $author$project$Main$FocusCompleted;
+		},
+		$elm$browser$Browser$Dom$focus(elementId));
+};
+var $author$project$Main$focusCellCmd = function (coord) {
+	return $author$project$Main$focusElementCmd(
+		$author$project$Board$cellDomId(coord));
+};
 var $author$project$Main$SessionLost = function (a) {
 	return {$: 3, a: a};
 };
 var $author$project$Main$applyConfirmedSnapshot = F2(
 	function (snapshot, model) {
 		var nextTimerRunning = function () {
-			var _v0 = snapshot.cB;
+			var _v0 = snapshot.c3;
 			switch (_v0) {
 				case 0:
 					return false;
@@ -6830,21 +7197,24 @@ var $author$project$Main$applyConfirmedSnapshot = F2(
 					return false;
 			}
 		}();
+		var nextFlaggedBeforeEnd = $author$project$Game$isFinished(snapshot.c3) ? model.aH : $author$project$Main$flaggedCoords(snapshot);
 		return _Utils_update(
 			model,
 			{
-				bZ: snapshot.bZ,
+				cr: snapshot.cr,
 				i: $elm$core$Maybe$Nothing,
+				aH: nextFlaggedBeforeEnd,
+				bm: A2($author$project$Board$clampCoord, snapshot, model.bm),
 				c: $author$project$Main$Idle,
-				h: $author$project$Main$Active(snapshot),
-				x: nextTimerRunning
+				d: $author$project$Main$Active(snapshot),
+				z: nextTimerRunning
 			});
 	});
 var $author$project$Api$isSessionLost = function (err) {
 	if ((err.$ === 3) && (err.a === 404)) {
 		if (!err.b.$) {
 			var payload = err.b.a;
-			return payload.ak === 'game_not_found';
+			return payload.aq === 'game_not_found';
 		} else {
 			var _v1 = err.b;
 			return true;
@@ -6865,11 +7235,12 @@ var $author$project$Api$isUncertainOutcome = function (err) {
 };
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
+var $author$project$Board$recoveryDomId = 'ms-recovery-btn';
 var $author$project$Main$handleActionResult = F3(
 	function (current, result, model) {
 		if (!result.$) {
 			var snapshot = result.a;
-			return (_Utils_cmp(snapshot.cx, current.cx) < 0) ? _Utils_Tuple2(
+			return (_Utils_cmp(snapshot.c$, current.c$) < 0) ? _Utils_Tuple2(
 				_Utils_update(
 					model,
 					{c: $author$project$Main$Idle}),
@@ -6885,26 +7256,26 @@ var $author$project$Main$handleActionResult = F3(
 						{
 							i: $elm$core$Maybe$Nothing,
 							c: $author$project$Main$Idle,
-							h: $author$project$Main$SessionLost(
+							d: $author$project$Main$SessionLost(
 								$author$project$Api$errorToMessage(err)),
-							x: false
+							z: false
 						}),
-					$elm$core$Platform$Cmd$none);
+					$author$project$Main$focusElementCmd($author$project$Board$recoveryDomId));
 			} else {
 				if ($author$project$Api$isUncertainOutcome(err)) {
-					var nextToken = model.w + 1;
+					var nextToken = model.y + 1;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
 							{
 								i: $elm$core$Maybe$Just('A resposta da jogada não chegou a tempo. Sincronizando estado com o servidor...'),
 								c: $author$project$Main$SyncingAfterUncertainAction,
-								w: nextToken
+								y: nextToken
 							}),
 						A2(
 							$author$project$Api$fetchGame,
-							current.b7,
-							A2($author$project$Main$SyncResponse, nextToken, current.b7)));
+							current.cB,
+							A2($author$project$Main$SyncResponse, nextToken, current.cB)));
 				} else {
 					return _Utils_Tuple2(
 						_Utils_update(
@@ -6923,7 +7294,7 @@ var $author$project$Main$handleSyncResult = F3(
 	function (current, result, model) {
 		if (!result.$) {
 			var snapshot = result.a;
-			return (_Utils_cmp(snapshot.cx, current.cx) < 0) ? _Utils_Tuple2(
+			return (_Utils_cmp(snapshot.c$, current.c$) < 0) ? _Utils_Tuple2(
 				_Utils_update(
 					model,
 					{i: $elm$core$Maybe$Nothing, c: $author$project$Main$Idle}),
@@ -6938,11 +7309,11 @@ var $author$project$Main$handleSyncResult = F3(
 					{
 						i: $elm$core$Maybe$Nothing,
 						c: $author$project$Main$Idle,
-						h: $author$project$Main$SessionLost(
+						d: $author$project$Main$SessionLost(
 							$author$project$Api$errorToMessage(err)),
-						x: false
+						z: false
 					}),
-				$elm$core$Platform$Cmd$none) : _Utils_Tuple2(
+				$author$project$Main$focusElementCmd($author$project$Board$recoveryDomId)) : _Utils_Tuple2(
 				_Utils_update(
 					model,
 					{
@@ -6953,20 +7324,58 @@ var $author$project$Main$handleSyncResult = F3(
 				$elm$core$Platform$Cmd$none);
 		}
 	});
+var $author$project$Main$modeAnnouncement = function (mode) {
+	if (!mode) {
+		return 'Modo de ação alterado para Revelar.';
+	} else {
+		return 'Modo de ação alterado para Bandeira.';
+	}
+};
+var $author$project$Board$modeDomId = function (mode) {
+	if (!mode) {
+		return 'ms-mode-reveal';
+	} else {
+		return 'ms-mode-flag';
+	}
+};
+var $author$project$Board$moveFocus = F4(
+	function (snapshot, dRow, dCol, current) {
+		return A2(
+			$author$project$Board$clampCoord,
+			snapshot,
+			{af: current.af + dCol, ak: current.ak + dRow});
+	});
+var $author$project$Board$moveFocusColumnEdge = F3(
+	function (snapshot, toBottom, current) {
+		var targetRow = toBottom ? A2($elm$core$Basics$max, 0, snapshot.bX - 1) : 0;
+		return A2(
+			$author$project$Board$clampCoord,
+			snapshot,
+			{af: current.af, ak: targetRow});
+	});
+var $author$project$Board$moveFocusRowEdge = F3(
+	function (snapshot, toEnd, current) {
+		var targetCol = toEnd ? A2($elm$core$Basics$max, 0, snapshot.bb - 1) : 0;
+		return A2(
+			$author$project$Board$clampCoord,
+			snapshot,
+			{af: targetCol, ak: current.ak});
+	});
+var $author$project$Board$restartDomId = 'ms-restart-btn';
 var $author$project$Main$ActionResponse = F3(
 	function (a, b, c) {
-		return {$: 7, a: a, b: b, c: c};
+		return {$: 20, a: a, b: b, c: c};
 	});
 var $author$project$Main$MutatingAction = function (a) {
 	return {$: 2, a: a};
 };
 var $author$project$Game$canReveal = F2(
 	function (status, cell) {
-		return (!$author$project$Game$isFinished(status)) && _Utils_eq(cell.bC, $author$project$Game$Hidden);
+		return (!$author$project$Game$isFinished(status)) && _Utils_eq(cell.b3, $author$project$Game$Hidden);
 	});
 var $author$project$Game$canToggleFlag = F2(
 	function (status, cell) {
-		return (!$author$project$Game$isFinished(status)) && (_Utils_eq(cell.bC, $author$project$Game$Hidden) || _Utils_eq(cell.bC, $author$project$Game$Flagged));
+		return (!$author$project$Game$isFinished(status)) && (_Utils_eq(cell.b3, $author$project$Game$Hidden) || _Utils_eq(cell.b3, $author$project$Game$Flagged));
 	});
 var $elm$core$List$filter = F2(
 	function (isGood, list) {
@@ -6994,9 +7403,9 @@ var $author$project$Main$findCell = F2(
 			A2(
 				$elm$core$List$filter,
 				function (cell) {
-					return _Utils_eq(cell.af, coord.af) && _Utils_eq(cell.aa, coord.aa);
+					return _Utils_eq(cell.ak, coord.ak) && _Utils_eq(cell.af, coord.af);
 				},
-				snapshot.at));
+				snapshot.aE));
 	});
 var $elm$core$Maybe$map = F2(
 	function (f, maybe) {
@@ -7026,7 +7435,7 @@ var $author$project$Main$canExecuteAction = F2(
 				false,
 				A2(
 					$elm$core$Maybe$map,
-					$author$project$Game$canReveal(snapshot.cB),
+					$author$project$Game$canReveal(snapshot.c3),
 					A2($author$project$Main$findCell, coord, snapshot)));
 		} else {
 			var coord = action.a;
@@ -7035,7 +7444,7 @@ var $author$project$Main$canExecuteAction = F2(
 				false,
 				A2(
 					$elm$core$Maybe$map,
-					$author$project$Game$canToggleFlag(snapshot.cB),
+					$author$project$Game$canToggleFlag(snapshot.c3),
 					A2($author$project$Main$findCell, coord, snapshot)));
 		}
 	});
@@ -7051,10 +7460,10 @@ var $author$project$Api$encodeAction = function (action) {
 					$elm$json$Json$Encode$string('reveal')),
 					_Utils_Tuple2(
 					'row',
-					$elm$json$Json$Encode$int(coord.af)),
+					$elm$json$Json$Encode$int(coord.ak)),
 					_Utils_Tuple2(
 					'col',
-					$elm$json$Json$Encode$int(coord.aa))
+					$elm$json$Json$Encode$int(coord.af))
 				]));
 	} else {
 		var coord = action.a;
@@ -7066,10 +7475,10 @@ var $author$project$Api$encodeAction = function (action) {
 					$elm$json$Json$Encode$string('toggle_flag')),
 					_Utils_Tuple2(
 					'row',
-					$elm$json$Json$Encode$int(coord.af)),
+					$elm$json$Json$Encode$int(coord.ak)),
 					_Utils_Tuple2(
 					'col',
-					$elm$json$Json$Encode$int(coord.aa))
+					$elm$json$Json$Encode$int(coord.af))
 				]));
 	}
 };
@@ -7077,14 +7486,14 @@ var $author$project$Api$sendAction = F3(
 	function (gameId, action, toMsg) {
 		return $elm$http$Http$request(
 			{
-				as: $elm$http$Http$jsonBody(
+				aD: $elm$http$Http$jsonBody(
 					$author$project$Api$encodeAction(action)),
-				av: A2($author$project$Api$expectJsonWithError, toMsg, $author$project$Api$snapshotDecoder),
-				ax: _List_Nil,
-				aC: 'POST',
-				aM: $elm$core$Maybe$Just($author$project$Api$requestTimeoutMs),
-				aN: $elm$core$Maybe$Nothing,
-				aO: '/api/games/' + (gameId + '/actions')
+				aG: A2($author$project$Api$expectJsonWithError, toMsg, $author$project$Api$snapshotDecoder),
+				aJ: _List_Nil,
+				aN: 'POST',
+				a2: $elm$core$Maybe$Just($author$project$Api$requestTimeoutMs),
+				a3: $elm$core$Maybe$Nothing,
+				a4: '/api/games/' + (gameId + '/actions')
 			});
 	});
 var $author$project$Main$sendPlayerAction = F2(
@@ -7092,7 +7501,7 @@ var $author$project$Main$sendPlayerAction = F2(
 		if (!_Utils_eq(model.c, $author$project$Main$Idle)) {
 			return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 		} else {
-			var _v0 = model.h;
+			var _v0 = model.d;
 			if (_v0.$ === 1) {
 				var snapshot = _v0.a;
 				return (!A2($author$project$Main$canExecuteAction, snapshot, action)) ? _Utils_Tuple2(model, $elm$core$Platform$Cmd$none) : _Utils_Tuple2(
@@ -7104,14 +7513,15 @@ var $author$project$Main$sendPlayerAction = F2(
 						}),
 					A3(
 						$author$project$Api$sendAction,
-						snapshot.b7,
+						snapshot.cB,
 						action,
-						A2($author$project$Main$ActionResponse, model.w, snapshot.b7)));
+						A2($author$project$Main$ActionResponse, model.y, snapshot.cB)));
 			} else {
 				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 			}
 		}
 	});
+var $author$project$Board$shortcutsDomId = 'ms-shortcuts-btn';
 var $author$project$Main$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
@@ -7119,7 +7529,7 @@ var $author$project$Main$update = F2(
 				var difficulty = msg.a;
 				return A2($author$project$Main$startNewGame, difficulty, model);
 			case 1:
-				return A2($author$project$Main$startNewGame, model.bZ, model);
+				return A2($author$project$Main$startNewGame, model.cr, model);
 			case 2:
 				var coord = msg.a;
 				return A2(
@@ -7133,73 +7543,240 @@ var $author$project$Main$update = F2(
 					$author$project$Api$ToggleFlag(coord),
 					model);
 			case 4:
+				var coord = msg.a;
+				var action = function () {
+					var _v2 = model.P;
+					if (!_v2) {
+						return $author$project$Api$Reveal(coord);
+					} else {
+						return $author$project$Api$ToggleFlag(coord);
+					}
+				}();
+				var _v1 = A2($author$project$Main$sendPlayerAction, action, model);
+				var nextModel = _v1.a;
+				var cmd = _v1.b;
+				return _Utils_Tuple2(
+					_Utils_update(
+						nextModel,
+						{bm: coord}),
+					cmd);
+			case 5:
+				var mode = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							P: mode,
+							x: $author$project$Main$modeAnnouncement(mode)
+						}),
+					$elm$core$Platform$Cmd$none);
+			case 6:
+				var nextMode = function () {
+					var _v3 = model.P;
+					if (!_v3) {
+						return 1;
+					} else {
+						return 0;
+					}
+				}();
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							P: nextMode,
+							x: $author$project$Main$modeAnnouncement(nextMode)
+						}),
+					$elm$core$Platform$Cmd$none);
+			case 7:
+				var coord = msg.a;
+				var _v4 = model.d;
+				if (_v4.$ === 1) {
+					var snapshot = _v4.a;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								bm: A2($author$project$Board$clampCoord, snapshot, coord)
+							}),
+						$elm$core$Platform$Cmd$none);
+				} else {
+					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				}
+			case 8:
+				var dRow = msg.a;
+				var dCol = msg.b;
+				var _v5 = model.d;
+				if (_v5.$ === 1) {
+					var snapshot = _v5.a;
+					var nextCoord = A4($author$project$Board$moveFocus, snapshot, dRow, dCol, model.bm);
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{bm: nextCoord}),
+						$author$project$Main$focusCellCmd(nextCoord));
+				} else {
+					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				}
+			case 9:
+				var toEnd = msg.a;
+				var _v6 = model.d;
+				if (_v6.$ === 1) {
+					var snapshot = _v6.a;
+					var nextCoord = A3($author$project$Board$moveFocusRowEdge, snapshot, toEnd, model.bm);
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{bm: nextCoord}),
+						$author$project$Main$focusCellCmd(nextCoord));
+				} else {
+					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				}
+			case 10:
+				var toBottom = msg.a;
+				var _v7 = model.d;
+				if (_v7.$ === 1) {
+					var snapshot = _v7.a;
+					var nextCoord = A3($author$project$Board$moveFocusColumnEdge, snapshot, toBottom, model.bm);
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{bm: nextCoord}),
+						$author$project$Main$focusCellCmd(nextCoord));
+				} else {
+					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				}
+			case 11:
+				var _v8 = model.d;
+				if (_v8.$ === 1) {
+					var snapshot = _v8.a;
+					var target = A2($author$project$Board$clampCoord, snapshot, model.bm);
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{bm: target, a_: false}),
+						$author$project$Main$focusCellCmd(target));
+				} else {
+					return _Utils_Tuple2(
+						model,
+						$author$project$Main$focusElementCmd($author$project$Board$recoveryDomId));
+				}
+			case 12:
+				var elementId = msg.a;
+				return _Utils_Tuple2(
+					model,
+					$author$project$Main$focusElementCmd(elementId));
+			case 13:
+				var mode = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							P: mode,
+							x: $author$project$Main$modeAnnouncement(mode)
+						}),
+					$author$project$Main$focusElementCmd(
+						$author$project$Board$modeDomId(mode)));
+			case 14:
+				var nextOpen = !model.a_;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							x: nextOpen ? 'Painel de atalhos de teclado aberto.' : 'Painel de atalhos de teclado fechado.',
+							a_: nextOpen
+						}),
+					$elm$core$Platform$Cmd$none);
+			case 15:
+				if (model.a_) {
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{x: 'Painel de atalhos de teclado fechado.', a_: false}),
+						$author$project$Main$focusElementCmd($author$project$Board$shortcutsDomId));
+				} else {
+					var _v9 = model.d;
+					if (_v9.$ === 1) {
+						return _Utils_Tuple2(
+							model,
+							$author$project$Main$focusElementCmd($author$project$Board$restartDomId));
+					} else {
+						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+					}
+				}
+			case 16:
+				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+			case 17:
 				if ((!_Utils_eq(model.c, $author$project$Main$Idle)) && (!_Utils_eq(model.c, $author$project$Main$SyncFailed))) {
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				} else {
-					var _v1 = model.h;
-					if (_v1.$ === 1) {
-						var snapshot = _v1.a;
-						var nextToken = model.w + 1;
+					var _v10 = model.d;
+					if (_v10.$ === 1) {
+						var snapshot = _v10.a;
+						var nextToken = model.y + 1;
 						return _Utils_Tuple2(
 							_Utils_update(
 								model,
 								{
 									i: $elm$core$Maybe$Just('Consultando estado confirmado da partida no servidor...'),
 									c: $author$project$Main$SyncingAfterUncertainAction,
-									w: nextToken
+									y: nextToken
 								}),
 							A2(
 								$author$project$Api$fetchGame,
-								snapshot.b7,
-								A2($author$project$Main$SyncResponse, nextToken, snapshot.b7)));
+								snapshot.cB,
+								A2($author$project$Main$SyncResponse, nextToken, snapshot.cB)));
 					} else {
 						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 					}
 				}
-			case 5:
-				if (model.x) {
-					var _v2 = model.h;
-					if (_v2.$ === 1) {
-						var snapshot = _v2.a;
-						return (snapshot.cB === 1) ? _Utils_Tuple2(
+			case 18:
+				if (model.z) {
+					var _v11 = model.d;
+					if (_v11.$ === 1) {
+						var snapshot = _v11.a;
+						return (snapshot.c3 === 1) ? _Utils_Tuple2(
 							_Utils_update(
 								model,
-								{B: model.B + 1}),
+								{bj: model.bj + 1}),
 							$elm$core$Platform$Cmd$none) : _Utils_Tuple2(
 							_Utils_update(
 								model,
-								{x: false}),
+								{z: false}),
 							$elm$core$Platform$Cmd$none);
 					} else {
 						return _Utils_Tuple2(
 							_Utils_update(
 								model,
-								{x: false}),
+								{z: false}),
 							$elm$core$Platform$Cmd$none);
 					}
 				} else {
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				}
-			case 6:
+			case 19:
 				var token = msg.a;
 				var result = msg.b;
-				if (!_Utils_eq(token, model.w)) {
+				if (!_Utils_eq(token, model.y)) {
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				} else {
 					if (!result.$) {
 						var snapshot = result.a;
+						var initialFocus = {af: 0, ak: 0};
 						return _Utils_Tuple2(
 							_Utils_update(
 								model,
 								{
-									bZ: snapshot.bZ,
-									B: 0,
+									cr: snapshot.cr,
+									bj: 0,
 									i: $elm$core$Maybe$Nothing,
+									aH: $author$project$Game$isFinished(snapshot.c3) ? $elm$core$Set$empty : $author$project$Main$flaggedCoords(snapshot),
+									bm: initialFocus,
+									x: 'Nova partida ' + ($author$project$Game$difficultyLabel(snapshot.cr) + ' pronta. Foco na linha 1, coluna 1.'),
 									c: $author$project$Main$Idle,
-									h: $author$project$Main$Active(snapshot),
-									x: snapshot.cB === 1
+									d: $author$project$Main$Active(snapshot),
+									z: snapshot.c3 === 1
 								}),
-							$elm$core$Platform$Cmd$none);
+							$author$project$Main$focusCellCmd(initialFocus));
 					} else {
 						var err = result.a;
 						return _Utils_Tuple2(
@@ -7208,24 +7785,24 @@ var $author$project$Main$update = F2(
 								{
 									i: $elm$core$Maybe$Nothing,
 									c: $author$project$Main$Idle,
-									h: $author$project$Main$Failed(
+									d: $author$project$Main$Failed(
 										$author$project$Api$errorToMessage(err)),
-									x: false
+									z: false
 								}),
-							$elm$core$Platform$Cmd$none);
+							$author$project$Main$focusElementCmd($author$project$Board$recoveryDomId));
 					}
 				}
-			case 7:
+			case 20:
 				var token = msg.a;
 				var gameId = msg.b;
 				var result = msg.c;
-				if (!_Utils_eq(token, model.w)) {
+				if (!_Utils_eq(token, model.y)) {
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				} else {
-					var _v4 = model.h;
-					if (_v4.$ === 1) {
-						var current = _v4.a;
-						return (!_Utils_eq(current.b7, gameId)) ? _Utils_Tuple2(model, $elm$core$Platform$Cmd$none) : A3($author$project$Main$handleActionResult, current, result, model);
+					var _v13 = model.d;
+					if (_v13.$ === 1) {
+						var current = _v13.a;
+						return (!_Utils_eq(current.cB, gameId)) ? _Utils_Tuple2(model, $elm$core$Platform$Cmd$none) : A3($author$project$Main$handleActionResult, current, result, model);
 					} else {
 						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 					}
@@ -7234,13 +7811,13 @@ var $author$project$Main$update = F2(
 				var token = msg.a;
 				var gameId = msg.b;
 				var result = msg.c;
-				if ((!_Utils_eq(token, model.w)) || (!_Utils_eq(model.c, $author$project$Main$SyncingAfterUncertainAction))) {
+				if ((!_Utils_eq(token, model.y)) || (!_Utils_eq(model.c, $author$project$Main$SyncingAfterUncertainAction))) {
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				} else {
-					var _v5 = model.h;
-					if (_v5.$ === 1) {
-						var current = _v5.a;
-						return (!_Utils_eq(current.b7, gameId)) ? _Utils_Tuple2(model, $elm$core$Platform$Cmd$none) : A3($author$project$Main$handleSyncResult, current, result, model);
+					var _v14 = model.d;
+					if (_v14.$ === 1) {
+						var current = _v14.a;
+						return (!_Utils_eq(current.cB, gameId)) ? _Utils_Tuple2(model, $elm$core$Platform$Cmd$none) : A3($author$project$Main$handleSyncResult, current, result, model);
 					} else {
 						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 					}
@@ -7248,66 +7825,8 @@ var $author$project$Main$update = F2(
 		}
 	});
 var $elm$json$Json$Decode$value = _Json_decodeValue;
-var $elm$html$Html$Attributes$stringProperty = F2(
-	function (key, string) {
-		return A2(
-			_VirtualDom_property,
-			key,
-			$elm$json$Json$Encode$string(string));
-	});
-var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
-var $elm$html$Html$h1 = _VirtualDom_node('h1');
-var $elm$html$Html$header = _VirtualDom_node('header');
-var $elm$html$Html$main_ = _VirtualDom_node('main');
-var $elm$virtual_dom$VirtualDom$node = function (tag) {
-	return _VirtualDom_node(
-		_VirtualDom_noScript(tag));
-};
-var $elm$html$Html$node = $elm$virtual_dom$VirtualDom$node;
-var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
-var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
-var $author$project$Explosion$styles = A3(
-	$elm$html$Html$node,
-	'style',
-	_List_Nil,
-	_List_fromArray(
-		[
-			$elm$html$Html$text('\n@keyframes ms-shake {\n  0%, 100% { transform: translate(0, 0); }\n  15% { transform: translate(-8px, -5px) rotate(-1deg); }\n  30% { transform: translate(8px, 4px) rotate(1deg); }\n  45% { transform: translate(-6px, 5px) rotate(-0.5deg); }\n  60% { transform: translate(6px, -4px) rotate(0.5deg); }\n  75% { transform: translate(-3px, 2px); }\n}\n@keyframes ms-flash {\n  0% { opacity: 0.85; }\n  35% { opacity: 0.15; }\n  55% { opacity: 0.6; }\n  100% { opacity: 0; }\n}\n@keyframes ms-pixel-fly {\n  0% {\n    transform: translate3d(0, 0, 0) rotateX(0deg) rotateY(0deg);\n    opacity: 1;\n  }\n  12% {\n    transform: translate3d(0, 0, 0) scale(1.15);\n    opacity: 1;\n  }\n  100% {\n    transform: translate3d(var(--dx), var(--dy), var(--dz)) rotateX(540deg) rotateY(720deg);\n    opacity: 0;\n  }\n}\n@keyframes ms-cell-boom {\n  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 120, 0, 0.9); }\n  40% { transform: scale(1.35); box-shadow: 0 0 24px 8px rgba(255, 60, 0, 0.9); }\n  100% { transform: scale(1); box-shadow: 0 0 10px 2px rgba(220, 38, 38, 0.7); }\n}\n.minesweeper-app--exploded {\n  animation: ms-shake 0.45s ease-out;\n}\n.ms-explosion-overlay {\n  position: fixed;\n  inset: 0;\n  pointer-events: none;\n  z-index: 9999;\n  overflow: hidden;\n}\n.ms-explosion-flash {\n  position: absolute;\n  inset: 0;\n  background: radial-gradient(circle, rgba(255,234,216,0.95) 0%, rgba(255,102,0,0.5) 45%, transparent 80%);\n  animation: ms-flash 0.5s ease-out forwards;\n}\n.ms-bomb-stage {\n  position: fixed;\n  left: 50%;\n  top: 50%;\n  width: 192px;\n  height: 192px;\n  margin-left: -96px;\n  margin-top: -96px;\n  perspective: 400px;\n}\n.ms-bomb-pixel {\n  position: absolute;\n  width: 12px;\n  height: 12px;\n  animation: ms-pixel-fly 1.35s cubic-bezier(0.18, 0.75, 0.35, 1) forwards;\n}\n.board-cell--exploded {\n  animation: ms-cell-boom 0.5s ease-out forwards;\n}\n')
-		]));
-var $author$project$Main$isBusy = function (model) {
-	return !_Utils_eq(model.c, $author$project$Main$Idle);
-};
-var $author$project$Game$flaggedCount = function (snapshot) {
-	return $elm$core$List$length(
-		A2(
-			$elm$core$List$filter,
-			function (cell) {
-				return _Utils_eq(cell.bC, $author$project$Game$Flagged);
-			},
-			snapshot.at));
-};
-var $author$project$Game$remainingMines = function (snapshot) {
-	return snapshot.bd - $author$project$Game$flaggedCount(snapshot);
-};
-var $author$project$Main$toViewState = function (model) {
-	return {
-		bZ: model.bZ,
-		B: model.B,
-		i: model.i,
-		az: $author$project$Main$isBusy(model),
-		c: model.c,
-		aG: function () {
-			var _v0 = model.h;
-			if (_v0.$ === 1) {
-				var snapshot = _v0.a;
-				return $elm$core$Maybe$Just(
-					$author$project$Game$remainingMines(snapshot));
-			} else {
-				return $elm$core$Maybe$Nothing;
-			}
-		}(),
-		h: model.h
-	};
+var $author$project$Main$FocusControl = function (a) {
+	return {$: 12, a: a};
 };
 var $elm$virtual_dom$VirtualDom$attribute = F2(
 	function (key, value) {
@@ -7317,9 +7836,102 @@ var $elm$virtual_dom$VirtualDom$attribute = F2(
 			_VirtualDom_noJavaScriptOrHtmlUri(value));
 	});
 var $elm$html$Html$Attributes$attribute = $elm$virtual_dom$VirtualDom$attribute;
+var $elm$html$Html$button = _VirtualDom_node('button');
+var $elm$html$Html$Attributes$stringProperty = F2(
+	function (key, string) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$string(string));
+	});
+var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
+var $elm$core$Tuple$second = function (_v0) {
+	var y = _v0.b;
+	return y;
+};
+var $elm$html$Html$Attributes$classList = function (classes) {
+	return $elm$html$Html$Attributes$class(
+		A2(
+			$elm$core$String$join,
+			' ',
+			A2(
+				$elm$core$List$map,
+				$elm$core$Tuple$first,
+				A2($elm$core$List$filter, $elm$core$Tuple$second, classes))));
+};
+var $author$project$Board$difficultyDomId = function (difficulty) {
+	return 'ms-diff-' + $author$project$Game$difficultyToString(difficulty);
+};
+var $elm$html$Html$div = _VirtualDom_node('div');
+var $elm$html$Html$footer = _VirtualDom_node('footer');
+var $elm$html$Html$h1 = _VirtualDom_node('h1');
+var $elm$html$Html$header = _VirtualDom_node('header');
+var $elm$html$Html$main_ = _VirtualDom_node('main');
+var $elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 0, a: a};
+};
+var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
+var $elm$html$Html$Events$on = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$Normal(decoder));
+	});
+var $elm$html$Html$Events$onClick = function (msg) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'click',
+		$elm$json$Json$Decode$succeed(msg));
+};
+var $elm$html$Html$p = _VirtualDom_node('p');
+var $elm$html$Html$span = _VirtualDom_node('span');
+var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $author$project$Main$isBusy = function (model) {
+	return !_Utils_eq(model.c, $author$project$Main$Idle);
+};
+var $author$project$Game$flaggedCount = function (snapshot) {
+	return $elm$core$List$length(
+		A2(
+			$elm$core$List$filter,
+			function (cell) {
+				return _Utils_eq(cell.b3, $author$project$Game$Flagged);
+			},
+			snapshot.aE));
+};
+var $author$project$Game$remainingMines = function (snapshot) {
+	return snapshot.by - $author$project$Game$flaggedCount(snapshot);
+};
+var $author$project$Main$toViewState = function (model) {
+	return {
+		cr: model.cr,
+		bj: model.bj,
+		i: model.i,
+		aH: model.aH,
+		bm: model.bm,
+		P: model.P,
+		as: $author$project$Main$isBusy(model),
+		x: model.x,
+		c: model.c,
+		aY: function () {
+			var _v0 = model.d;
+			if (_v0.$ === 1) {
+				var snapshot = _v0.a;
+				return $elm$core$Maybe$Just(
+					$author$project$Game$remainingMines(snapshot));
+			} else {
+				return $elm$core$Maybe$Nothing;
+			}
+		}(),
+		d: model.d,
+		a_: model.a_
+	};
+};
+var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $author$project$Explosion$Pixel = F6(
 	function (x, y, color, dx, dy, dz) {
-		return {aU: color, a_: dx, a$: dy, a0: dz, bL: x, bM: y};
+		return {ba: color, bg: dx, bh: dy, bi: dz, cc: x, cd: y};
 	});
 var $elm$core$Basics$negate = function (n) {
 	return -n;
@@ -7424,9 +8036,6 @@ var $author$project$Explosion$bombPixels = _List_fromArray(
 		A6($author$project$Explosion$Pixel, 132, 156, '#000000', 192, 477, 30),
 		A6($author$project$Explosion$Pixel, 144, 156, '#000000', 271, 425, 95)
 	]);
-var $elm$html$Html$div = _VirtualDom_node('div');
-var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
-var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
 var $author$project$Explosion$viewPixel = function (p) {
 	return A2(
 		$elm$html$Html$div,
@@ -7434,26 +8043,9 @@ var $author$project$Explosion$viewPixel = function (p) {
 			[
 				$elm$html$Html$Attributes$class('ms-bomb-pixel'),
 				A2(
-				$elm$html$Html$Attributes$style,
-				'left',
-				$elm$core$String$fromInt(p.bL) + 'px'),
-				A2(
-				$elm$html$Html$Attributes$style,
-				'top',
-				$elm$core$String$fromInt(p.bM) + 'px'),
-				A2($elm$html$Html$Attributes$style, 'background-color', p.aU),
-				A2(
-				$elm$html$Html$Attributes$style,
-				'--dx',
-				$elm$core$String$fromInt(p.a_) + 'px'),
-				A2(
-				$elm$html$Html$Attributes$style,
-				'--dy',
-				$elm$core$String$fromInt(p.a$) + 'px'),
-				A2(
-				$elm$html$Html$Attributes$style,
-				'--dz',
-				$elm$core$String$fromInt(p.a0) + 'px')
+				$elm$html$Html$Attributes$attribute,
+				'style',
+				'left:' + ($elm$core$String$fromInt(p.cc) + ('px;top:' + ($elm$core$String$fromInt(p.cd) + ('px;background-color:' + (p.ba + (';--dx:' + ($elm$core$String$fromInt(p.bg) + ('px;--dy:' + ($elm$core$String$fromInt(p.bh) + ('px;--dz:' + ($elm$core$String$fromInt(p.bi) + 'px;'))))))))))))
 			]),
 		_List_Nil);
 };
@@ -7481,59 +8073,201 @@ var $author$project$Explosion$view = A2(
 				]),
 			A2($elm$core$List$map, $author$project$Explosion$viewPixel, $author$project$Explosion$bombPixels))
 		]));
-var $author$project$Main$RestartGame = {$: 1};
-var $elm$html$Html$button = _VirtualDom_node('button');
-var $elm$virtual_dom$VirtualDom$Normal = function (a) {
-	return {$: 0, a: a};
+var $author$project$Main$FocusCell = function (a) {
+	return {$: 7, a: a};
 };
-var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
-var $elm$html$Html$Events$on = F2(
-	function (event, decoder) {
-		return A2(
-			$elm$virtual_dom$VirtualDom$on,
-			event,
-			$elm$virtual_dom$VirtualDom$Normal(decoder));
+var $author$project$Main$FocusColumnEdge = function (a) {
+	return {$: 10, a: a};
+};
+var $author$project$Main$FocusRowEdge = function (a) {
+	return {$: 9, a: a};
+};
+var $author$project$Main$MoveFocus = F2(
+	function (a, b) {
+		return {$: 8, a: a, b: b};
 	});
-var $elm$html$Html$Events$onClick = function (msg) {
-	return A2(
-		$elm$html$Html$Events$on,
-		'click',
-		$elm$json$Json$Decode$succeed(msg));
+var $author$project$Main$PrimaryCellAction = function (a) {
+	return {$: 4, a: a};
 };
-var $elm$html$Html$p = _VirtualDom_node('p');
-var $elm$html$Html$section = _VirtualDom_node('section');
-var $author$project$Game$statusLabel = function (status) {
-	switch (status) {
-		case 0:
-			return 'Pronto para começar';
-		case 1:
-			return 'Em andamento';
-		case 2:
-			return 'Vitória!';
-		default:
-			return 'Derrota';
-	}
-};
-var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $author$project$Main$RevealCell = function (a) {
 	return {$: 2, a: a};
 };
 var $author$project$Main$ToggleFlag = function (a) {
 	return {$: 3, a: a};
 };
-var $elm$json$Json$Encode$bool = _Json_wrap;
-var $elm$html$Html$Attributes$boolProperty = F2(
-	function (key, bool) {
-		return A2(
-			_VirtualDom_property,
-			key,
-			$elm$json$Json$Encode$bool(bool));
+var $elm$html$Html$h2 = _VirtualDom_node('h2');
+var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
+var $elm$html$Html$section = _VirtualDom_node('section');
+var $author$project$Board$boardDensityClass = function (cols) {
+	return (cols >= 25) ? 'board--hard' : ((cols >= 14) ? 'board--medium' : 'board--easy');
+};
+var $author$project$Board$boolAttr = function (b) {
+	return b ? 'true' : 'false';
+};
+var $elm$core$List$drop = F2(
+	function (n, list) {
+		drop:
+		while (true) {
+			if (n <= 0) {
+				return list;
+			} else {
+				if (!list.b) {
+					return list;
+				} else {
+					var x = list.a;
+					var xs = list.b;
+					var $temp$n = n - 1,
+						$temp$list = xs;
+					n = $temp$n;
+					list = $temp$list;
+					continue drop;
+				}
+			}
+		}
 	});
-var $elm$html$Html$Attributes$disabled = $elm$html$Html$Attributes$boolProperty('disabled');
-var $author$project$Game$isWrongFlag = F2(
-	function (status, cellState) {
-		return (status === 3) && _Utils_eq(cellState, $author$project$Game$Flagged);
+var $elm$core$List$takeReverse = F3(
+	function (n, list, kept) {
+		takeReverse:
+		while (true) {
+			if (n <= 0) {
+				return kept;
+			} else {
+				if (!list.b) {
+					return kept;
+				} else {
+					var x = list.a;
+					var xs = list.b;
+					var $temp$n = n - 1,
+						$temp$list = xs,
+						$temp$kept = A2($elm$core$List$cons, x, kept);
+					n = $temp$n;
+					list = $temp$list;
+					kept = $temp$kept;
+					continue takeReverse;
+				}
+			}
+		}
 	});
+var $elm$core$List$takeTailRec = F2(
+	function (n, list) {
+		return $elm$core$List$reverse(
+			A3($elm$core$List$takeReverse, n, list, _List_Nil));
+	});
+var $elm$core$List$takeFast = F3(
+	function (ctr, n, list) {
+		if (n <= 0) {
+			return _List_Nil;
+		} else {
+			var _v0 = _Utils_Tuple2(n, list);
+			_v0$1:
+			while (true) {
+				_v0$5:
+				while (true) {
+					if (!_v0.b.b) {
+						return list;
+					} else {
+						if (_v0.b.b.b) {
+							switch (_v0.a) {
+								case 1:
+									break _v0$1;
+								case 2:
+									var _v2 = _v0.b;
+									var x = _v2.a;
+									var _v3 = _v2.b;
+									var y = _v3.a;
+									return _List_fromArray(
+										[x, y]);
+								case 3:
+									if (_v0.b.b.b.b) {
+										var _v4 = _v0.b;
+										var x = _v4.a;
+										var _v5 = _v4.b;
+										var y = _v5.a;
+										var _v6 = _v5.b;
+										var z = _v6.a;
+										return _List_fromArray(
+											[x, y, z]);
+									} else {
+										break _v0$5;
+									}
+								default:
+									if (_v0.b.b.b.b && _v0.b.b.b.b.b) {
+										var _v7 = _v0.b;
+										var x = _v7.a;
+										var _v8 = _v7.b;
+										var y = _v8.a;
+										var _v9 = _v8.b;
+										var z = _v9.a;
+										var _v10 = _v9.b;
+										var w = _v10.a;
+										var tl = _v10.b;
+										return (ctr > 1000) ? A2(
+											$elm$core$List$cons,
+											x,
+											A2(
+												$elm$core$List$cons,
+												y,
+												A2(
+													$elm$core$List$cons,
+													z,
+													A2(
+														$elm$core$List$cons,
+														w,
+														A2($elm$core$List$takeTailRec, n - 4, tl))))) : A2(
+											$elm$core$List$cons,
+											x,
+											A2(
+												$elm$core$List$cons,
+												y,
+												A2(
+													$elm$core$List$cons,
+													z,
+													A2(
+														$elm$core$List$cons,
+														w,
+														A3($elm$core$List$takeFast, ctr + 1, n - 4, tl)))));
+									} else {
+										break _v0$5;
+									}
+							}
+						} else {
+							if (_v0.a === 1) {
+								break _v0$1;
+							} else {
+								break _v0$5;
+							}
+						}
+					}
+				}
+				return list;
+			}
+			var _v1 = _v0.b;
+			var x = _v1.a;
+			return _List_fromArray(
+				[x]);
+		}
+	});
+var $elm$core$List$take = F2(
+	function (n, list) {
+		return A3($elm$core$List$takeFast, 0, n, list);
+	});
+var $author$project$Game$chunkList = F2(
+	function (size, items) {
+		if (!items.b) {
+			return _List_Nil;
+		} else {
+			return A2(
+				$elm$core$List$cons,
+				A2($elm$core$List$take, size, items),
+				A2(
+					$author$project$Game$chunkList,
+					size,
+					A2($elm$core$List$drop, size, items)));
+		}
+	});
+var $author$project$Game$cellsByRow = function (snapshot) {
+	return (snapshot.bb <= 0) ? _List_Nil : A2($author$project$Game$chunkList, snapshot.bb, snapshot.aE);
+};
 var $elm$virtual_dom$VirtualDom$MayPreventDefault = function (a) {
 	return {$: 2, a: a};
 };
@@ -7544,106 +8278,1000 @@ var $elm$html$Html$Events$preventDefaultOn = F2(
 			event,
 			$elm$virtual_dom$VirtualDom$MayPreventDefault(decoder));
 	});
-var $elm$html$Html$Attributes$title = $elm$html$Html$Attributes$stringProperty('title');
-var $author$project$Main$viewCell = F3(
-	function (busy, status, cell) {
-		var coord = {aa: cell.aa, af: cell.af};
-		var onRightClick = A2(
-			$elm$html$Html$Events$preventDefaultOn,
-			'contextmenu',
-			$elm$json$Json$Decode$succeed(
-				_Utils_Tuple2(
-					$author$project$Main$ToggleFlag(coord),
-					true)));
-		var _v0 = function () {
-			var _v1 = cell.bC;
-			switch (_v1.$) {
-				case 0:
-					return _Utils_Tuple3('', '#4b5563', '#f9fafb');
-				case 1:
-					return A2($author$project$Game$isWrongFlag, status, cell.bC) ? _Utils_Tuple3('✕', '#7f1d1d', '#fecaca') : _Utils_Tuple3('⚑', '#4b5563', '#facc15');
-				case 2:
-					if (!_v1.a) {
-						return _Utils_Tuple3('', '#1f2937', '#e5e7eb');
-					} else {
-						var n = _v1.a;
-						return _Utils_Tuple3(
-							$elm$core$String$fromInt(n),
-							'#1f2937',
-							'#e5e7eb');
-					}
-				case 3:
-					return _Utils_Tuple3('💣', '#374151', '#f9fafb');
-				default:
-					return _Utils_Tuple3('💥', '#991b1b', '#ffffff');
+var $elm$svg$Svg$Attributes$class = _VirtualDom_attribute('class');
+var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
+var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
+var $elm$svg$Svg$line = $elm$svg$Svg$trustedNode('line');
+var $elm$svg$Svg$Attributes$points = _VirtualDom_attribute('points');
+var $elm$svg$Svg$polygon = $elm$svg$Svg$trustedNode('polygon');
+var $elm$svg$Svg$polyline = $elm$svg$Svg$trustedNode('polyline');
+var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
+var $elm$svg$Svg$Attributes$strokeLinecap = _VirtualDom_attribute('stroke-linecap');
+var $elm$svg$Svg$Attributes$strokeLinejoin = _VirtualDom_attribute('stroke-linejoin');
+var $elm$svg$Svg$Attributes$strokeWidth = _VirtualDom_attribute('stroke-width');
+var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
+var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
+var $elm$svg$Svg$Attributes$x1 = _VirtualDom_attribute('x1');
+var $elm$svg$Svg$Attributes$x2 = _VirtualDom_attribute('x2');
+var $elm$svg$Svg$Attributes$y1 = _VirtualDom_attribute('y1');
+var $elm$svg$Svg$Attributes$y2 = _VirtualDom_attribute('y2');
+var $author$project$Board$iconCorrectFlag = A2(
+	$elm$svg$Svg$svg,
+	_List_fromArray(
+		[
+			$elm$svg$Svg$Attributes$viewBox('0 0 24 24'),
+			$elm$svg$Svg$Attributes$class('icon icon-correct-flag'),
+			A2($elm$html$Html$Attributes$attribute, 'aria-hidden', 'true')
+		]),
+	_List_fromArray(
+		[
+			A2(
+			$elm$svg$Svg$line,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$x1('6.5'),
+					$elm$svg$Svg$Attributes$y1('4'),
+					$elm$svg$Svg$Attributes$x2('6.5'),
+					$elm$svg$Svg$Attributes$y2('20'),
+					$elm$svg$Svg$Attributes$stroke('currentColor'),
+					$elm$svg$Svg$Attributes$strokeWidth('2.2'),
+					$elm$svg$Svg$Attributes$strokeLinecap('round')
+				]),
+			_List_Nil),
+			A2(
+			$elm$svg$Svg$polygon,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$points('6.5,4 18.5,8.5 6.5,13'),
+					$elm$svg$Svg$Attributes$fill('var(--good, #2b8a3e)')
+				]),
+			_List_Nil),
+			A2(
+			$elm$svg$Svg$line,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$x1('4'),
+					$elm$svg$Svg$Attributes$y1('20'),
+					$elm$svg$Svg$Attributes$x2('11'),
+					$elm$svg$Svg$Attributes$y2('20'),
+					$elm$svg$Svg$Attributes$stroke('currentColor'),
+					$elm$svg$Svg$Attributes$strokeWidth('2.2'),
+					$elm$svg$Svg$Attributes$strokeLinecap('round')
+				]),
+			_List_Nil),
+			A2(
+			$elm$svg$Svg$polyline,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$points('13.5,16.5 16.2,19.2 21,13.5'),
+					$elm$svg$Svg$Attributes$fill('none'),
+					$elm$svg$Svg$Attributes$stroke('var(--good, #2b8a3e)'),
+					$elm$svg$Svg$Attributes$strokeWidth('2.6'),
+					$elm$svg$Svg$Attributes$strokeLinecap('round'),
+					$elm$svg$Svg$Attributes$strokeLinejoin('round')
+				]),
+			_List_Nil)
+		]));
+var $author$project$Board$iconFlag = A2(
+	$elm$svg$Svg$svg,
+	_List_fromArray(
+		[
+			$elm$svg$Svg$Attributes$viewBox('0 0 24 24'),
+			$elm$svg$Svg$Attributes$class('icon icon-flag'),
+			A2($elm$html$Html$Attributes$attribute, 'aria-hidden', 'true')
+		]),
+	_List_fromArray(
+		[
+			A2(
+			$elm$svg$Svg$line,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$x1('7'),
+					$elm$svg$Svg$Attributes$y1('4'),
+					$elm$svg$Svg$Attributes$x2('7'),
+					$elm$svg$Svg$Attributes$y2('20'),
+					$elm$svg$Svg$Attributes$stroke('currentColor'),
+					$elm$svg$Svg$Attributes$strokeWidth('2.2'),
+					$elm$svg$Svg$Attributes$strokeLinecap('round')
+				]),
+			_List_Nil),
+			A2(
+			$elm$svg$Svg$polygon,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$points('7,4 19,8.5 7,13'),
+					$elm$svg$Svg$Attributes$fill('var(--flag-fill, #d9480f)')
+				]),
+			_List_Nil),
+			A2(
+			$elm$svg$Svg$line,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$x1('4.5'),
+					$elm$svg$Svg$Attributes$y1('20'),
+					$elm$svg$Svg$Attributes$x2('11.5'),
+					$elm$svg$Svg$Attributes$y2('20'),
+					$elm$svg$Svg$Attributes$stroke('currentColor'),
+					$elm$svg$Svg$Attributes$strokeWidth('2.2'),
+					$elm$svg$Svg$Attributes$strokeLinecap('round')
+				]),
+			_List_Nil)
+		]));
+var $elm$svg$Svg$circle = $elm$svg$Svg$trustedNode('circle');
+var $elm$svg$Svg$Attributes$cx = _VirtualDom_attribute('cx');
+var $elm$svg$Svg$Attributes$cy = _VirtualDom_attribute('cy');
+var $elm$svg$Svg$Attributes$r = _VirtualDom_attribute('r');
+var $author$project$Board$iconMine = A2(
+	$elm$svg$Svg$svg,
+	_List_fromArray(
+		[
+			$elm$svg$Svg$Attributes$viewBox('0 0 24 24'),
+			$elm$svg$Svg$Attributes$class('icon icon-mine'),
+			A2($elm$html$Html$Attributes$attribute, 'aria-hidden', 'true')
+		]),
+	_List_fromArray(
+		[
+			A2(
+			$elm$svg$Svg$circle,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$cx('12'),
+					$elm$svg$Svg$Attributes$cy('12'),
+					$elm$svg$Svg$Attributes$r('5.5'),
+					$elm$svg$Svg$Attributes$fill('currentColor')
+				]),
+			_List_Nil),
+			A2(
+			$elm$svg$Svg$line,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$x1('12'),
+					$elm$svg$Svg$Attributes$y1('3'),
+					$elm$svg$Svg$Attributes$x2('12'),
+					$elm$svg$Svg$Attributes$y2('21'),
+					$elm$svg$Svg$Attributes$stroke('currentColor'),
+					$elm$svg$Svg$Attributes$strokeWidth('2.2'),
+					$elm$svg$Svg$Attributes$strokeLinecap('round')
+				]),
+			_List_Nil),
+			A2(
+			$elm$svg$Svg$line,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$x1('3'),
+					$elm$svg$Svg$Attributes$y1('12'),
+					$elm$svg$Svg$Attributes$x2('21'),
+					$elm$svg$Svg$Attributes$y2('12'),
+					$elm$svg$Svg$Attributes$stroke('currentColor'),
+					$elm$svg$Svg$Attributes$strokeWidth('2.2'),
+					$elm$svg$Svg$Attributes$strokeLinecap('round')
+				]),
+			_List_Nil),
+			A2(
+			$elm$svg$Svg$line,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$x1('5.6'),
+					$elm$svg$Svg$Attributes$y1('5.6'),
+					$elm$svg$Svg$Attributes$x2('18.4'),
+					$elm$svg$Svg$Attributes$y2('18.4'),
+					$elm$svg$Svg$Attributes$stroke('currentColor'),
+					$elm$svg$Svg$Attributes$strokeWidth('2'),
+					$elm$svg$Svg$Attributes$strokeLinecap('round')
+				]),
+			_List_Nil),
+			A2(
+			$elm$svg$Svg$line,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$x1('18.4'),
+					$elm$svg$Svg$Attributes$y1('5.6'),
+					$elm$svg$Svg$Attributes$x2('5.6'),
+					$elm$svg$Svg$Attributes$y2('18.4'),
+					$elm$svg$Svg$Attributes$stroke('currentColor'),
+					$elm$svg$Svg$Attributes$strokeWidth('2'),
+					$elm$svg$Svg$Attributes$strokeLinecap('round')
+				]),
+			_List_Nil),
+			A2(
+			$elm$svg$Svg$circle,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$cx('10'),
+					$elm$svg$Svg$Attributes$cy('10'),
+					$elm$svg$Svg$Attributes$r('1.5'),
+					$elm$svg$Svg$Attributes$fill('var(--panel, #fff)')
+				]),
+			_List_Nil)
+		]));
+var $elm$svg$Svg$Attributes$opacity = _VirtualDom_attribute('opacity');
+var $author$project$Board$iconWrongFlag = A2(
+	$elm$svg$Svg$svg,
+	_List_fromArray(
+		[
+			$elm$svg$Svg$Attributes$viewBox('0 0 24 24'),
+			$elm$svg$Svg$Attributes$class('icon icon-wrong-flag'),
+			A2($elm$html$Html$Attributes$attribute, 'aria-hidden', 'true')
+		]),
+	_List_fromArray(
+		[
+			A2(
+			$elm$svg$Svg$line,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$x1('7'),
+					$elm$svg$Svg$Attributes$y1('4'),
+					$elm$svg$Svg$Attributes$x2('7'),
+					$elm$svg$Svg$Attributes$y2('20'),
+					$elm$svg$Svg$Attributes$stroke('currentColor'),
+					$elm$svg$Svg$Attributes$strokeWidth('2'),
+					$elm$svg$Svg$Attributes$strokeLinecap('round'),
+					$elm$svg$Svg$Attributes$opacity('0.55')
+				]),
+			_List_Nil),
+			A2(
+			$elm$svg$Svg$polygon,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$points('7,4 18,8.5 7,13'),
+					$elm$svg$Svg$Attributes$fill('var(--flag-fill, #d9480f)'),
+					$elm$svg$Svg$Attributes$opacity('0.55')
+				]),
+			_List_Nil),
+			A2(
+			$elm$svg$Svg$line,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$x1('4'),
+					$elm$svg$Svg$Attributes$y1('4'),
+					$elm$svg$Svg$Attributes$x2('20'),
+					$elm$svg$Svg$Attributes$y2('20'),
+					$elm$svg$Svg$Attributes$stroke('var(--danger, #c92a2a)'),
+					$elm$svg$Svg$Attributes$strokeWidth('2.8'),
+					$elm$svg$Svg$Attributes$strokeLinecap('round')
+				]),
+			_List_Nil),
+			A2(
+			$elm$svg$Svg$line,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$x1('20'),
+					$elm$svg$Svg$Attributes$y1('4'),
+					$elm$svg$Svg$Attributes$x2('4'),
+					$elm$svg$Svg$Attributes$y2('20'),
+					$elm$svg$Svg$Attributes$stroke('var(--danger, #c92a2a)'),
+					$elm$svg$Svg$Attributes$strokeWidth('2.8'),
+					$elm$svg$Svg$Attributes$strokeLinecap('round')
+				]),
+			_List_Nil)
+		]));
+var $author$project$Board$viewLegend = function (inputMode) {
+	var activeModeLabel = function () {
+		if (!inputMode) {
+			return 'Revelar';
+		} else {
+			return 'Bandeira';
+		}
+	}();
+	return A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('board-legend'),
+				A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Legenda de símbolos e atalhos de teclado')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$span,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('legend-item')
+					]),
+				_List_fromArray(
+					[
+						$author$project$Board$iconFlag,
+						$elm$html$Html$text(' Bandeira (botão direito ou F)')
+					])),
+				A2(
+				$elm$html$Html$span,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('legend-item')
+					]),
+				_List_fromArray(
+					[
+						$author$project$Board$iconMine,
+						$elm$html$Html$text(' Mina')
+					])),
+				A2(
+				$elm$html$Html$span,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('legend-item')
+					]),
+				_List_fromArray(
+					[
+						$author$project$Board$iconCorrectFlag,
+						$elm$html$Html$text(' Bandeira correta na derrota')
+					])),
+				A2(
+				$elm$html$Html$span,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('legend-item')
+					]),
+				_List_fromArray(
+					[
+						$author$project$Board$iconWrongFlag,
+						$elm$html$Html$text(' Bandeira incorreta na derrota')
+					])),
+				A2(
+				$elm$html$Html$span,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('legend-item')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Teclado: Setas/WASD/Home/End/PgUp/PgDn · Enter/Espaço (' + (activeModeLabel + ') · R revela · F bandeira · M modo · 1/2/3 dificuldade · N novo jogo · G grade · Esc controles · ? ajuda'))
+					]))
+			]));
+};
+var $elm$virtual_dom$VirtualDom$node = function (tag) {
+	return _VirtualDom_node(
+		_VirtualDom_noScript(tag));
+};
+var $elm$html$Html$node = $elm$virtual_dom$VirtualDom$node;
+var $author$project$Board$statusSummary = function (status) {
+	switch (status) {
+		case 0:
+			return {ae: 'Pronto', U: 'O primeiro clique revelado é sempre seguro. Você já pode marcar bandeiras se desejar.', Z: 'Pronto para começar'};
+		case 1:
+			return {ae: 'Jogando', U: 'Revele todas as células sem mina para vencer.', Z: 'Partida em andamento'};
+		case 2:
+			return {ae: 'Vitória', U: 'Você revelou todas as células seguras do campo minado.', Z: 'Vitória!'};
+		default:
+			return {ae: 'Derrota', U: 'As minas, bandeiras corretas (verdes) e eventuais bandeiras incorretas foram reveladas no tabuleiro.', Z: 'Derrota — você detonou uma mina'};
+	}
+};
+var $elm$html$Html$strong = _VirtualDom_node('strong');
+var $author$project$Board$viewOutcomeBanner = function (cfg) {
+	var _v0 = cfg.X.c3;
+	switch (_v0) {
+		case 2:
+			var info = $author$project$Board$statusSummary(2);
+			return A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('outcome outcome--won'),
+						A2($elm$html$Html$Attributes$attribute, 'role', 'status'),
+						A2($elm$html$Html$Attributes$attribute, 'aria-live', 'polite')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('outcome-copy')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$strong,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text(info.Z)
+									])),
+								A2(
+								$elm$html$Html$span,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text(info.U)
+									]))
+							])),
+						A2(
+						$elm$html$Html$button,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$type_('button'),
+								$elm$html$Html$Attributes$class('btn btn--primary'),
+								A2($elm$html$Html$Attributes$attribute, 'aria-keyshortcuts', 'n'),
+								$elm$html$Html$Events$onClick(cfg.aT)
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$span,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Jogar novamente')
+									])),
+								A3(
+								$elm$html$Html$node,
+								'kbd',
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('kbd-hint kbd-hint--on-accent'),
+										A2($elm$html$Html$Attributes$attribute, 'aria-hidden', 'true')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('N')
+									]))
+							]))
+					]));
+		case 3:
+			var info = $author$project$Board$statusSummary(3);
+			return A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('outcome outcome--lost'),
+						A2($elm$html$Html$Attributes$attribute, 'role', 'status'),
+						A2($elm$html$Html$Attributes$attribute, 'aria-live', 'polite')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('outcome-copy')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$strong,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text(info.Z)
+									])),
+								A2(
+								$elm$html$Html$span,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text(info.U)
+									]))
+							])),
+						A2(
+						$elm$html$Html$button,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$type_('button'),
+								$elm$html$Html$Attributes$class('btn btn--primary'),
+								A2($elm$html$Html$Attributes$attribute, 'aria-keyshortcuts', 'n'),
+								$elm$html$Html$Events$onClick(cfg.aT)
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$span,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Nova partida')
+									])),
+								A3(
+								$elm$html$Html$node,
+								'kbd',
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('kbd-hint kbd-hint--on-accent'),
+										A2($elm$html$Html$Attributes$attribute, 'aria-hidden', 'true')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('N')
+									]))
+							]))
+					]));
+		default:
+			return $elm$html$Html$text('');
+	}
+};
+var $author$project$Board$VisualCorrectFlag = {$: 2};
+var $elm$core$Dict$member = F2(
+	function (key, dict) {
+		var _v0 = A2($elm$core$Dict$get, key, dict);
+		if (!_v0.$) {
+			return true;
+		} else {
+			return false;
+		}
+	});
+var $elm$core$Set$member = F2(
+	function (key, _v0) {
+		var dict = _v0;
+		return A2($elm$core$Dict$member, key, dict);
+	});
+var $author$project$Board$VisualExploded = {$: 6};
+var $author$project$Board$VisualFlagged = {$: 1};
+var $author$project$Board$VisualHidden = {$: 0};
+var $author$project$Board$VisualMine = {$: 5};
+var $author$project$Board$VisualRevealed = function (a) {
+	return {$: 4, a: a};
+};
+var $author$project$Board$VisualWrongFlag = {$: 3};
+var $author$project$Game$isWrongFlag = F2(
+	function (status, cellState) {
+		return (status === 3) && _Utils_eq(cellState, $author$project$Game$Flagged);
+	});
+var $author$project$Board$visualKind = F2(
+	function (status, state) {
+		switch (state.$) {
+			case 0:
+				return $author$project$Board$VisualHidden;
+			case 1:
+				return A2($author$project$Game$isWrongFlag, status, state) ? $author$project$Board$VisualWrongFlag : $author$project$Board$VisualFlagged;
+			case 2:
+				var n = state.a;
+				return $author$project$Board$VisualRevealed(n);
+			case 3:
+				return $author$project$Board$VisualMine;
+			default:
+				return $author$project$Board$VisualExploded;
+		}
+	});
+var $author$project$Board$cellVisualKind = F3(
+	function (status, flaggedBeforeEnd, cell) {
+		return ((status === 3) && (_Utils_eq(cell.b3, $author$project$Game$Mine) && A2(
+			$elm$core$Set$member,
+			_Utils_Tuple2(cell.ak, cell.af),
+			flaggedBeforeEnd))) ? $author$project$Board$VisualCorrectFlag : A2($author$project$Board$visualKind, status, cell.b3);
+	});
+var $author$project$Board$cellAriaLabel = F3(
+	function (status, flaggedBeforeEnd, cell) {
+		var pos = 'Linha ' + ($elm$core$String$fromInt(cell.ak + 1) + (', coluna ' + ($elm$core$String$fromInt(cell.af + 1) + ': ')));
+		var _v0 = A3($author$project$Board$cellVisualKind, status, flaggedBeforeEnd, cell);
+		switch (_v0.$) {
+			case 0:
+				return pos + 'oculta';
+			case 1:
+				return pos + 'marcada com bandeira';
+			case 2:
+				return pos + 'bandeira correta (mina acertada)';
+			case 3:
+				return pos + 'bandeira incorreta';
+			case 4:
+				switch (_v0.a) {
+					case 0:
+						return pos + 'revelada, sem minas adjacentes';
+					case 1:
+						return pos + 'revelada, 1 mina adjacente';
+					default:
+						var n = _v0.a;
+						return pos + ('revelada, ' + ($elm$core$String$fromInt(n) + ' minas adjacentes'));
+				}
+			case 5:
+				return pos + 'mina';
+			default:
+				return pos + 'mina detonada';
+		}
+	});
+var $author$project$Board$cellClasses = function (kind) {
+	switch (kind.$) {
+		case 0:
+			return 'ms-cell cell--hidden';
+		case 1:
+			return 'ms-cell cell--flagged';
+		case 2:
+			return 'ms-cell cell--correct-flag';
+		case 3:
+			return 'ms-cell cell--wrong-flag';
+		case 4:
+			if (!kind.a) {
+				return 'ms-cell cell--revealed cell--empty';
+			} else {
+				var n = kind.a;
+				return 'ms-cell cell--revealed cell--num-' + $elm$core$String$fromInt(n);
 			}
-		}();
-		var label = _v0.a;
-		var bgColor = _v0.b;
-		var textColor = _v0.c;
+		case 5:
+			return 'ms-cell cell--mine';
+		default:
+			return 'ms-cell cell--exploded';
+	}
+};
+var $author$project$Board$cellKeyDecoder = F2(
+	function (cfg, coord) {
+		var handle = function (message) {
+			return $elm$json$Json$Decode$succeed(
+				{aL: message, aw: true, aA: true});
+		};
+		return A2(
+			$elm$json$Json$Decode$andThen,
+			function (_v0) {
+				var key = _v0.a;
+				var hasModifier = _v0.b;
+				if (hasModifier) {
+					return $elm$json$Json$Decode$fail('modificador ativo');
+				} else {
+					switch (key) {
+						case 'ArrowUp':
+							return handle(
+								A2(cfg.t, -1, 0));
+						case 'ArrowDown':
+							return handle(
+								A2(cfg.t, 1, 0));
+						case 'ArrowLeft':
+							return handle(
+								A2(cfg.t, 0, -1));
+						case 'ArrowRight':
+							return handle(
+								A2(cfg.t, 0, 1));
+						case 'w':
+							return handle(
+								A2(cfg.t, -1, 0));
+						case 'W':
+							return handle(
+								A2(cfg.t, -1, 0));
+						case 's':
+							return handle(
+								A2(cfg.t, 1, 0));
+						case 'S':
+							return handle(
+								A2(cfg.t, 1, 0));
+						case 'a':
+							return handle(
+								A2(cfg.t, 0, -1));
+						case 'A':
+							return handle(
+								A2(cfg.t, 0, -1));
+						case 'd':
+							return handle(
+								A2(cfg.t, 0, 1));
+						case 'D':
+							return handle(
+								A2(cfg.t, 0, 1));
+						case 'Home':
+							return handle(
+								cfg.aS(false));
+						case 'End':
+							return handle(
+								cfg.aS(true));
+						case 'PageUp':
+							return handle(
+								cfg.aR(false));
+						case 'PageDown':
+							return handle(
+								cfg.aR(true));
+						case 'Enter':
+							return handle(
+								cfg.av(coord));
+						case ' ':
+							return handle(
+								cfg.av(coord));
+						case 'r':
+							return handle(
+								cfg.aU(coord));
+						case 'R':
+							return handle(
+								cfg.aU(coord));
+						case 'f':
+							return handle(
+								cfg.aW(coord));
+						case 'F':
+							return handle(
+								cfg.aW(coord));
+						case 'm':
+							return handle(cfg.aX);
+						case 'M':
+							return handle(cfg.aX);
+						case 'Escape':
+							return handle(cfg.bF);
+						default:
+							return $elm$json$Json$Decode$fail('tecla não tratada pela célula');
+					}
+				}
+			},
+			A5(
+				$elm$json$Json$Decode$map4,
+				F4(
+					function (key, ctrl, alt, meta) {
+						return _Utils_Tuple2(key, ctrl || (alt || meta));
+					}),
+				A2($elm$json$Json$Decode$field, 'key', $elm$json$Json$Decode$string),
+				A2($elm$json$Json$Decode$field, 'ctrlKey', $elm$json$Json$Decode$bool),
+				A2($elm$json$Json$Decode$field, 'altKey', $elm$json$Json$Decode$bool),
+				A2($elm$json$Json$Decode$field, 'metaKey', $elm$json$Json$Decode$bool)));
+	});
+var $elm$virtual_dom$VirtualDom$Custom = function (a) {
+	return {$: 3, a: a};
+};
+var $elm$html$Html$Events$custom = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$Custom(decoder));
+	});
+var $elm$html$Html$Events$onFocus = function (msg) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'focus',
+		$elm$json$Json$Decode$succeed(msg));
+};
+var $elm$html$Html$Attributes$tabindex = function (n) {
+	return A2(
+		_VirtualDom_attribute,
+		'tabIndex',
+		$elm$core$String$fromInt(n));
+};
+var $elm$html$Html$Attributes$title = $elm$html$Html$Attributes$stringProperty('title');
+var $author$project$Board$iconExploded = A2(
+	$elm$svg$Svg$svg,
+	_List_fromArray(
+		[
+			$elm$svg$Svg$Attributes$viewBox('0 0 24 24'),
+			$elm$svg$Svg$Attributes$class('icon icon-exploded'),
+			A2($elm$html$Html$Attributes$attribute, 'aria-hidden', 'true')
+		]),
+	_List_fromArray(
+		[
+			A2(
+			$elm$svg$Svg$polygon,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$points('12,1.5 14.5,7.2 20.5,5.5 16.8,10.8 22.5,13.5 16.2,15.2 18.5,21.5 12.8,17.5 8.5,22.2 8.2,16 2,15.5 6.8,11.2 4,5.2 9.8,7.2'),
+					$elm$svg$Svg$Attributes$fill('var(--exploded-burst, #ffd43b)'),
+					$elm$svg$Svg$Attributes$stroke('currentColor'),
+					$elm$svg$Svg$Attributes$strokeWidth('1.4')
+				]),
+			_List_Nil),
+			A2(
+			$elm$svg$Svg$circle,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$cx('12'),
+					$elm$svg$Svg$Attributes$cy('12'),
+					$elm$svg$Svg$Attributes$r('3.6'),
+					$elm$svg$Svg$Attributes$fill('currentColor')
+				]),
+			_List_Nil)
+		]));
+var $author$project$Board$viewCellContent = function (kind) {
+	switch (kind.$) {
+		case 0:
+			return A2(
+				$elm$html$Html$span,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('cell-sr-only')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Oculta')
+					]));
+		case 1:
+			return $author$project$Board$iconFlag;
+		case 2:
+			return $author$project$Board$iconCorrectFlag;
+		case 3:
+			return $author$project$Board$iconWrongFlag;
+		case 4:
+			if (!kind.a) {
+				return $elm$html$Html$text('');
+			} else {
+				var n = kind.a;
+				return A2(
+					$elm$html$Html$span,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('cell-number')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text(
+							$elm$core$String$fromInt(n))
+						]));
+			}
+		case 5:
+			return $author$project$Board$iconMine;
+		default:
+			return $author$project$Board$iconExploded;
+	}
+};
+var $author$project$Board$viewCell = F3(
+	function (cfg, focusedCoord, cell) {
+		var labelText = A3($author$project$Board$cellAriaLabel, cfg.X.c3, cfg.aH, cell);
+		var kind = A3($author$project$Board$cellVisualKind, cfg.X.c3, cfg.aH, cell);
+		var ended = $author$project$Game$isFinished(cfg.X.c3);
+		var isActionDisabled = cfg.as || ended;
+		var coord = {af: cell.af, ak: cell.ak};
+		var isFocused = _Utils_eq(focusedCoord, coord);
 		return A2(
 			$elm$html$Html$button,
 			_List_fromArray(
 				[
 					$elm$html$Html$Attributes$type_('button'),
+					$elm$html$Html$Attributes$id(
+					$author$project$Board$cellDomId(coord)),
 					$elm$html$Html$Attributes$class(
-					_Utils_eq(cell.bC, $author$project$Game$Exploded) ? 'board-cell board-cell--exploded' : 'board-cell'),
-					A2($elm$html$Html$Attributes$style, 'width', '2rem'),
-					A2($elm$html$Html$Attributes$style, 'height', '2rem'),
-					A2($elm$html$Html$Attributes$style, 'padding', '0'),
-					A2($elm$html$Html$Attributes$style, 'background-color', bgColor),
-					A2($elm$html$Html$Attributes$style, 'color', textColor),
-					A2($elm$html$Html$Attributes$style, 'border', '1px solid #374151'),
-					$elm$html$Html$Attributes$disabled(
-					busy || $author$project$Game$isFinished(status)),
+					$author$project$Board$cellClasses(kind)),
+					$elm$html$Html$Attributes$classList(
+					_List_fromArray(
+						[
+							_Utils_Tuple2('cell--focused', isFocused)
+						])),
+					$elm$html$Html$Attributes$tabindex(
+					isFocused ? 0 : (-1)),
+					A2($elm$html$Html$Attributes$attribute, 'role', 'gridcell'),
+					A2(
+					$elm$html$Html$Attributes$attribute,
+					'aria-rowindex',
+					$elm$core$String$fromInt(cell.ak + 1)),
+					A2(
+					$elm$html$Html$Attributes$attribute,
+					'aria-colindex',
+					$elm$core$String$fromInt(cell.af + 1)),
+					A2($elm$html$Html$Attributes$attribute, 'aria-label', labelText),
+					A2(
+					$elm$html$Html$Attributes$attribute,
+					'aria-disabled',
+					$author$project$Board$boolAttr(isActionDisabled)),
+					$elm$html$Html$Attributes$title(labelText),
+					$elm$html$Html$Events$onFocus(
+					cfg.aQ(coord)),
 					$elm$html$Html$Events$onClick(
-					$author$project$Main$RevealCell(coord)),
-					onRightClick,
-					$elm$html$Html$Attributes$title(
-					'Linha ' + ($elm$core$String$fromInt(cell.af + 1) + (', Coluna ' + $elm$core$String$fromInt(cell.aa + 1))))
+					cfg.av(coord)),
+					A2(
+					$elm$html$Html$Events$preventDefaultOn,
+					'contextmenu',
+					$elm$json$Json$Decode$succeed(
+						_Utils_Tuple2(
+							cfg.bJ(coord),
+							true))),
+					A2(
+					$elm$html$Html$Events$custom,
+					'keydown',
+					A2($author$project$Board$cellKeyDecoder, cfg, coord))
 				]),
 			_List_fromArray(
 				[
-					$elm$html$Html$text(label)
+					$author$project$Board$viewCellContent(kind)
 				]));
 	});
-var $author$project$Main$viewBoard = F2(
-	function (busy, snapshot) {
+var $author$project$Board$viewRow = F4(
+	function (cfg, focusedCoord, rowIdx, rowCells) {
 		return A2(
 			$elm$html$Html$div,
 			_List_fromArray(
 				[
-					$elm$html$Html$Attributes$class('minesweeper-board'),
-					A2($elm$html$Html$Attributes$style, 'display', 'grid'),
+					$elm$html$Html$Attributes$class('board-row'),
+					A2($elm$html$Html$Attributes$attribute, 'role', 'row'),
 					A2(
-					$elm$html$Html$Attributes$style,
-					'grid-template-columns',
-					'repeat(' + ($elm$core$String$fromInt(snapshot.aV) + ', 2rem)')),
-					A2($elm$html$Html$Attributes$style, 'gap', '2px')
+					$elm$html$Html$Attributes$attribute,
+					'aria-rowindex',
+					$elm$core$String$fromInt(rowIdx + 1))
 				]),
 			A2(
 				$elm$core$List$map,
-				A2($author$project$Main$viewCell, busy, snapshot.cB),
-				snapshot.at));
+				A2($author$project$Board$viewCell, cfg, focusedCoord),
+				rowCells));
 	});
+var $author$project$Board$view = function (cfg) {
+	var snapshot = cfg.X;
+	var rows = $author$project$Game$cellsByRow(snapshot);
+	var ended = $author$project$Game$isFinished(snapshot.c3);
+	var clampedFocus = A2($author$project$Board$clampCoord, snapshot, cfg.bm);
+	return A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('board-container')
+			]),
+		_List_fromArray(
+			[
+				$author$project$Board$viewOutcomeBanner(cfg),
+				(snapshot.bb >= 25) ? A2(
+				$elm$html$Html$p,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('scroll-hint')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Dica em telas menores: deslize o tabuleiro horizontalmente ou use as setas do teclado para percorrer todas as colunas.')
+					])) : $elm$html$Html$text(''),
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('board-scroll'),
+						A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Área do tabuleiro com rolagem')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$id('ms-board-grid'),
+								$elm$html$Html$Attributes$class(
+								'board ' + $author$project$Board$boardDensityClass(snapshot.bb)),
+								$elm$html$Html$Attributes$classList(
+								_List_fromArray(
+									[
+										_Utils_Tuple2('board--busy', cfg.as && (!ended)),
+										_Utils_Tuple2('board--won', snapshot.c3 === 2),
+										_Utils_Tuple2('board--lost', snapshot.c3 === 3)
+									])),
+								A2($elm$html$Html$Attributes$attribute, 'role', 'grid'),
+								A2(
+								$elm$html$Html$Attributes$attribute,
+								'aria-label',
+								'Tabuleiro de Campo Minado ' + ($elm$core$String$fromInt(snapshot.bX) + (' por ' + $elm$core$String$fromInt(snapshot.bb)))),
+								A2(
+								$elm$html$Html$Attributes$attribute,
+								'aria-rowcount',
+								$elm$core$String$fromInt(snapshot.bX)),
+								A2(
+								$elm$html$Html$Attributes$attribute,
+								'aria-colcount',
+								$elm$core$String$fromInt(snapshot.bb)),
+								A2(
+								$elm$html$Html$Attributes$attribute,
+								'aria-busy',
+								$author$project$Board$boolAttr(cfg.as && (!ended))),
+								A2(
+								$elm$html$Html$Events$preventDefaultOn,
+								'contextmenu',
+								$elm$json$Json$Decode$succeed(
+									_Utils_Tuple2(
+										cfg.aQ(clampedFocus),
+										true)))
+							]),
+						A2(
+							$elm$core$List$indexedMap,
+							A2($author$project$Board$viewRow, cfg, clampedFocus),
+							rows))
+					])),
+				$author$project$Board$viewLegend(cfg.P)
+			]));
+};
 var $author$project$Main$viewBody = function (state) {
-	var _v0 = state.h;
+	var _v0 = state.d;
 	switch (_v0.$) {
 		case 0:
 			return A2(
 				$elm$html$Html$section,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('screen-loading')
+						$elm$html$Html$Attributes$class('status-card screen-loading'),
+						A2($elm$html$Html$Attributes$attribute, 'role', 'status'),
+						A2($elm$html$Html$Attributes$attribute, 'aria-live', 'polite')
 					]),
 				_List_fromArray(
 					[
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('spinner'),
+								A2($elm$html$Html$Attributes$attribute, 'aria-hidden', 'true')
+							]),
+						_List_Nil),
+						A2(
+						$elm$html$Html$h2,
+						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Preparando partida...')
+							])),
 						A2(
 						$elm$html$Html$p,
 						_List_Nil,
 						_List_fromArray(
 							[
-								$elm$html$Html$text('Carregando nova partida...')
+								$elm$html$Html$text(
+								'Solicitando novo tabuleiro (' + ($author$project$Game$difficultyLabel(state.cr) + ') ao servidor Prolog.'))
 							]))
 					]));
 		case 2:
@@ -7652,10 +9280,18 @@ var $author$project$Main$viewBody = function (state) {
 				$elm$html$Html$section,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('screen-error')
+						$elm$html$Html$Attributes$class('status-card status-card--error screen-error'),
+						A2($elm$html$Html$Attributes$attribute, 'role', 'alert')
 					]),
 				_List_fromArray(
 					[
+						A2(
+						$elm$html$Html$h2,
+						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Não foi possível iniciar a partida')
+							])),
 						A2(
 						$elm$html$Html$p,
 						_List_Nil,
@@ -7668,12 +9304,14 @@ var $author$project$Main$viewBody = function (state) {
 						_List_fromArray(
 							[
 								$elm$html$Html$Attributes$type_('button'),
-								A2($elm$html$Html$Attributes$style, 'color', '#111'),
+								$elm$html$Html$Attributes$id($author$project$Board$recoveryDomId),
+								$elm$html$Html$Attributes$class('btn btn--primary'),
+								A2($elm$html$Html$Attributes$attribute, 'aria-keyshortcuts', 'n'),
 								$elm$html$Html$Events$onClick($author$project$Main$RestartGame)
 							]),
 						_List_fromArray(
 							[
-								$elm$html$Html$text('Tentar novamente')
+								$elm$html$Html$text('Tentar novamente (N)')
 							]))
 					]));
 		case 3:
@@ -7682,10 +9320,18 @@ var $author$project$Main$viewBody = function (state) {
 				$elm$html$Html$section,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('screen-session-lost')
+						$elm$html$Html$Attributes$class('status-card status-card--error screen-session-lost'),
+						A2($elm$html$Html$Attributes$attribute, 'role', 'alert')
 					]),
 				_List_fromArray(
 					[
+						A2(
+						$elm$html$Html$h2,
+						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Sessão da partida encerrada')
+							])),
 						A2(
 						$elm$html$Html$p,
 						_List_Nil,
@@ -7698,12 +9344,14 @@ var $author$project$Main$viewBody = function (state) {
 						_List_fromArray(
 							[
 								$elm$html$Html$Attributes$type_('button'),
-								A2($elm$html$Html$Attributes$style, 'color', '#111'),
+								$elm$html$Html$Attributes$id($author$project$Board$recoveryDomId),
+								$elm$html$Html$Attributes$class('btn btn--primary'),
+								A2($elm$html$Html$Attributes$attribute, 'aria-keyshortcuts', 'n'),
 								$elm$html$Html$Events$onClick($author$project$Main$RestartGame)
 							]),
 						_List_fromArray(
 							[
-								$elm$html$Html$text('Iniciar novo jogo')
+								$elm$html$Html$text('Iniciar novo jogo (N)')
 							]))
 					]));
 		default:
@@ -7712,148 +9360,217 @@ var $author$project$Main$viewBody = function (state) {
 				$elm$html$Html$section,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('screen-active')
+						$elm$html$Html$Attributes$class('game-stage screen-active')
 					]),
 				_List_fromArray(
 					[
-						A2(
-						$elm$html$Html$p,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('game-status')
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text(
-								$author$project$Game$statusLabel(snapshot.cB))
-							])),
-						A2($author$project$Main$viewBoard, state.az, snapshot)
+						$author$project$Board$view(
+						{aH: state.aH, bm: state.bm, P: state.P, as: state.as, bF: $author$project$Main$HandleEscape, aQ: $author$project$Main$FocusCell, aR: $author$project$Main$FocusColumnEdge, aS: $author$project$Main$FocusRowEdge, t: $author$project$Main$MoveFocus, aT: $author$project$Main$RestartGame, av: $author$project$Main$PrimaryCellAction, aU: $author$project$Main$RevealCell, bJ: $author$project$Main$ToggleFlag, aW: $author$project$Main$ToggleFlag, aX: $author$project$Main$ToggleInputMode, X: snapshot})
 					]));
 	}
 };
 var $author$project$Game$allDifficulties = _List_fromArray(
 	[0, 1, 2]);
-var $elm$html$Html$span = _VirtualDom_node('span');
-var $author$project$Main$SelectDifficulty = function (a) {
-	return {$: 0, a: a};
-};
-var $author$project$Game$difficultyLabel = function (difficulty) {
+var $elm$html$Html$nav = _VirtualDom_node('nav');
+var $author$project$Board$adjacentDifficulty = F2(
+	function (delta, current) {
+		var _v0 = _Utils_Tuple2(current, delta < 0);
+		if (_v0.b) {
+			switch (_v0.a) {
+				case 0:
+					var _v1 = _v0.a;
+					return 2;
+				case 1:
+					var _v3 = _v0.a;
+					return 0;
+				default:
+					var _v5 = _v0.a;
+					return 1;
+			}
+		} else {
+			switch (_v0.a) {
+				case 0:
+					var _v2 = _v0.a;
+					return 1;
+				case 1:
+					var _v4 = _v0.a;
+					return 2;
+				default:
+					var _v6 = _v0.a;
+					return 0;
+			}
+		}
+	});
+var $author$project$Board$difficultyMeta = function (difficulty) {
 	switch (difficulty) {
 		case 0:
-			return 'Fácil (9×9)';
+			return {au: 'Fácil', al: '1'};
 		case 1:
-			return 'Médio (16×16)';
+			return {au: 'Médio', al: '2'};
 		default:
-			return 'Difícil (16×30)';
+			return {au: 'Difícil', al: '3'};
 	}
 };
-var $author$project$Main$viewDifficultyButton = F2(
-	function (current, difficulty) {
+var $author$project$Game$dimensions = function (difficulty) {
+	switch (difficulty) {
+		case 0:
+			return {bb: 9, by: 10, bX: 9};
+		case 1:
+			return {bb: 16, by: 40, bX: 16};
+		default:
+			return {bb: 30, by: 99, bX: 16};
+	}
+};
+var $author$project$Board$viewDifficultyButton = F2(
+	function (cfg, difficulty) {
+		var onKeyNav = A2(
+			$elm$html$Html$Events$custom,
+			'keydown',
+			A2(
+				$elm$json$Json$Decode$andThen,
+				function (key) {
+					switch (key) {
+						case 'ArrowLeft':
+							return $elm$json$Json$Decode$succeed(
+								{
+									aL: cfg.bG(
+										A2($author$project$Board$adjacentDifficulty, -1, difficulty)),
+									aw: true,
+									aA: true
+								});
+						case 'ArrowRight':
+							return $elm$json$Json$Decode$succeed(
+								{
+									aL: cfg.bG(
+										A2($author$project$Board$adjacentDifficulty, 1, difficulty)),
+									aw: true,
+									aA: true
+								});
+						default:
+							return $elm$json$Json$Decode$fail('ignorar');
+					}
+				},
+				A2($elm$json$Json$Decode$field, 'key', $elm$json$Json$Decode$string)));
+		var meta = $author$project$Board$difficultyMeta(difficulty);
+		var isActive = _Utils_eq(cfg.co, difficulty);
+		var dims = $author$project$Game$dimensions(difficulty);
 		return A2(
 			$elm$html$Html$button,
 			_List_fromArray(
 				[
 					$elm$html$Html$Attributes$type_('button'),
-					$elm$html$Html$Attributes$class(
-					_Utils_eq(current, difficulty) ? 'difficulty-button difficulty-button--active' : 'difficulty-button'),
-					A2($elm$html$Html$Attributes$style, 'color', '#111'),
-					A2($elm$html$Html$Attributes$style, 'padding', '0.25rem 0.6rem'),
-					A2($elm$html$Html$Attributes$style, 'margin-right', '0.25rem'),
+					$elm$html$Html$Attributes$id(
+					$author$project$Board$difficultyDomId(difficulty)),
+					$elm$html$Html$Attributes$classList(
+					_List_fromArray(
+						[
+							_Utils_Tuple2('diff-btn', true),
+							_Utils_Tuple2('is-active', isActive)
+						])),
+					A2(
+					$elm$html$Html$Attributes$attribute,
+					'aria-pressed',
+					$author$project$Board$boolAttr(isActive)),
+					A2($elm$html$Html$Attributes$attribute, 'aria-keyshortcuts', meta.al),
 					$elm$html$Html$Events$onClick(
-					$author$project$Main$SelectDifficulty(difficulty))
-				]),
-			_List_fromArray(
-				[
-					$elm$html$Html$text(
-					$author$project$Game$difficultyLabel(difficulty))
-				]));
-	});
-var $author$project$Main$viewControls = function (state) {
-	return A2(
-		$elm$html$Html$div,
-		_List_fromArray(
-			[
-				$elm$html$Html$Attributes$class('minesweeper-controls')
-			]),
-		_List_fromArray(
-			[
-				A2(
-				$elm$html$Html$div,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('difficulty-selector')
-					]),
-				A2(
-					$elm$core$List$map,
-					$author$project$Main$viewDifficultyButton(state.bZ),
-					$author$project$Game$allDifficulties)),
-				A2(
-				$elm$html$Html$div,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('status-bar')
-					]),
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$span,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('mine-counter')
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text(
-								'Minas: ' + A2(
-									$elm$core$Maybe$withDefault,
-									'--',
-									A2($elm$core$Maybe$map, $elm$core$String$fromInt, state.aG)))
-							])),
-						A2(
-						$elm$html$Html$span,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('timer'),
-								A2($elm$html$Html$Attributes$style, 'margin', '0 0.75rem')
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text(
-								'Tempo: ' + ($elm$core$String$fromInt(state.B) + 's'))
-							])),
-						A2(
-						$elm$html$Html$button,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$type_('button'),
-								$elm$html$Html$Attributes$class('restart-button'),
-								A2($elm$html$Html$Attributes$style, 'color', '#111'),
-								A2($elm$html$Html$Attributes$style, 'padding', '0.25rem 0.6rem'),
-								$elm$html$Html$Events$onClick($author$project$Main$RestartGame)
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Novo jogo')
-							]))
-					]))
-			]));
-};
-var $author$project$Main$SyncGame = {$: 4};
-var $author$project$Main$viewFeedback = function (state) {
-	var _v0 = state.i;
-	if (!_v0.$) {
-		var message = _v0.a;
-		return A2(
-			$elm$html$Html$div,
-			_List_fromArray(
-				[
-					$elm$html$Html$Attributes$class('feedback-banner'),
-					A2($elm$html$Html$Attributes$attribute, 'role', 'status')
+					cfg.cS(difficulty)),
+					onKeyNav
 				]),
 			_List_fromArray(
 				[
 					A2(
-					$elm$html$Html$p,
+					$elm$html$Html$span,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('diff-head')
+						]),
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$span,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('diff-name')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text(meta.au)
+								])),
+							A3(
+							$elm$html$Html$node,
+							'kbd',
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('kbd-hint'),
+									A2($elm$html$Html$Attributes$attribute, 'aria-hidden', 'true')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text(meta.al)
+								]))
+						])),
+					A2(
+					$elm$html$Html$span,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('diff-meta')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text(
+							$elm$core$String$fromInt(dims.bX) + ('×' + ($elm$core$String$fromInt(dims.bb) + (' · ' + ($elm$core$String$fromInt(dims.by) + ' minas')))))
+						]))
+				]));
+	});
+var $author$project$Board$viewDifficultyBar = function (cfg) {
+	return A2(
+		$elm$html$Html$nav,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('difficulty-bar'),
+				A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Seleção de dificuldade')
+			]),
+		A2(
+			$elm$core$List$map,
+			$author$project$Board$viewDifficultyButton(cfg),
+			$author$project$Game$allDifficulties));
+};
+var $elm$json$Json$Encode$bool = _Json_wrap;
+var $elm$html$Html$Attributes$boolProperty = F2(
+	function (key, bool) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$bool(bool));
+	});
+var $elm$html$Html$Attributes$disabled = $elm$html$Html$Attributes$boolProperty('disabled');
+var $author$project$Main$viewFeedback = function (state) {
+	var _v0 = state.i;
+	if (!_v0.$) {
+		var message = _v0.a;
+		var bannerClass = function () {
+			var _v2 = state.c;
+			switch (_v2.$) {
+				case 4:
+					return 'banner banner--error';
+				case 3:
+					return 'banner banner--warning';
+				default:
+					return 'banner banner--info';
+			}
+		}();
+		return A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class(bannerClass),
+					A2($elm$html$Html$Attributes$attribute, 'role', 'status'),
+					A2($elm$html$Html$Attributes$attribute, 'aria-live', 'polite')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$span,
 					_List_Nil,
 					_List_fromArray(
 						[
@@ -7868,7 +9585,7 @@ var $author$project$Main$viewFeedback = function (state) {
 								_List_fromArray(
 									[
 										$elm$html$Html$Attributes$type_('button'),
-										A2($elm$html$Html$Attributes$style, 'color', '#111'),
+										$elm$html$Html$Attributes$class('btn btn--ghost'),
 										$elm$html$Html$Attributes$disabled(true)
 									]),
 								_List_fromArray(
@@ -7877,16 +9594,39 @@ var $author$project$Main$viewFeedback = function (state) {
 									]));
 						case 4:
 							return A2(
-								$elm$html$Html$button,
+								$elm$html$Html$div,
 								_List_fromArray(
 									[
-										$elm$html$Html$Attributes$type_('button'),
-										A2($elm$html$Html$Attributes$style, 'color', '#111'),
-										$elm$html$Html$Events$onClick($author$project$Main$SyncGame)
+										$elm$html$Html$Attributes$class('banner-actions')
 									]),
 								_List_fromArray(
 									[
-										$elm$html$Html$text('Sincronizar novamente')
+										A2(
+										$elm$html$Html$button,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$type_('button'),
+												$elm$html$Html$Attributes$class('btn btn--primary'),
+												A2($elm$html$Html$Attributes$attribute, 'aria-keyshortcuts', 'u'),
+												$elm$html$Html$Events$onClick($author$project$Main$SyncGame)
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text('Sincronizar novamente (U)')
+											])),
+										A2(
+										$elm$html$Html$button,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$type_('button'),
+												$elm$html$Html$Attributes$class('btn btn--ghost'),
+												A2($elm$html$Html$Attributes$attribute, 'aria-keyshortcuts', 'n'),
+												$elm$html$Html$Events$onClick($author$project$Main$RestartGame)
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text('Novo jogo (N)')
+											]))
 									]));
 						default:
 							return $elm$html$Html$text('');
@@ -7897,49 +9637,713 @@ var $author$project$Main$viewFeedback = function (state) {
 		return $elm$html$Html$text('');
 	}
 };
+var $author$project$Main$FocusModeButton = function (a) {
+	return {$: 13, a: a};
+};
+var $author$project$Main$SetInputMode = function (a) {
+	return {$: 5, a: a};
+};
+var $author$project$Board$revealedSafeCount = function (snapshot) {
+	return $elm$core$List$length(
+		A2(
+			$elm$core$List$filter,
+			function (cell) {
+				var _v0 = cell.b3;
+				if (_v0.$ === 2) {
+					return true;
+				} else {
+					return false;
+				}
+			},
+			snapshot.aE));
+};
+var $author$project$Board$safeTotal = function (snapshot) {
+	return A2($elm$core$Basics$max, 0, (snapshot.bX * snapshot.bb) - snapshot.by);
+};
+var $elm$core$Basics$modBy = _Basics_modBy;
+var $author$project$Board$formatElapsed = function (totalSeconds) {
+	var safeSeconds = A2($elm$core$Basics$max, 0, totalSeconds);
+	var secs = A2($elm$core$Basics$modBy, 60, safeSeconds);
+	var pad = function (n) {
+		return (n < 10) ? ('0' + $elm$core$String$fromInt(n)) : $elm$core$String$fromInt(n);
+	};
+	var mins = (safeSeconds / 60) | 0;
+	return pad(mins) + (':' + pad(secs));
+};
+var $author$project$Board$iconReveal = A2(
+	$elm$svg$Svg$svg,
+	_List_fromArray(
+		[
+			$elm$svg$Svg$Attributes$viewBox('0 0 24 24'),
+			$elm$svg$Svg$Attributes$class('icon icon-reveal'),
+			A2($elm$html$Html$Attributes$attribute, 'aria-hidden', 'true')
+		]),
+	_List_fromArray(
+		[
+			A2(
+			$elm$svg$Svg$circle,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$cx('11'),
+					$elm$svg$Svg$Attributes$cy('11'),
+					$elm$svg$Svg$Attributes$r('6'),
+					$elm$svg$Svg$Attributes$fill('none'),
+					$elm$svg$Svg$Attributes$stroke('currentColor'),
+					$elm$svg$Svg$Attributes$strokeWidth('2')
+				]),
+			_List_Nil),
+			A2(
+			$elm$svg$Svg$line,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$x1('15.5'),
+					$elm$svg$Svg$Attributes$y1('15.5'),
+					$elm$svg$Svg$Attributes$x2('20'),
+					$elm$svg$Svg$Attributes$y2('20'),
+					$elm$svg$Svg$Attributes$stroke('currentColor'),
+					$elm$svg$Svg$Attributes$strokeWidth('2'),
+					$elm$svg$Svg$Attributes$strokeLinecap('round')
+				]),
+			_List_Nil)
+		]));
+var $author$project$Board$metricCard = F3(
+	function (labelText, valueText, extraClass) {
+		return A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('metric-card')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$span,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('metric-label')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text(labelText)
+						])),
+					A2(
+					$elm$html$Html$strong,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('metric-value ' + extraClass)
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text(valueText)
+						]))
+				]));
+	});
+var $author$project$Board$viewHud = function (cfg) {
+	var statusBadge = cfg.bu ? 'Sincronizando...' : A2(
+		$elm$core$Maybe$withDefault,
+		'Carregando',
+		A2(
+			$elm$core$Maybe$map,
+			A2(
+				$elm$core$Basics$composeR,
+				$author$project$Board$statusSummary,
+				function ($) {
+					return $.ae;
+				}),
+			cfg.c3));
+	var safeProgressText = function () {
+		var _v0 = _Utils_Tuple2(cfg.bW, cfg.bY);
+		if ((!_v0.a.$) && (!_v0.b.$)) {
+			var done = _v0.a.a;
+			var total = _v0.b.a;
+			return $elm$core$String$fromInt(done) + ('/' + $elm$core$String$fromInt(total));
+		} else {
+			return '--';
+		}
+	}();
+	var remainingText = A2(
+		$elm$core$Maybe$withDefault,
+		'--',
+		A2($elm$core$Maybe$map, $elm$core$String$fromInt, cfg.aY));
+	var modeArrowKey = function (targetMode) {
+		return A2(
+			$elm$html$Html$Events$custom,
+			'keydown',
+			A2(
+				$elm$json$Json$Decode$andThen,
+				function (key) {
+					return ((key === 'ArrowLeft') || (key === 'ArrowRight')) ? $elm$json$Json$Decode$succeed(
+						{
+							aL: cfg.bH(targetMode),
+							aw: true,
+							aA: true
+						}) : $elm$json$Json$Decode$fail('ignorar');
+				},
+				A2($elm$json$Json$Decode$field, 'key', $elm$json$Json$Decode$string)));
+	};
+	var isOverFlagged = A2(
+		$elm$core$Maybe$withDefault,
+		false,
+		A2(
+			$elm$core$Maybe$map,
+			function (n) {
+				return n < 0;
+			},
+			cfg.aY));
+	return A2(
+		$elm$html$Html$section,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('hud-panel'),
+				A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Painel da partida')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('hud-metrics')
+					]),
+				_List_fromArray(
+					[
+						A3(
+						$author$project$Board$metricCard,
+						'Bandeiras',
+						remainingText,
+						isOverFlagged ? 'metric-value--warn' : ''),
+						A3(
+						$author$project$Board$metricCard,
+						'Tempo',
+						$author$project$Board$formatElapsed(cfg.bj),
+						''),
+						A3($author$project$Board$metricCard, 'Seguras', safeProgressText, ''),
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$classList(
+								_List_fromArray(
+									[
+										_Utils_Tuple2('metric-card', true),
+										_Utils_Tuple2(
+										'metric-card--won',
+										_Utils_eq(
+											cfg.c3,
+											$elm$core$Maybe$Just(2))),
+										_Utils_Tuple2(
+										'metric-card--lost',
+										_Utils_eq(
+											cfg.c3,
+											$elm$core$Maybe$Just(3)))
+									])),
+								A2($elm$html$Html$Attributes$attribute, 'role', 'status'),
+								A2($elm$html$Html$Attributes$attribute, 'aria-live', 'polite')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$span,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('metric-label')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Estado')
+									])),
+								A2(
+								$elm$html$Html$strong,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('metric-value')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text(statusBadge)
+									]))
+							]))
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('hud-actions')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('mode-switch'),
+								A2($elm$html$Html$Attributes$attribute, 'role', 'group'),
+								A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Modo de toque e clique principal (atalho M)')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$button,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$type_('button'),
+										$elm$html$Html$Attributes$id(
+										$author$project$Board$modeDomId(0)),
+										$elm$html$Html$Attributes$classList(
+										_List_fromArray(
+											[
+												_Utils_Tuple2('mode-btn', true),
+												_Utils_Tuple2('is-active', !cfg.P)
+											])),
+										A2(
+										$elm$html$Html$Attributes$attribute,
+										'aria-pressed',
+										$author$project$Board$boolAttr(!cfg.P)),
+										A2($elm$html$Html$Attributes$attribute, 'aria-keyshortcuts', 'm'),
+										$elm$html$Html$Events$onClick(
+										cfg.aV(0)),
+										modeArrowKey(1)
+									]),
+								_List_fromArray(
+									[
+										$author$project$Board$iconReveal,
+										A2(
+										$elm$html$Html$span,
+										_List_Nil,
+										_List_fromArray(
+											[
+												$elm$html$Html$text('Revelar')
+											]))
+									])),
+								A2(
+								$elm$html$Html$button,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$type_('button'),
+										$elm$html$Html$Attributes$id(
+										$author$project$Board$modeDomId(1)),
+										$elm$html$Html$Attributes$classList(
+										_List_fromArray(
+											[
+												_Utils_Tuple2('mode-btn', true),
+												_Utils_Tuple2('is-active', cfg.P === 1)
+											])),
+										A2(
+										$elm$html$Html$Attributes$attribute,
+										'aria-pressed',
+										$author$project$Board$boolAttr(cfg.P === 1)),
+										A2($elm$html$Html$Attributes$attribute, 'aria-keyshortcuts', 'm'),
+										$elm$html$Html$Events$onClick(
+										cfg.aV(1)),
+										modeArrowKey(0)
+									]),
+								_List_fromArray(
+									[
+										$author$project$Board$iconFlag,
+										A2(
+										$elm$html$Html$span,
+										_List_Nil,
+										_List_fromArray(
+											[
+												$elm$html$Html$text('Bandeira')
+											]))
+									]))
+							])),
+						A2(
+						$elm$html$Html$button,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$type_('button'),
+								$elm$html$Html$Attributes$id($author$project$Board$restartDomId),
+								$elm$html$Html$Attributes$class('btn btn--primary restart-btn'),
+								A2($elm$html$Html$Attributes$attribute, 'aria-keyshortcuts', 'n'),
+								$elm$html$Html$Events$onClick(cfg.bI)
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$span,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Reiniciar')
+									])),
+								A3(
+								$elm$html$Html$node,
+								'kbd',
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('kbd-hint kbd-hint--on-accent'),
+										A2($elm$html$Html$Attributes$attribute, 'aria-hidden', 'true')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('N')
+									]))
+							])),
+						A2(
+						$elm$html$Html$button,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$type_('button'),
+								$elm$html$Html$Attributes$id($author$project$Board$shortcutsDomId),
+								$elm$html$Html$Attributes$classList(
+								_List_fromArray(
+									[
+										_Utils_Tuple2('btn btn--ghost shortcuts-btn', true),
+										_Utils_Tuple2('is-active', cfg.a_)
+									])),
+								A2(
+								$elm$html$Html$Attributes$attribute,
+								'aria-expanded',
+								$author$project$Board$boolAttr(cfg.a_)),
+								A2($elm$html$Html$Attributes$attribute, 'aria-controls', 'ms-shortcuts-panel'),
+								A2($elm$html$Html$Attributes$attribute, 'aria-keyshortcuts', '?'),
+								$elm$html$Html$Events$onClick(cfg.bK)
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$span,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Teclado')
+									])),
+								A3(
+								$elm$html$Html$node,
+								'kbd',
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('kbd-hint'),
+										A2($elm$html$Html$Attributes$attribute, 'aria-hidden', 'true')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('?')
+									]))
+							]))
+					]))
+			]));
+};
+var $author$project$Main$viewHudForState = function (state) {
+	var _v0 = function () {
+		var _v1 = state.d;
+		if (_v1.$ === 1) {
+			var snapshot = _v1.a;
+			return _Utils_Tuple3(
+				$elm$core$Maybe$Just(snapshot.c3),
+				$elm$core$Maybe$Just(
+					$author$project$Board$revealedSafeCount(snapshot)),
+				$elm$core$Maybe$Just(
+					$author$project$Board$safeTotal(snapshot)));
+		} else {
+			return _Utils_Tuple3($elm$core$Maybe$Nothing, $elm$core$Maybe$Nothing, $elm$core$Maybe$Nothing);
+		}
+	}();
+	var maybeStatus = _v0.a;
+	var maybeRevealed = _v0.b;
+	var maybeSafeTotal = _v0.c;
+	return $author$project$Board$viewHud(
+		{
+			bj: state.bj,
+			P: state.P,
+			bu: _Utils_eq(state.c, $author$project$Main$SyncingAfterUncertainAction),
+			bH: $author$project$Main$FocusModeButton,
+			bI: $author$project$Main$RestartGame,
+			aV: $author$project$Main$SetInputMode,
+			bK: $author$project$Main$ToggleShortcutsHelp,
+			aY: state.aY,
+			bW: maybeRevealed,
+			bY: maybeSafeTotal,
+			a_: state.a_,
+			c3: maybeStatus
+		});
+};
+var $author$project$Board$shortcutItem = F2(
+	function (keys, description) {
+		return A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('shortcut-item')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$span,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('shortcut-keys')
+						]),
+					A2(
+						$elm$core$List$map,
+						function (k) {
+							return A3(
+								$elm$html$Html$node,
+								'kbd',
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('kbd-chip')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text(k)
+									]));
+						},
+						keys)),
+					A2(
+					$elm$html$Html$span,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('shortcut-desc')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text(description)
+						]))
+				]));
+	});
+var $author$project$Board$viewShortcutsPanel = F2(
+	function (isOpen, onClose) {
+		return (!isOpen) ? $elm$html$Html$text('') : A2(
+			$elm$html$Html$section,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$id('ms-shortcuts-panel'),
+					$elm$html$Html$Attributes$class('shortcuts-panel'),
+					A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Guia de navegação por teclado')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('shortcuts-header')
+						]),
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$strong,
+							_List_Nil,
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Navegação completa por teclado')
+								])),
+							A2(
+							$elm$html$Html$button,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$type_('button'),
+									$elm$html$Html$Attributes$class('btn btn--ghost btn--compact'),
+									$elm$html$Html$Events$onClick(onClose)
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Fechar (Esc)')
+								]))
+						])),
+					A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('shortcuts-grid')
+						]),
+					_List_fromArray(
+						[
+							A2(
+							$author$project$Board$shortcutItem,
+							_List_fromArray(
+								['Setas', 'WASD']),
+							'Mover entre células'),
+							A2(
+							$author$project$Board$shortcutItem,
+							_List_fromArray(
+								['Home', 'End']),
+							'Início / fim da linha'),
+							A2(
+							$author$project$Board$shortcutItem,
+							_List_fromArray(
+								['PgUp', 'PgDn']),
+							'Topo / base da coluna'),
+							A2(
+							$author$project$Board$shortcutItem,
+							_List_fromArray(
+								['Enter', 'Espaço']),
+							'Aplicar ação do modo ativo'),
+							A2(
+							$author$project$Board$shortcutItem,
+							_List_fromArray(
+								['R']),
+							'Revelar célula focada'),
+							A2(
+							$author$project$Board$shortcutItem,
+							_List_fromArray(
+								['F']),
+							'Alternar bandeira na célula'),
+							A2(
+							$author$project$Board$shortcutItem,
+							_List_fromArray(
+								['M']),
+							'Alternar modo Revelar / Bandeira'),
+							A2(
+							$author$project$Board$shortcutItem,
+							_List_fromArray(
+								['1', '2', '3']),
+							'Fácil / Médio / Difícil'),
+							A2(
+							$author$project$Board$shortcutItem,
+							_List_fromArray(
+								['N']),
+							'Reiniciar / nova partida'),
+							A2(
+							$author$project$Board$shortcutItem,
+							_List_fromArray(
+								['G']),
+							'Ir direto para o tabuleiro'),
+							A2(
+							$author$project$Board$shortcutItem,
+							_List_fromArray(
+								['Esc']),
+							'Sair da grade para controles'),
+							A2(
+							$author$project$Board$shortcutItem,
+							_List_fromArray(
+								['Tab']),
+							'Navegar por todos os controles')
+						]))
+				]));
+	});
 var $author$project$Main$view = function (model) {
 	var state = $author$project$Main$toViewState(model);
 	var isLost = function () {
-		var _v0 = state.h;
+		var _v0 = state.d;
 		if (_v0.$ === 1) {
 			var snapshot = _v0.a;
-			return snapshot.cB === 3;
+			return snapshot.c3 === 3;
 		} else {
 			return false;
 		}
 	}();
 	return A2(
-		$elm$html$Html$main_,
+		$elm$html$Html$div,
 		_List_fromArray(
 			[
-				$elm$html$Html$Attributes$class(
-				isLost ? 'minesweeper-app minesweeper-app--exploded' : 'minesweeper-app')
+				$elm$html$Html$Attributes$classList(
+				_List_fromArray(
+					[
+						_Utils_Tuple2('app', true),
+						_Utils_Tuple2('minesweeper-app', true),
+						_Utils_Tuple2('minesweeper-app--exploded', isLost)
+					]))
 			]),
 		_List_fromArray(
 			[
-				$author$project$Explosion$styles,
+				A2(
+				$elm$html$Html$button,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$type_('button'),
+						$elm$html$Html$Attributes$class('skip-link'),
+						$elm$html$Html$Events$onClick($author$project$Main$FocusBoard)
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Ir para o tabuleiro (G)')
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('sr-only'),
+						A2($elm$html$Html$Attributes$attribute, 'role', 'status'),
+						A2($elm$html$Html$Attributes$attribute, 'aria-live', 'polite')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text(state.x)
+					])),
 				A2(
 				$elm$html$Html$header,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('minesweeper-header')
+						$elm$html$Html$Attributes$class('topbar')
 					]),
 				_List_fromArray(
 					[
 						A2(
-						$elm$html$Html$h1,
-						_List_Nil,
+						$elm$html$Html$div,
 						_List_fromArray(
 							[
-								$elm$html$Html$text('Campo Minado')
+								$elm$html$Html$Attributes$class('brand')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$h1,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Campo '),
+										A2(
+										$elm$html$Html$span,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('accent')
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text('Minado')
+											]))
+									])),
+								A2(
+								$elm$html$Html$p,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('subtitle')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Motor em SWI-Prolog · Interface funcional em Elm')
+									]))
 							])),
-						$author$project$Main$viewControls(state)
+						$author$project$Board$viewDifficultyBar(
+						{
+							co: state.cr,
+							bG: function (d) {
+								return $author$project$Main$FocusControl(
+									$author$project$Board$difficultyDomId(d));
+							},
+							cS: $author$project$Main$SelectDifficulty
+						})
 					])),
-				$author$project$Main$viewFeedback(state),
-				$author$project$Main$viewBody(state),
+				A2(
+				$elm$html$Html$main_,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('main-shell')
+					]),
+				_List_fromArray(
+					[
+						$author$project$Main$viewHudForState(state),
+						A2($author$project$Board$viewShortcutsPanel, state.a_, $author$project$Main$ToggleShortcutsHelp),
+						$author$project$Main$viewFeedback(state),
+						$author$project$Main$viewBody(state)
+					])),
+				A2(
+				$elm$html$Html$footer,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('footer')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Primeiro clique revelado sempre seguro · Sessões mantidas em memória no servidor Prolog.')
+					])),
 				isLost ? $author$project$Explosion$view : $elm$html$Html$text('')
 			]));
 };
 var $author$project$Main$main = $elm$browser$Browser$element(
-	{ca: $author$project$Main$init, cE: $author$project$Main$subscriptions, cJ: $author$project$Main$update, cK: $author$project$Main$view});
+	{cE: $author$project$Main$init, c6: $author$project$Main$subscriptions, da: $author$project$Main$update, db: $author$project$Main$view});
 _Platform_export({'Main':{'init':$author$project$Main$main($elm$json$Json$Decode$value)(0)}});}(this));

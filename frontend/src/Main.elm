@@ -4,6 +4,7 @@ module Main exposing
     , PendingRequest(..)
     , ScreenState(..)
     , ViewState
+    , globalKeyDecoder
     , init
     , isBusy
     , main
@@ -13,25 +14,27 @@ module Main exposing
     , view
     )
 
-{-| Coordenação da partida de Campo Minado (Frente 04).
+{-| Coordenação da partida de Campo Minado (Frentes 04 e 05).
 
 Responsável pelo modelo TEA, ciclo de vida das requisições HTTP, bloqueio de
 ações concorrentes, descarte de respostas de partidas antigas, recuperação via
-GET após timeout/falha incerta, tratamento de sessão perdida e cronômetro local.
-
-Os tipos, mensagens e `ViewState` são expostos para integração direta da
-interface pela Frente 05 (`Board.elm`).
-
+GET após timeout/falha incerta, tratamento de sessão perdida, cronômetro local
+e coordenação de foco, atalhos globais de teclado e modo de entrada com `Board`.
 -}
 
 import Api exposing (Action(..), ApiError)
+import Board exposing (InputMode(..))
 import Browser
+import Browser.Dom as Dom
+import Browser.Events
 import Explosion
 import Game exposing (Cell, CellState(..), Coord, Difficulty(..), Snapshot, Status(..))
-import Html exposing (Html, button, div, h1, header, main_, p, section, span, text)
-import Html.Attributes exposing (attribute, class, disabled, style, title, type_)
-import Html.Events exposing (onClick, preventDefaultOn)
+import Html exposing (Html, button, div, footer, h1, h2, header, main_, p, section, span, text)
+import Html.Attributes exposing (attribute, class, classList, disabled, id, type_)
+import Html.Events exposing (onClick)
 import Json.Decode as Decode
+import Set exposing (Set)
+import Task
 import Time
 
 
@@ -72,11 +75,17 @@ type alias Model =
     , elapsedSeconds : Int
     , timerRunning : Bool
     , feedback : Maybe String
+    , focused : Coord
+    , inputMode : InputMode
+    , flaggedBeforeEnd : Set ( Int, Int )
+    , showShortcuts : Bool
+    , liveAnnouncement : String
     }
 
 
 {-| Projeção de leitura para componentes de interface (Frente 05):
-grade, seletor de dificuldade, contador de minas, cronômetro e resultado.
+grade, seletor de dificuldade, contador de minas, cronômetro, foco, modo de
+entrada e resultado.
 -}
 type alias ViewState =
     { difficulty : Difficulty
@@ -86,6 +95,11 @@ type alias ViewState =
     , elapsedSeconds : Int
     , remainingMines : Maybe Int
     , feedback : Maybe String
+    , focused : Coord
+    , inputMode : InputMode
+    , flaggedBeforeEnd : Set ( Int, Int )
+    , showShortcuts : Bool
+    , liveAnnouncement : String
     }
 
 
@@ -104,6 +118,11 @@ toViewState model =
             _ ->
                 Nothing
     , feedback = model.feedback
+    , focused = model.focused
+    , inputMode = model.inputMode
+    , flaggedBeforeEnd = model.flaggedBeforeEnd
+    , showShortcuts = model.showShortcuts
+    , liveAnnouncement = model.liveAnnouncement
     }
 
 
@@ -122,6 +141,11 @@ init _ =
         , elapsedSeconds = 0
         , timerRunning = False
         , feedback = Nothing
+        , focused = { row = 0, col = 0 }
+        , inputMode = RevealMode
+        , flaggedBeforeEnd = Set.empty
+        , showShortcuts = False
+        , liveAnnouncement = ""
         }
 
 
@@ -134,6 +158,19 @@ type Msg
     | RestartGame
     | RevealCell Coord
     | ToggleFlag Coord
+    | PrimaryCellAction Coord
+    | SetInputMode InputMode
+    | ToggleInputMode
+    | FocusCell Coord
+    | MoveFocus Int Int
+    | FocusRowEdge Bool
+    | FocusColumnEdge Bool
+    | FocusBoard
+    | FocusControl String
+    | FocusModeButton InputMode
+    | ToggleShortcutsHelp
+    | HandleEscape
+    | FocusCompleted
     | SyncGame
     | Tick
     | CreateGameResponse Int (Result ApiError Snapshot)
@@ -159,6 +196,161 @@ update msg model =
 
         ToggleFlag coord ->
             sendPlayerAction (Api.ToggleFlag coord) model
+
+        PrimaryCellAction coord ->
+            let
+                action =
+                    case model.inputMode of
+                        RevealMode ->
+                            Api.Reveal coord
+
+                        FlagMode ->
+                            Api.ToggleFlag coord
+
+                ( nextModel, cmd ) =
+                    sendPlayerAction action model
+            in
+            ( { nextModel | focused = coord }, cmd )
+
+        SetInputMode mode ->
+            ( { model
+                | inputMode = mode
+                , liveAnnouncement = modeAnnouncement mode
+              }
+            , Cmd.none
+            )
+
+        ToggleInputMode ->
+            let
+                nextMode =
+                    case model.inputMode of
+                        RevealMode ->
+                            FlagMode
+
+                        FlagMode ->
+                            RevealMode
+            in
+            ( { model
+                | inputMode = nextMode
+                , liveAnnouncement = modeAnnouncement nextMode
+              }
+            , Cmd.none
+            )
+
+        FocusCell coord ->
+            case model.screen of
+                Active snapshot ->
+                    ( { model | focused = Board.clampCoord snapshot coord }, Cmd.none )
+
+                _ ->
+                    ( model, Cmd.none )
+
+        MoveFocus dRow dCol ->
+            case model.screen of
+                Active snapshot ->
+                    let
+                        nextCoord =
+                            Board.moveFocus snapshot dRow dCol model.focused
+                    in
+                    ( { model | focused = nextCoord }
+                    , focusCellCmd nextCoord
+                    )
+
+                _ ->
+                    ( model, Cmd.none )
+
+        FocusRowEdge toEnd ->
+            case model.screen of
+                Active snapshot ->
+                    let
+                        nextCoord =
+                            Board.moveFocusRowEdge snapshot toEnd model.focused
+                    in
+                    ( { model | focused = nextCoord }
+                    , focusCellCmd nextCoord
+                    )
+
+                _ ->
+                    ( model, Cmd.none )
+
+        FocusColumnEdge toBottom ->
+            case model.screen of
+                Active snapshot ->
+                    let
+                        nextCoord =
+                            Board.moveFocusColumnEdge snapshot toBottom model.focused
+                    in
+                    ( { model | focused = nextCoord }
+                    , focusCellCmd nextCoord
+                    )
+
+                _ ->
+                    ( model, Cmd.none )
+
+        FocusBoard ->
+            case model.screen of
+                Active snapshot ->
+                    let
+                        target =
+                            Board.clampCoord snapshot model.focused
+                    in
+                    ( { model
+                        | focused = target
+                        , showShortcuts = False
+                      }
+                    , focusCellCmd target
+                    )
+
+                _ ->
+                    ( model, focusElementCmd Board.recoveryDomId )
+
+        FocusControl elementId ->
+            ( model, focusElementCmd elementId )
+
+        FocusModeButton mode ->
+            ( { model
+                | inputMode = mode
+                , liveAnnouncement = modeAnnouncement mode
+              }
+            , focusElementCmd (Board.modeDomId mode)
+            )
+
+        ToggleShortcutsHelp ->
+            let
+                nextOpen =
+                    not model.showShortcuts
+            in
+            ( { model
+                | showShortcuts = nextOpen
+                , liveAnnouncement =
+                    if nextOpen then
+                        "Painel de atalhos de teclado aberto."
+
+                    else
+                        "Painel de atalhos de teclado fechado."
+              }
+            , Cmd.none
+            )
+
+        HandleEscape ->
+            if model.showShortcuts then
+                ( { model
+                    | showShortcuts = False
+                    , liveAnnouncement = "Painel de atalhos de teclado fechado."
+                  }
+                , focusElementCmd Board.shortcutsDomId
+                )
+
+            else
+                case model.screen of
+                    Active _ ->
+                        ( model, focusElementCmd Board.restartDomId )
+
+                    _ ->
+                        ( model, Cmd.none )
+
+        FocusCompleted ->
+            ( model, Cmd.none )
 
         SyncGame ->
             if model.pending /= Idle && model.pending /= SyncFailed then
@@ -209,6 +401,10 @@ update msg model =
             else
                 case result of
                     Ok snapshot ->
+                        let
+                            initialFocus =
+                                { row = 0, col = 0 }
+                        in
                         ( { model
                             | difficulty = snapshot.difficulty
                             , screen = Active snapshot
@@ -216,8 +412,19 @@ update msg model =
                             , elapsedSeconds = 0
                             , timerRunning = snapshot.status == Playing
                             , feedback = Nothing
+                            , focused = initialFocus
+                            , flaggedBeforeEnd =
+                                if Game.isFinished snapshot.status then
+                                    Set.empty
+
+                                else
+                                    flaggedCoords snapshot
+                            , liveAnnouncement =
+                                "Nova partida "
+                                    ++ Game.difficultyLabel snapshot.difficulty
+                                    ++ " pronta. Foco na linha 1, coluna 1."
                           }
-                        , Cmd.none
+                        , focusCellCmd initialFocus
                         )
 
                     Err err ->
@@ -227,7 +434,7 @@ update msg model =
                             , timerRunning = False
                             , feedback = Nothing
                           }
-                        , Cmd.none
+                        , focusElementCmd Board.recoveryDomId
                         )
 
         ActionResponse token gameId result ->
@@ -265,6 +472,27 @@ update msg model =
                         ( model, Cmd.none )
 
 
+modeAnnouncement : InputMode -> String
+modeAnnouncement mode =
+    case mode of
+        RevealMode ->
+            "Modo de ação alterado para Revelar."
+
+        FlagMode ->
+            "Modo de ação alterado para Bandeira."
+
+
+focusCellCmd : Coord -> Cmd Msg
+focusCellCmd coord =
+    focusElementCmd (Board.cellDomId coord)
+
+
+focusElementCmd : String -> Cmd Msg
+focusElementCmd elementId =
+    Dom.focus elementId
+        |> Task.attempt (\_ -> FocusCompleted)
+
+
 startNewGame : Difficulty -> Model -> ( Model, Cmd Msg )
 startNewGame difficulty model =
     let
@@ -279,6 +507,8 @@ startNewGame difficulty model =
         , elapsedSeconds = 0
         , timerRunning = False
         , feedback = Nothing
+        , focused = { row = 0, col = 0 }
+        , flaggedBeforeEnd = Set.empty
       }
     , Api.createGame difficulty (CreateGameResponse nextToken)
     )
@@ -347,7 +577,7 @@ handleActionResult current result model =
                     , timerRunning = False
                     , feedback = Nothing
                   }
-                , Cmd.none
+                , focusElementCmd Board.recoveryDomId
                 )
 
             else if Api.isUncertainOutcome err then
@@ -394,7 +624,7 @@ handleSyncResult current result model =
                     , timerRunning = False
                     , feedback = Nothing
                   }
-                , Cmd.none
+                , focusElementCmd Board.recoveryDomId
                 )
 
             else
@@ -428,6 +658,15 @@ applyConfirmedSnapshot snapshot model =
 
                 Lost ->
                     False
+
+        nextFlaggedBeforeEnd =
+            if Game.isFinished snapshot.status then
+                -- Preserva as bandeiras da última jogada ativa para distinguir
+                -- minas acertadas com bandeira na tela de derrota.
+                model.flaggedBeforeEnd
+
+            else
+                flaggedCoords snapshot
     in
     { model
         | difficulty = snapshot.difficulty
@@ -435,24 +674,118 @@ applyConfirmedSnapshot snapshot model =
         , pending = Idle
         , timerRunning = nextTimerRunning
         , feedback = Nothing
+        , focused = Board.clampCoord snapshot model.focused
+        , flaggedBeforeEnd = nextFlaggedBeforeEnd
     }
 
 
+flaggedCoords : Snapshot -> Set ( Int, Int )
+flaggedCoords snapshot =
+    snapshot.cells
+        |> List.filterMap
+            (\cell ->
+                if cell.state == Flagged then
+                    Just ( cell.row, cell.col )
 
--- SUBSCRIPTIONS
+                else
+                    Nothing
+            )
+        |> Set.fromList
+
+
+
+-- SUBSCRIPTIONS E ATALHOS GLOBAIS DE TECLADO
 
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    if model.timerRunning then
-        Time.every 1000 (\_ -> Tick)
+    Sub.batch
+        [ if model.timerRunning then
+            Time.every 1000 (\_ -> Tick)
 
-    else
-        Sub.none
+          else
+            Sub.none
+        , Browser.Events.onKeyDown (globalKeyDecoder model)
+        ]
+
+
+{-| Decodificador global de atalhos de teclado da interface.
+Nunca intercepta combinações com Ctrl/Alt/Meta (preserva atalhos do navegador)
+e ignora teclas já consumidas pelas células da grade (que usam stopPropagation).
+-}
+globalKeyDecoder : Model -> Decode.Decoder Msg
+globalKeyDecoder model =
+    Decode.map4
+        (\key ctrl alt meta -> ( key, ctrl || alt || meta ))
+        (Decode.field "key" Decode.string)
+        (Decode.field "ctrlKey" Decode.bool)
+        (Decode.field "altKey" Decode.bool)
+        (Decode.field "metaKey" Decode.bool)
+        |> Decode.andThen
+            (\( key, hasModifier ) ->
+                if hasModifier then
+                    Decode.fail "modificador ativo"
+
+                else
+                    case key of
+                        "1" ->
+                            Decode.succeed (SelectDifficulty Easy)
+
+                        "2" ->
+                            Decode.succeed (SelectDifficulty Medium)
+
+                        "3" ->
+                            Decode.succeed (SelectDifficulty Hard)
+
+                        "n" ->
+                            Decode.succeed RestartGame
+
+                        "N" ->
+                            Decode.succeed RestartGame
+
+                        "g" ->
+                            Decode.succeed FocusBoard
+
+                        "G" ->
+                            Decode.succeed FocusBoard
+
+                        "m" ->
+                            Decode.succeed ToggleInputMode
+
+                        "M" ->
+                            Decode.succeed ToggleInputMode
+
+                        "u" ->
+                            if model.pending == SyncFailed then
+                                Decode.succeed SyncGame
+
+                            else
+                                Decode.fail "sincronização não está em falha"
+
+                        "U" ->
+                            if model.pending == SyncFailed then
+                                Decode.succeed SyncGame
+
+                            else
+                                Decode.fail "sincronização não está em falha"
+
+                        "?" ->
+                            Decode.succeed ToggleShortcutsHelp
+
+                        "Escape" ->
+                            if model.showShortcuts then
+                                Decode.succeed HandleEscape
+
+                            else
+                                Decode.fail "nenhum painel aberto"
+
+                        _ ->
+                            Decode.fail "tecla não mapeada globalmente"
+            )
 
 
 
--- VISUALIZAÇÃO BASE (será estilizada/estendida pela Frente 05 em Board.elm)
+-- VISUALIZAÇÃO (Frente 05 — integrada a Board.elm)
 
 
 view : Model -> Html Msg
@@ -469,22 +802,43 @@ view model =
                 _ ->
                     False
     in
-    main_
-        [ class
-            (if isLost then
-                "minesweeper-app minesweeper-app--exploded"
-
-             else
-                "minesweeper-app"
-            )
-        ]
-        [ Explosion.styles
-        , header [ class "minesweeper-header" ]
-            [ h1 [] [ text "Campo Minado" ]
-            , viewControls state
+    div
+        [ classList
+            [ ( "app", True )
+            , ( "minesweeper-app", True )
+            , ( "minesweeper-app--exploded", isLost )
             ]
-        , viewFeedback state
-        , viewBody state
+        ]
+        [ button
+            [ type_ "button"
+            , class "skip-link"
+            , onClick FocusBoard
+            ]
+            [ text "Ir para o tabuleiro (G)" ]
+        , div [ class "sr-only", attribute "role" "status", attribute "aria-live" "polite" ]
+            [ text state.liveAnnouncement ]
+        , header [ class "topbar" ]
+            [ div [ class "brand" ]
+                [ h1 []
+                    [ text "Campo "
+                    , span [ class "accent" ] [ text "Minado" ]
+                    ]
+                , p [ class "subtitle" ] [ text "Motor em SWI-Prolog · Interface funcional em Elm" ]
+                ]
+            , Board.viewDifficultyBar
+                { current = state.difficulty
+                , onSelect = SelectDifficulty
+                , onFocusDifficulty = \d -> FocusControl (Board.difficultyDomId d)
+                }
+            ]
+        , main_ [ class "main-shell" ]
+            [ viewHudForState state
+            , Board.viewShortcutsPanel state.showShortcuts ToggleShortcutsHelp
+            , viewFeedback state
+            , viewBody state
+            ]
+        , footer [ class "footer" ]
+            [ text "Primeiro clique revelado sempre seguro · Sessões mantidas em memória no servidor Prolog." ]
         , if isLost then
             Explosion.view
 
@@ -493,76 +847,80 @@ view model =
         ]
 
 
-viewControls : ViewState -> Html Msg
-viewControls state =
-    div [ class "minesweeper-controls" ]
-        [ div [ class "difficulty-selector" ]
-            (List.map (viewDifficultyButton state.difficulty) Game.allDifficulties)
-        , div [ class "status-bar" ]
-            [ span [ class "mine-counter" ]
-                [ text
-                    ("Minas: "
-                        ++ (state.remainingMines
-                                |> Maybe.map String.fromInt
-                                |> Maybe.withDefault "--"
-                           )
+viewHudForState : ViewState -> Html Msg
+viewHudForState state =
+    let
+        ( maybeStatus, maybeRevealed, maybeSafeTotal ) =
+            case state.screen of
+                Active snapshot ->
+                    ( Just snapshot.status
+                    , Just (Board.revealedSafeCount snapshot)
+                    , Just (Board.safeTotal snapshot)
                     )
-                ]
-            , span [ class "timer", style "margin" "0 0.75rem" ]
-                [ text ("Tempo: " ++ String.fromInt state.elapsedSeconds ++ "s") ]
-            , button
-                [ type_ "button"
-                , class "restart-button"
-                , style "color" "#111"
-                , style "padding" "0.25rem 0.6rem"
-                , onClick RestartGame
-                ]
-                [ text "Novo jogo" ]
-            ]
-        ]
 
-
-viewDifficultyButton : Difficulty -> Difficulty -> Html Msg
-viewDifficultyButton current difficulty =
-    button
-        [ type_ "button"
-        , class
-            (if current == difficulty then
-                "difficulty-button difficulty-button--active"
-
-             else
-                "difficulty-button"
-            )
-        , style "color" "#111"
-        , style "padding" "0.25rem 0.6rem"
-        , style "margin-right" "0.25rem"
-        , onClick (SelectDifficulty difficulty)
-        ]
-        [ text (Game.difficultyLabel difficulty) ]
+                _ ->
+                    ( Nothing, Nothing, Nothing )
+    in
+    Board.viewHud
+        { status = maybeStatus
+        , elapsedSeconds = state.elapsedSeconds
+        , remainingMines = state.remainingMines
+        , revealedCount = maybeRevealed
+        , safeTotal = maybeSafeTotal
+        , inputMode = state.inputMode
+        , isSyncing = state.pending == SyncingAfterUncertainAction
+        , showShortcuts = state.showShortcuts
+        , onRestart = RestartGame
+        , onSetInputMode = SetInputMode
+        , onFocusMode = FocusModeButton
+        , onToggleShortcuts = ToggleShortcutsHelp
+        }
 
 
 viewFeedback : ViewState -> Html Msg
 viewFeedback state =
     case state.feedback of
         Just message ->
-            div [ class "feedback-banner", attribute "role" "status" ]
-                [ p [] [ text message ]
+            let
+                bannerClass =
+                    case state.pending of
+                        SyncFailed ->
+                            "banner banner--error"
+
+                        SyncingAfterUncertainAction ->
+                            "banner banner--warning"
+
+                        _ ->
+                            "banner banner--info"
+            in
+            div [ class bannerClass, attribute "role" "status", attribute "aria-live" "polite" ]
+                [ span [] [ text message ]
                 , case state.pending of
                     SyncingAfterUncertainAction ->
                         button
                             [ type_ "button"
-                            , style "color" "#111"
+                            , class "btn btn--ghost"
                             , disabled True
                             ]
                             [ text "Sincronizando..." ]
 
                     SyncFailed ->
-                        button
-                            [ type_ "button"
-                            , style "color" "#111"
-                            , onClick SyncGame
+                        div [ class "banner-actions" ]
+                            [ button
+                                [ type_ "button"
+                                , class "btn btn--primary"
+                                , attribute "aria-keyshortcuts" "u"
+                                , onClick SyncGame
+                                ]
+                                [ text "Sincronizar novamente (U)" ]
+                            , button
+                                [ type_ "button"
+                                , class "btn btn--ghost"
+                                , attribute "aria-keyshortcuts" "n"
+                                , onClick RestartGame
+                                ]
+                                [ text "Novo jogo (N)" ]
                             ]
-                            [ text "Sincronizar novamente" ]
 
                     _ ->
                         text ""
@@ -576,90 +934,68 @@ viewBody : ViewState -> Html Msg
 viewBody state =
     case state.screen of
         Loading ->
-            section [ class "screen-loading" ]
-                [ p [] [ text "Carregando nova partida..." ] ]
+            section
+                [ class "status-card screen-loading"
+                , attribute "role" "status"
+                , attribute "aria-live" "polite"
+                ]
+                [ div [ class "spinner", attribute "aria-hidden" "true" ] []
+                , h2 [] [ text "Preparando partida..." ]
+                , p []
+                    [ text
+                        ("Solicitando novo tabuleiro ("
+                            ++ Game.difficultyLabel state.difficulty
+                            ++ ") ao servidor Prolog."
+                        )
+                    ]
+                ]
 
         Failed message ->
-            section [ class "screen-error" ]
-                [ p [] [ text message ]
-                , button [ type_ "button", style "color" "#111", onClick RestartGame ] [ text "Tentar novamente" ]
+            section [ class "status-card status-card--error screen-error", attribute "role" "alert" ]
+                [ h2 [] [ text "Não foi possível iniciar a partida" ]
+                , p [] [ text message ]
+                , button
+                    [ type_ "button"
+                    , id Board.recoveryDomId
+                    , class "btn btn--primary"
+                    , attribute "aria-keyshortcuts" "n"
+                    , onClick RestartGame
+                    ]
+                    [ text "Tentar novamente (N)" ]
                 ]
 
         SessionLost message ->
-            section [ class "screen-session-lost" ]
-                [ p [] [ text message ]
-                , button [ type_ "button", style "color" "#111", onClick RestartGame ] [ text "Iniciar novo jogo" ]
+            section [ class "status-card status-card--error screen-session-lost", attribute "role" "alert" ]
+                [ h2 [] [ text "Sessão da partida encerrada" ]
+                , p [] [ text message ]
+                , button
+                    [ type_ "button"
+                    , id Board.recoveryDomId
+                    , class "btn btn--primary"
+                    , attribute "aria-keyshortcuts" "n"
+                    , onClick RestartGame
+                    ]
+                    [ text "Iniciar novo jogo (N)" ]
                 ]
 
         Active snapshot ->
-            section [ class "screen-active" ]
-                [ p [ class "game-status" ] [ text (Game.statusLabel snapshot.status) ]
-                , viewBoard state.isBusy snapshot
+            section [ class "game-stage screen-active" ]
+                [ Board.view
+                    { snapshot = snapshot
+                    , flaggedBeforeEnd = state.flaggedBeforeEnd
+                    , focused = state.focused
+                    , inputMode = state.inputMode
+                    , isBusy = state.isBusy
+                    , onPrimaryClick = PrimaryCellAction
+                    , onSecondaryClick = ToggleFlag
+                    , onReveal = RevealCell
+                    , onToggleFlag = ToggleFlag
+                    , onMoveFocus = MoveFocus
+                    , onFocusRowEdge = FocusRowEdge
+                    , onFocusColumnEdge = FocusColumnEdge
+                    , onFocusCell = FocusCell
+                    , onExitGrid = HandleEscape
+                    , onToggleInputMode = ToggleInputMode
+                    , onNewGame = RestartGame
+                    }
                 ]
-
-
-viewBoard : Bool -> Snapshot -> Html Msg
-viewBoard busy snapshot =
-    div
-        [ class "minesweeper-board"
-        , style "display" "grid"
-        , style "grid-template-columns" ("repeat(" ++ String.fromInt snapshot.cols ++ ", 2rem)")
-        , style "gap" "2px"
-        ]
-        (List.map (viewCell busy snapshot.status) snapshot.cells)
-
-
-viewCell : Bool -> Status -> Cell -> Html Msg
-viewCell busy status cell =
-    let
-        coord =
-            { row = cell.row, col = cell.col }
-
-        ( label, bgColor, textColor ) =
-            case cell.state of
-                Hidden ->
-                    ( "", "#4b5563", "#f9fafb" )
-
-                Flagged ->
-                    if Game.isWrongFlag status cell.state then
-                        ( "✕", "#7f1d1d", "#fecaca" )
-
-                    else
-                        ( "⚑", "#4b5563", "#facc15" )
-
-                Revealed 0 ->
-                    ( "", "#1f2937", "#e5e7eb" )
-
-                Revealed n ->
-                    ( String.fromInt n, "#1f2937", "#e5e7eb" )
-
-                Mine ->
-                    ( "💣", "#374151", "#f9fafb" )
-
-                Exploded ->
-                    ( "💥", "#991b1b", "#ffffff" )
-
-        onRightClick =
-            preventDefaultOn "contextmenu" (Decode.succeed ( ToggleFlag coord, True ))
-    in
-    button
-        [ type_ "button"
-        , class
-            (if cell.state == Exploded then
-                "board-cell board-cell--exploded"
-
-             else
-                "board-cell"
-            )
-        , style "width" "2rem"
-        , style "height" "2rem"
-        , style "padding" "0"
-        , style "background-color" bgColor
-        , style "color" textColor
-        , style "border" "1px solid #374151"
-        , disabled (busy || Game.isFinished status)
-        , onClick (RevealCell coord)
-        , onRightClick
-        , title ("Linha " ++ String.fromInt (cell.row + 1) ++ ", Coluna " ++ String.fromInt (cell.col + 1))
-        ]
-        [ text label ]
