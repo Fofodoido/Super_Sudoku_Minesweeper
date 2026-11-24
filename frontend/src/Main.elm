@@ -20,6 +20,7 @@ Responsável pelo modelo TEA, ciclo de vida das requisições HTTP, bloqueio de
 ações concorrentes, descarte de respostas de partidas antigas, recuperação via
 GET após timeout/falha incerta, tratamento de sessão perdida, cronômetro local
 e coordenação de foco, atalhos globais de teclado e modo de entrada com `Board`.
+
 -}
 
 import Api exposing (Action(..), ApiError)

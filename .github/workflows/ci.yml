@@ -28,7 +28,7 @@ jobs:
         run: make test-prolog
 
   elm:
-    name: Elm (0.19.1, elm-test 0.19.1-revision18)
+    name: Elm (0.19.1, elm-test e elm-format)
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
@@ -42,10 +42,12 @@ jobs:
         with:
           path: ~/.elm
           key: elm-${{ hashFiles('frontend/elm.json') }}
-      - name: Instalar elm e elm-test fixados
+      - name: Instalar elm, elm-test e elm-format fixados
         run: make deps
       - run: frontend/node_modules/.bin/elm --version
-      - name: Bundle versionado corresponde ao fonte
-        run: make check-bundle
+      - name: Verificar formatação Elm (elm-format)
+        run: make check-format
+      - name: Compilar bundle Elm (elm make --optimize)
+        run: make build
       - name: Testes Elm
         run: make test-elm

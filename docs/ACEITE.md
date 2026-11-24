@@ -14,6 +14,7 @@ procedimento de aceite no navegador. Cada frente mantém os testes da própria
 | SWI-Prolog | 10.0.2 | `.github/workflows/ci.yml` (`container: swipl:10.0.2`) |
 | Elm | 0.19.1 (npm `elm@0.19.1-5`) | `frontend/package.json` e `package-lock.json` |
 | elm-test | 0.19.1-revision18 | `frontend/package.json` e `package-lock.json` |
+| elm-format | 0.8.7 | `frontend/package.json` e `package-lock.json` |
 | elm-explorations/test | 2.2.1 | `frontend/elm.json` (`test-dependencies`) |
 | Node.js (só para instalar Elm) | 22 | `.github/workflows/ci.yml` |
 
@@ -29,7 +30,8 @@ make deps
 make ci
 make test
 make test-acceptance
-make check-bundle
+make check-format
+make build
 ```
 
 Sem `make`:
@@ -38,8 +40,8 @@ Sem `make`:
 for t in backend/tests/test_*.pl; do swipl -g run_tests -t halt "$t" || exit 1; done
 cd frontend
 npm ci
-npx elm make src/Main.elm --optimize --output=elm-stuff/elm.check.js
-cmp elm-stuff/elm.check.js public/elm.js
+npx elm-format src/ tests/ --validate
+npx elm make src/Main.elm --optimize --output=public/elm.js
 npx elm-test
 ```
 
@@ -50,8 +52,8 @@ docker run --rm -v "$PWD":/w -w /w swipl:10.0.2 \
   sh -c 'for t in backend/tests/test_*.pl; do swipl -g run_tests -t halt "$t" || exit 1; done'
 ```
 
-A compilação `elm make --optimize` do Elm 0.19.1 é determinística; por isso
-`check-bundle` compara byte a byte o bundle versionado com uma compilação nova.
+O artefato `frontend/public/elm.js` não é versionado no Git: `make build` (e
+`make run`) gera o bundle determinístico a partir dos módulos Elm.
 
 ## Testes integrados via HTTP
 
@@ -87,7 +89,7 @@ comparado com `adjacent_mines/5`.
 | 15 | Resposta antiga após novo jogo não afeta a partida nova | `acceptance:stale_game_isolated_after_new_game`, `elm:Descarte de respostas atrasadas` | Automatizado (servidor e cliente) |
 | 16 | Nenhuma mina, semente ou número oculto no JSON de partida ativa | `acceptance` (todas as respostas), `http:create_get_and_action` | Automatizado |
 | 17 | Ações concorrentes na mesma partida são serializadas | `http:concurrent_actions`, `sessions:concurrent_toggles_are_serialized` | Automatizado |
-| 18 | Bundle servido corresponde ao fonte Elm | `make check-bundle` (CI) | Automatizado |
+| 18 | Código Elm formatado (`elm-format`) e bundle compilável sem erros | `make check-format` e `make build` (CI) | Automatizado |
 | 19 | Cliente Elm: uma ação pendente por vez, timeout → GET, ignorar partida antiga, sessão perdida | `elm:Concorrência e recuperação após resultado incerto`, `elm:Sessão perdida e reinício` | Automatizado |
 | 20 | Navegador: mouse, teclado, toque, grade difícil em viewport móvel | Lógica em `elm:BoardTest` (foco, atalhos, modo bandeira, rótulos); uso real pelo procedimento abaixo | Manual: passou em 23/11/2026 |
 
@@ -110,7 +112,7 @@ e #14 (frente 05), Sudoku retirado, SWI-Prolog 10.0.2 (Docker) e Elm 0.19.1:
 | `test_minesweeper_sessions.pl` | 9 (+2) passaram |
 | `elm-test` (`MinesweeperTest.elm`, `BoardTest.elm`) | 46 passaram |
 | `swipl backend/server.pl` | Carrega sem avisos |
-| `make check-bundle` | `elm.js` corresponde ao fonte |
+| `make check-format` e `make build` | `elm-format` validado e `elm.js` compilado sem erros |
 | Servidor real (`docker … swipl backend/server.pl 8080`) | `/` serve "Campo Minado — Prolog + Elm", `/elm.js` 200, partida difícil criada e primeiro clique seguro via API |
 
 ## Procedimento de aceite no navegador

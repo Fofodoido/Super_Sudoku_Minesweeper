@@ -6,6 +6,7 @@ Firebomb), implementada em Elm + CSS externo (`frontend/public/style.css`).
 Os estilos e o suporte a `@media (prefers-reduced-motion: reduce)` ficam no
 stylesheet externo para evitar divergência de quebras de linha (CRLF/LF) no
 bundle `elm.js` entre ambientes Windows e Linux e respeitar acessibilidade.
+
 -}
 
 import Html exposing (Html, div)
