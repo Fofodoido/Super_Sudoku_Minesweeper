@@ -1,5 +1,6 @@
 SWIPL ?= swipl
 NPM   ?= npm
+UV    ?= uv
 PORT  ?= 8080
 
 FRONTEND := frontend
@@ -15,7 +16,7 @@ BUNDLE     := $(FRONTEND)/public/elm.js
 BUNDLE_TMP := elm-stuff/elm.check.js
 
 .PHONY: help deps build run test test-prolog test-minesweeper test-acceptance \
-        test-elm check-bundle ci clean
+        test-elm check-bundle ci validar clean
 
 help:
 	@echo "make deps              instala elm e elm-test fixados (npm ci em frontend/)"
@@ -28,6 +29,7 @@ help:
 	@echo "make test-elm          elm-test em frontend/tests"
 	@echo "make check-bundle      confere se $(BUNDLE) corresponde ao fonte"
 	@echo "make ci                test + check-bundle (o mesmo que o GitHub Actions)"
+	@echo "make validar           valida a entrega (scripts/validar_entrega.py, via uv)"
 
 deps:
 	cd $(FRONTEND) && $(NPM) ci
@@ -69,6 +71,9 @@ check-bundle:
 	fi
 
 ci: test check-bundle
+
+validar:
+	$(UV) run scripts/validar_entrega.py
 
 clean:
 	rm -rf $(BUNDLE) $(FRONTEND)/elm-stuff
